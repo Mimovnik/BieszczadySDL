@@ -37,5 +37,7 @@ public:
 	double bottomSide() {
 		return position.y + height / 2;
 	}
+
+	
 };
 
