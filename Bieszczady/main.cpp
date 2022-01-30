@@ -144,9 +144,6 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
 
-void move(Vector* position, Vector* velocity, double gameTime) {
-}
-
 int main(int argc, char* args[]) {
 	SDL_Surface* screen = nullptr;
 	SDL_Texture* screenTexture = nullptr;
