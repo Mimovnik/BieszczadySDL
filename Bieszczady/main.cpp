@@ -168,7 +168,12 @@ int main(int argc, char* args[]) {
 	}
 
 	SDL_Surface* heroSurface = loadBMP("bmp/witcher200.bmp", charset, screen, screenTexture, window, renderer);
-	RigidBody player = RigidBody(screenMiddle, heroSurface, 3);
+	RigidBody player = RigidBody(screenMiddle, heroSurface, 60, 88, 3);
+
+
+	Vector floorPosition = Vector(0, 600);
+	SDL_Surface* floorSurface = loadBMP("bmp/grass.bmp", charset, screen, screenTexture, window, renderer);
+	RigidBody floor = RigidBody(floorPosition, floorSurface, 22220, 21, 0);
 
 	theme = loadBMP("bmp/theme.bmp", charset, screen, screenTexture, window, renderer);
 
@@ -187,7 +192,7 @@ int main(int argc, char* args[]) {
 	bool quit = false;
 	double timeFactor = 0.01;
 	lastTime = SDL_GetTicks();
-	Vector camera = player.position;
+	Vector camera = player.hitbox.position;
 
 	double distance = 0;
 	double speed = 0.5;
@@ -207,11 +212,17 @@ int main(int argc, char* args[]) {
 
 		SDL_FillRect(screen, NULL, black);
 
-		camera = player.position.difference(screenMiddle);
+		camera = player.hitbox.position.difference(screenMiddle);
 
 		DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
 
+		Vector nullVector = Vector(0, 0);
+		Collision playerCollision = player.collide(floor, gameDelta);
+		if (playerCollision.exists) {
+			player.velocity = playerCollision.velocity;
+		}
 		player.move(gameDelta);
+		floor.draw(screen, camera);
 		player.draw(screen, camera);
 
 		fpsTimer += delta;

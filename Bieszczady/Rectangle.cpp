@@ -35,4 +35,3 @@ bool Rectangle::overlaps(Rectangle another) {
 		&& thisLeftSide < anotherRightSide
 		&& thisRightSide > anotherLeftSide;
 }
-
