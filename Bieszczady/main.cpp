@@ -5,6 +5,9 @@
 
 #include <SDL.h>
 #include <iostream>
+#include "Vector.h"
+#include "Rectangle.h"
+#include "RigidBody.h"
 
 #define FULLSCREEN_ON false
 #define MAX_FPS 150
@@ -18,17 +21,17 @@ void displaySetUp(SDL_Surface** charset, SDL_Surface** screen, SDL_Texture** scr
 	}
 
 	// tryb pe³noekranowy / fullscreen mode
-	int rc;
+	int rendererCreated;
 	if (FULLSCREEN_ON) {
-		rc = SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP,
+		rendererCreated = SDL_CreateWindowAndRenderer(0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP,
 			window, renderer);
 	}
 	else {
-		rc = SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0,
+		rendererCreated = SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0,
 			window, renderer);
 	}
 
-	if (rc != 0) {
+	if (rendererCreated != 0) {
 		SDL_Quit();
 		printf("SDL_CreateWindowAndRenderer error: %s\n", SDL_GetError());
 		throw 1;
@@ -62,7 +65,7 @@ void displaySetUp(SDL_Surface** charset, SDL_Surface** screen, SDL_Texture** scr
 	SDL_SetColorKey(*charset, true, 0x000000);
 }
 
-SDL_Surface* loadBMP(char* fileName, SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* scrtex, SDL_Window* window, SDL_Renderer* renderer) {
+SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* scrtex, SDL_Window* window, SDL_Renderer* renderer) {
 	SDL_Surface* surface = SDL_LoadBMP(fileName);
 	if (surface == NULL) {
 		printf("SDL_LoadBMP(%s) error: %s\n", fileName, SDL_GetError());
@@ -101,18 +104,16 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 	};
 };
 
-
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y)
 // (x, y) to punkt środka obrazka sprite na ekranie
-void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
+void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y, Vector offset) {
 	SDL_Rect dest;
-	dest.x = x - sprite->w / 2;
-	dest.y = y - sprite->h / 2;
+	dest.x = x - sprite->w / 2 - offset.x;
+	dest.y = y - sprite->h / 2 - offset.y;
 	dest.w = sprite->w;
 	dest.h = sprite->h;
 	SDL_BlitSurface(sprite, NULL, screen, &dest);
 };
-
 
 // rysowanie pojedynczego pixela
 void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
@@ -120,7 +121,6 @@ void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;
 };
-
 
 // rysowanie linii o długości l w pionie (gdy dx = 0, dy = 1) 
 // bądź poziomie (gdy dx = 1, dy = 0)
@@ -131,7 +131,6 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 c
 		y += dy;
 	};
 };
-
 
 // rysowanie prostokąta o długości boków l i k
 void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
@@ -145,14 +144,21 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
 
+void move(Vector* position, Vector* velocity, double gameTime) {
+}
+
 int main(int argc, char* args[]) {
-	SDL_Surface* screen = nullptr, *charset, *title;
+	SDL_Surface* screen = nullptr;
 	SDL_Texture* screenTexture = nullptr;
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
+	SDL_Surface* charset = nullptr,
+		* theme = nullptr;
+
 	SDL_Event event;
 
+	Vector screenMiddle = Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
 	try {
 		displaySetUp(&charset, &screen, &screenTexture, &window, &renderer);
@@ -161,18 +167,10 @@ int main(int argc, char* args[]) {
 		std::cerr << error;
 	}
 
+	SDL_Surface* heroSurface = loadBMP("bmp/witcher200.bmp", charset, screen, screenTexture, window, renderer);
+	RigidBody player = RigidBody(screenMiddle, heroSurface, 3);
 
-	title = SDL_LoadBMP("bmp/bieszczady.bmp");
-	if (title == NULL) {
-		printf("SDL_LoadBMP(bieszczady.bmp) error: %s\n", SDL_GetError());
-		SDL_FreeSurface(charset);
-		SDL_FreeSurface(screen);
-		SDL_DestroyTexture(screenTexture);
-		SDL_DestroyWindow(window);
-		SDL_DestroyRenderer(renderer);
-		SDL_Quit();
-		return 1;
-	};
+	theme = loadBMP("bmp/theme.bmp", charset, screen, screenTexture, window, renderer);
 
 	char text[128];
 	int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -188,8 +186,8 @@ int main(int argc, char* args[]) {
 	double gameDelta;
 	bool quit = false;
 	double timeFactor = 0.01;
-
-	//lastTime = SDL_GetTicks();
+	lastTime = SDL_GetTicks();
+	Vector camera = player.position;
 
 	double distance = 0;
 	double speed = 0.5;
@@ -209,8 +207,12 @@ int main(int argc, char* args[]) {
 
 		SDL_FillRect(screen, NULL, black);
 
-		DrawSurface(screen, title, SCREEN_WIDTH / 2 + sin(distance) * SCREEN_HEIGHT / 3,
-			SCREEN_HEIGHT / 2 + cos(distance) * SCREEN_HEIGHT / 3);
+		camera = player.position;
+
+		DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
+
+		player.move(gameDelta);
+		player.draw(screen, camera);
 
 		fpsTimer += delta;
 		if (fpsTimer > 500) {
@@ -234,21 +236,40 @@ int main(int argc, char* args[]) {
 		SDL_RenderPresent(renderer);
 
 		// obsługa zdarzeń (o ile jakieś zaszły)
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
-				else if (event.key.keysym.sym == SDLK_UP) speed = 1.0;
-				else if (event.key.keysym.sym == SDLK_DOWN) speed = 0.3;
-				break;
-			case SDL_KEYUP:
-				speed = 0.5;
-				break;
-			case SDL_QUIT:
-				quit = true;
-				break;
-			};
-		};
+		SDL_PumpEvents();//every gameSecond
+		const Uint8* KeyState = SDL_GetKeyboardState(NULL);
+		if (KeyState[SDL_SCANCODE_ESCAPE]) quit = 1;
+
+		double speedLength;
+		if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_S] || KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_D]) {
+			speedLength = player.velocity.magnitude() + player.accelerationRate;
+		}
+
+		if (KeyState[SDL_SCANCODE_W]) {
+			player.velocity = Vector::fromAngle(speedLength, 180);
+		}
+		if (KeyState[SDL_SCANCODE_S]) {
+			player.velocity = Vector::fromAngle(speedLength, 0);
+		}
+		if (KeyState[SDL_SCANCODE_A]) {
+			player.velocity = Vector::fromAngle(speedLength, -90);
+		}
+		if (KeyState[SDL_SCANCODE_D]) {
+			player.velocity = Vector::fromAngle(speedLength, 90);
+		}
+		if (KeyState[SDL_SCANCODE_W] && KeyState[SDL_SCANCODE_A]) {
+			player.velocity = Vector::fromAngle(speedLength, -135);
+		}
+		if (KeyState[SDL_SCANCODE_W] && KeyState[SDL_SCANCODE_D]) {
+			player.velocity = Vector::fromAngle(speedLength, 135);
+		}
+		if (KeyState[SDL_SCANCODE_S] && KeyState[SDL_SCANCODE_A]) {
+			player.velocity = Vector::fromAngle(speedLength, -45);
+		}
+		if (KeyState[SDL_SCANCODE_S] && KeyState[SDL_SCANCODE_D]) {
+			player.velocity = Vector::fromAngle(speedLength, 45);
+		}
+
 		frames++;
 	}
 
@@ -260,6 +281,6 @@ int main(int argc, char* args[]) {
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
-	
+
 	return 0;
 }
