@@ -207,7 +207,7 @@ int main(int argc, char* args[]) {
 
 		SDL_FillRect(screen, NULL, black);
 
-		camera = player.position;
+		camera = player.position.difference(screenMiddle);
 
 		DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
 

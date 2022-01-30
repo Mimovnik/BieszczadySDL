@@ -15,8 +15,8 @@ void RigidBody::move(double delta) {
 
 void RigidBody::draw(SDL_Surface* screen, Vector offset) {
 	SDL_Rect dest;
-	dest.x = position.x - surface->w / 2;
-	dest.y = position.y - surface->h / 2;
+	dest.x = position.x - surface->w / 2 - offset.x;
+	dest.y = position.y - surface->h / 2 - offset.y;
 	dest.w = surface->w;
 	dest.h = surface->h;
 	SDL_BlitSurface(surface, NULL, screen, &dest);
