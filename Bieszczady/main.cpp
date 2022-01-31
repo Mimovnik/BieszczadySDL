@@ -170,7 +170,7 @@ int main(int argc, char* args[]) {
 
 	Vector floorPosition = Vector(0, 600);
 	SDL_Surface* floorSurface = loadBMP("bmp/grass.bmp", charset, screen, screenTexture, window, renderer);
-	RigidBody floor = RigidBody(floorPosition, floorSurface, 22220, 21, 0);
+	RigidBody floor = RigidBody(floorPosition, floorSurface, 2000, 50, 0);
 
 	theme = loadBMP("bmp/theme.bmp", charset, screen, screenTexture, window, renderer);
 

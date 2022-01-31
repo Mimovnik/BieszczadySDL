@@ -1,0 +1,3 @@
+-grawitacja (chodzenie tylko w lewo i prawo oraz skok)
+-kafelkowanie bloków
+-lepsze tekstury
