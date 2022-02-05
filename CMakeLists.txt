@@ -6,8 +6,6 @@ set(SDL2_LIB_DIR lib/SDL2/x64)
 
 add_library(
     SOURCE_FILES
-    src/Collision.h
-    src/Collision.cpp
     src/Rectangle.h
     src/Rectangle.cpp
     src/RigidBody.h

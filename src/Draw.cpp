@@ -28,7 +28,7 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 // (x, y) to punkt środka obrazka sprite na ekranie
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y, Vector offset) {
 	SDL_Rect dest;
-	dest.x = x - sprite->w / 2 - offset.x;
+	dest.x = static_cast<int>(x - sprite->w / 2 - offset.x);
 	dest.y = y - sprite->h / 2 - offset.y;
 	dest.w = sprite->w;
 	dest.h = sprite->h;

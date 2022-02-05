@@ -2,7 +2,6 @@
 #include <SDL.h>
 #include "Vector.h"
 #include "Rectangle.h"
-#include "Collision.h"
 class RigidBody
 {
 	SDL_Surface* surface = nullptr;
@@ -19,7 +18,7 @@ public:
 
 	void draw(SDL_Surface* screen, Vector offset);
 
-	Collision collide(RigidBody another, double gameDelta);
+	void collide(RigidBody another, double gameDelta);
 
 private:
 	Rectangle leftHitbox();

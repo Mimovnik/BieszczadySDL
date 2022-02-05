@@ -3,9 +3,9 @@
 RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface,int width, int height, double accelerationRate) {
 	this->hitbox.position = startingPosition;
 	this->surface = surface;
-	this->accelerationRate = accelerationRate;
 	this->hitbox.width = width;
 	this->hitbox.height = height;
+	this->accelerationRate = accelerationRate;
 }
 
 
@@ -27,28 +27,23 @@ void RigidBody::draw(SDL_Surface* screen, Vector offset) {
 
 }
 
-Collision RigidBody::collide(RigidBody another, double gameDelta) {
-	Rectangle shadowHitbox = this->hitbox.translate(this->velocity.rescale(gameDelta));
-	Collision collision;
-	if (shadowHitbox.overlaps(another.hitbox)) {
-		collision.exists = true;
+void RigidBody::collide(RigidBody another, double gameDelta) {
+	Vector futureOffset = velocity.rescale(gameDelta).add(acceleration.rescale(gameDelta*gameDelta/2));
+	if (topHitbox().translate(futureOffset).overlaps(another.hitbox) || bottomHitbox().translate(futureOffset).overlaps(another.hitbox)) {
+		velocity.y = 0;
+		acceleration.y = 0;
+		futureOffset = velocity.rescale(gameDelta).add(acceleration.rescale(gameDelta*gameDelta/2));
 	}
-	else {
-		collision.exists = false;
+	if (leftHitbox().translate(futureOffset).overlaps(another.hitbox) || rightHitbox().translate(futureOffset).overlaps(another.hitbox)) {
+		velocity.x = 0;
+		acceleration.x = 0;
 	}
-	if (leftHitbox().translate(this->velocity.rescale(gameDelta)).overlaps(another.hitbox) || rightHitbox().translate(this->velocity.rescale(gameDelta)).overlaps(another.hitbox)) {
-		collision.acceleration.x = 0;
-	}
-	if (topHitbox().translate(this->velocity.rescale(gameDelta)).overlaps(another.hitbox) || bottomHitbox().translate(this->velocity.rescale(gameDelta)).overlaps(another.hitbox)) {
-		collision.acceleration.y = 0;
-	}
-	return collision;
 }
 
 Rectangle RigidBody::leftHitbox() {
 	Rectangle leftHitbox;
 	leftHitbox.width = 10;
-	leftHitbox.height = hitbox.height;
+	leftHitbox.height = hitbox.height - 2;
 	leftHitbox.position.x = hitbox.leftSide() + 5;
 	leftHitbox.position.y = hitbox.position.y;
 	return leftHitbox;
@@ -57,7 +52,7 @@ Rectangle RigidBody::leftHitbox() {
 Rectangle RigidBody::rightHitbox() {
 	Rectangle rightHitbox;
 	rightHitbox.width = 10;
-	rightHitbox.height = hitbox.height;
+	rightHitbox.height = hitbox.height - 2;
 	rightHitbox.position.x = hitbox.rightSide() - 5;
 	rightHitbox.position.y = hitbox.position.y;
 	return rightHitbox;
@@ -65,7 +60,7 @@ Rectangle RigidBody::rightHitbox() {
 
 Rectangle RigidBody::topHitbox() {
 	Rectangle topHitbox;
-	topHitbox.width = hitbox.width;
+	topHitbox.width = hitbox.width - 2;
 	topHitbox.height = 10;
 	topHitbox.position.x = hitbox.position.x;
 	topHitbox.position.y = hitbox.topSide() + 5;
@@ -74,7 +69,7 @@ Rectangle RigidBody::topHitbox() {
 
 Rectangle RigidBody::bottomHitbox() {
 	Rectangle botHitbox;
-	botHitbox.width = hitbox.width;
+	botHitbox.width = hitbox.width - 2;
 	botHitbox.height = 10;
 	botHitbox.position.x = hitbox.position.x;
 	botHitbox.position.y = hitbox.bottomSide() - 5;

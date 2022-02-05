@@ -82,7 +82,6 @@ SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset, SDL_Surface* sc
 	return surface;
 }
 
-
 int main(int argc, char* args[]) {
 	SDL_Surface* screen = nullptr;
 	SDL_Texture* screenTexture = nullptr;
@@ -133,8 +132,7 @@ int main(int argc, char* args[]) {
 
 	double distance = 0;
 	double speed = 0.5;
-
-    double pumpTime = 0;
+		Vector gravity = Vector(0, 2);
 
 	while (!quit) {
 		currentTime = SDL_GetTicks();
@@ -155,12 +153,10 @@ int main(int argc, char* args[]) {
 
 		DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
 
-        player.acceleration = Vector(0, 2);
-		Collision playerCollision = player.collide(floor, gameDelta);
-		if (playerCollision.exists) {
-            player.velocity = Vector::ZERO;
-			player.acceleration = playerCollision.acceleration;
-		}
+        player.acceleration = gravity;
+
+		player.collide(floor, gameDelta);
+		
         printf("Player's velocity: x = %.8f y = %.8f\n", player.velocity.x, player.velocity.y);
 		floor.draw(screen, camera);
 		player.draw(screen, camera);
@@ -192,16 +188,13 @@ int main(int argc, char* args[]) {
 		if (KeyState[SDL_SCANCODE_ESCAPE]) quit = 1;
 
 		if (KeyState[SDL_SCANCODE_W]) {
-			player.acceleration = player.acceleration.add(Vector::fromAngle(player.accelerationRate, 180));
-		}
-        if (KeyState[SDL_SCANCODE_S]) {
-			player.acceleration = player.acceleration.add(Vector::fromAngle(player.accelerationRate, 0));
+			player.acceleration = player.acceleration.add(Vector(0, -player.accelerationRate));
 		}
 		if (KeyState[SDL_SCANCODE_A]) {
-			player.acceleration = player.acceleration.add(Vector::fromAngle(player.accelerationRate, -90));
+			player.acceleration = player.acceleration.add(Vector(-player.accelerationRate, 0));
 		}
 		if (KeyState[SDL_SCANCODE_D]) {
-			player.acceleration = player.acceleration.add(Vector::fromAngle(player.accelerationRate, 90));
+			player.acceleration = player.acceleration.add(Vector(player.accelerationRate, 0));
 		}
 		
         
