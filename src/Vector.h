@@ -8,6 +8,7 @@ class Vector
 public:
 	double x;
 	double y;
+	const static Vector ZERO;
 
 	Vector() {
 		x = 0;
@@ -23,10 +24,6 @@ public:
 		double x = length * sin(angle * PI / 180);
 		double y = length * cos(angle * PI / 180);
 		return Vector(x, y);
-	}
-
-	static Vector nullVector(){
-		return Vector(0, 0);
 	}
 
 	Vector difference(Vector other) {

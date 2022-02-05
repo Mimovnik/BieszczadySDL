@@ -13,7 +13,6 @@ public:
 	double mass;
 	Rectangle hitbox;
 
-
 	RigidBody(Vector startingPosition, SDL_Surface* surface,int width, int height, double accelerationRate);
 
 	void move(double gameDelta);

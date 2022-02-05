@@ -14,6 +14,7 @@ add_library(
     src/RigidBody.cpp
     src/Vector.h
     src/Vector.cpp
+    src/Draw.cpp
 )
 
 include_directories(${SDL2_INCLUDE_DIR})
