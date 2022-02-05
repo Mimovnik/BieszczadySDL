@@ -6,4 +6,6 @@ class Alive : public RigidBody {
     
 
     void jump(RigidBody another);
+
+    void move(char direction, RigidBody another);
 };

@@ -17,7 +17,7 @@ class RigidBody {
     RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
               int height, double accelerationRate);
 
-    void calculatePosition(double gameDelta);
+    void calculatePosition(double gameDelta, RigidBody another);
 
     void draw(SDL_Surface* screen, Vector offset);
 

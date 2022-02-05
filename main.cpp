@@ -6,10 +6,10 @@
 
 #include <iostream>
 
+#include "src/Alive.h"
 #include "src/Draw.cpp"
 #include "src/Rectangle.h"
 #include "src/RigidBody.h"
-#include "src/Alive.h"
 #include "src/Vector.h"
 
 #define FULLSCREEN_ON false
@@ -164,8 +164,14 @@ int main(int argc, char* args[]) {
 
         player.collide(floor, gameDelta);
 
-        printf("Player's velocity: x = %.8f y = %.8f\n", player.velocity.x,
-               player.velocity.y);
+        printf(
+            "Player's position: x = %.8f y = %.8f "
+            "velocity: x = %.8f y = %.8f "
+            "acceleration: x = %.8f y = %.8f\n",
+            player.hitbox.position.x, player.hitbox.position.y,
+            player.velocity.x, player.velocity.y, player.acceleration.x,
+            player.acceleration.y);
+
         floor.draw(screen, camera);
         player.draw(screen, camera);
 
@@ -205,15 +211,13 @@ int main(int argc, char* args[]) {
             player.jump(floor);
         }
         if (KeyState[SDL_SCANCODE_A]) {
-            player.acceleration =
-                player.acceleration.add(Vector(-player.accelerationRate, 0));
+            player.move('R', floor);
         }
         if (KeyState[SDL_SCANCODE_D]) {
-            player.acceleration =
-                player.acceleration.add(Vector(player.accelerationRate, 0));
+            player.move('L', floor);
         }
 
-        player.calculatePosition(gameDelta);
+        player.calculatePosition(gameDelta, floor);
 
         frames++;
     }
