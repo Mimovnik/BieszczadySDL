@@ -1,29 +1,31 @@
 #pragma once
 #include <SDL.h>
-#include "Vector.h"
+
 #include "Rectangle.h"
-class RigidBody
-{
-	SDL_Surface* surface = nullptr;
-public:
-	Vector velocity;
-	Vector acceleration;
-	double accelerationRate;
-	double mass;
-	Rectangle hitbox;
+#include "Vector.h"
+class RigidBody {
+   public:
+    SDL_Surface* surface = nullptr;
+    Vector velocity;
+    Vector acceleration;
+    double accelerationRate;
+    double mass;
+    Rectangle hitbox;
 
-	RigidBody(Vector startingPosition, SDL_Surface* surface,int width, int height, double accelerationRate);
+    RigidBody(){};
 
-	void move(double gameDelta);
+    RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
+              int height, double accelerationRate);
 
-	void draw(SDL_Surface* screen, Vector offset);
+    void calculatePosition(double gameDelta);
 
-	void collide(RigidBody another, double gameDelta);
+    void draw(SDL_Surface* screen, Vector offset);
 
-private:
-	Rectangle leftHitbox();
-	Rectangle rightHitbox();
-	Rectangle topHitbox();
-	Rectangle bottomHitbox();
+    void collide(RigidBody another, double gameDelta);
 
+   protected:
+    Rectangle leftHitbox();
+    Rectangle rightHitbox();
+    Rectangle topHitbox();
+    Rectangle bottomHitbox();
 };

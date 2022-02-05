@@ -10,6 +10,8 @@ add_library(
     src/Rectangle.cpp
     src/RigidBody.h
     src/RigidBody.cpp
+    src/Alive.h
+    src/Alive.cpp
     src/Vector.h
     src/Vector.cpp
     src/Draw.cpp

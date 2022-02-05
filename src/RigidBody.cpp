@@ -8,8 +8,7 @@ RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface,int width, in
 	this->accelerationRate = accelerationRate;
 }
 
-
-void RigidBody::move(double gameDelta) {
+void RigidBody::calculatePosition(double gameDelta) {
 	// const double frictionFactor = 0.5;
 	// Vector friction = velocity.rescale(frictionFactor);
 	// Vector netAcceleration = acceleration.difference(friction);
