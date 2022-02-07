@@ -145,7 +145,7 @@ Vector boxPosition = screenMiddle.add(Vector(200,120));
 
     double distance = 0;
     double speed = 0.5;
-    Vector gravity = Vector(0, 2);
+    Vector gravity = Vector(0, 10);
 
     while (!quit) {
         currentTime = SDL_GetTicks();

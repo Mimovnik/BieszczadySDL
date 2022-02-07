@@ -13,6 +13,9 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
     const double frictionFactor = 7;
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
+    if(velocity.x < 0.5 && velocity.x > -0.5) {
+        velocity.x = 0;
+    }
     if (bottomHitbox().translate(below).overlaps(another.hitbox)) {
         if (velocity.x > 0) {
             friction = Vector(frictionFactor, 0);

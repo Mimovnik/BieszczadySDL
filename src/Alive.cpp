@@ -15,7 +15,7 @@ Alive::Alive(Vector startingPosition, SDL_Surface* surface, int width,
 void Alive::jump(RigidBody another) {
     Vector below = Vector(0, 1);
     if (bottomHitbox().translate(below).overlaps(another.hitbox)) {
-        acceleration.y = -200;
+        acceleration.y = -500;
     }
 }
 
