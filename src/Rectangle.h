@@ -19,6 +19,7 @@ public:
 	bool contains(Vector point);
 
 	bool overlaps(Rectangle another);
+	bool overlaps(Rectangle* others, int othersCount);
 
 	Rectangle translate(Vector offset);
 

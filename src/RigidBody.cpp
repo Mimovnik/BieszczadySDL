@@ -31,6 +31,34 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
+void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
+                                  int othersCount) {
+    const double frictionFactor = 7;
+    Vector friction = Vector::ZERO;
+    Vector below = Vector(0, 5);
+    if (velocity.x < 0.1 && velocity.x > -0.1) {
+        velocity.x = 0;
+    }
+    Rectangle* othersHitboxes = new Rectangle[othersCount];
+    for (int i = 0; i < othersCount; i++) {
+        othersHitboxes[i] = others[i].hitbox;
+    }
+    if (bottomHitbox().translate(below).overlaps(othersHitboxes, othersCount)) {
+        if (velocity.x > 0) {
+            friction = Vector(frictionFactor, 0);
+        } else if (velocity.x < 0) {
+            friction = Vector(-frictionFactor, 0);
+        }
+    }
+    delete[] othersHitboxes;
+
+    acceleration = acceleration.difference(friction);
+    velocity = velocity.add(acceleration.rescale(gameDelta));
+    if (velocity.x > maxSpeed) velocity.x = maxSpeed;
+    if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
+    hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
+}
+
 void RigidBody::draw(SDL_Surface* screen, Vector offset) {
     SDL_Rect dest;
     dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
@@ -55,6 +83,37 @@ void RigidBody::collide(RigidBody another, double gameDelta) {
         velocity.x = 0;
         acceleration.x = 0;
     }
+}
+
+void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
+    Vector futureOffset = velocity.rescale(gameDelta).add(
+        acceleration.rescale(gameDelta * gameDelta / 2));
+    Rectangle* othersHitboxes = new Rectangle[othersCount];
+    for (int i = 0; i < othersCount; i++) {
+        if(&others[i] == this) continue;
+        othersHitboxes[i] = others[i].hitbox;
+    }
+    if (topHitbox()
+            .translate(futureOffset)
+            .overlaps(othersHitboxes, othersCount) ||
+        bottomHitbox()
+            .translate(futureOffset)
+            .overlaps(othersHitboxes, othersCount)) {
+        velocity.y = 0;
+        acceleration.y = 0;
+        futureOffset = velocity.rescale(gameDelta).add(
+            acceleration.rescale(gameDelta * gameDelta / 2));
+    }
+    if (leftHitbox()
+            .translate(futureOffset)
+            .overlaps(othersHitboxes, othersCount) ||
+        rightHitbox()
+            .translate(futureOffset)
+            .overlaps(othersHitboxes, othersCount)) {
+        velocity.x = 0;
+        acceleration.x = 0;
+    }
+    delete[] othersHitboxes;
 }
 
 Rectangle RigidBody::leftHitbox() {

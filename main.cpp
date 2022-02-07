@@ -90,25 +90,26 @@ SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset,
     return surface;
 }
 
-int control(Alive* entity, double realTime, RigidBody colObj1, RigidBody box) {
+bool control(Alive* entity, double realTime, RigidBody colObj1,
+             RigidBody* boxes, int boxesCount) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
-    if (KeyState[SDL_SCANCODE_ESCAPE]) return 1;
+    if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
 
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP] ||
         KeyState[SDL_SCANCODE_SPACE]) {
         entity->jump(colObj1, realTime);
-        entity->jump(box, realTime);
+        entity->jump(boxes, boxesCount, realTime);
     }
     if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
         entity->move('R', colObj1);
-        entity->move('R', box);
+        entity->move('R', boxes, boxesCount);
     }
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
         entity->move('L', colObj1);
-        entity->move('L', box);
+        entity->move('L', boxes, boxesCount);
     }
-    return 0;
+    return false;
 }
 
 int main(int argc, char* args[]) {
@@ -137,7 +138,7 @@ int main(int argc, char* args[]) {
     int hitboxHeigth = 88;
     double walkAcceleration = 10;
     double maxSpeed = 30;
-    double jumpHeight = 50;
+    double jumpHeight = 40;
     double jumpCooldown = 0.5;
     Alive player = Alive(screenMiddle, heroSurface, hitboxWidth, hitboxHeigth,
                          maxSpeed, walkAcceleration, jumpHeight, jumpCooldown);
@@ -147,10 +148,27 @@ int main(int argc, char* args[]) {
                                         screenTexture, window, renderer);
     RigidBody floor = RigidBody(floorPosition, floorSurface, 1920, 63);
 
-    Vector boxPosition = screenMiddle.add(Vector(200, 120));
+    const int boxesCount = 32;
+    Vector boxesPositions[boxesCount];
+    RigidBody boxes[boxesCount];
     SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
                                       screenTexture, window, renderer);
-    RigidBody box = RigidBody(boxPosition, boxSurface, 64, 64);
+    for (int i = 0; i < boxesCount; i++) {
+        //boxes' positions setup
+        if (i < boxesCount / 4) {
+            boxesPositions[i] = screenMiddle.add(Vector(i * 64, 128));
+        } else if (i < 2 * boxesCount / 4) {
+            boxesPositions[i] =
+                screenMiddle.add(Vector((i - 2) * 64, 192));
+        } else if (i < 3 * boxesCount / 4) {
+            boxesPositions[i] =
+                screenMiddle.add(Vector((i - 13) * 64, 256));
+        } else {
+            boxesPositions[i] =
+                screenMiddle.add(Vector((i - 17) * 64, 320));
+        }
+        boxes[i] = RigidBody(boxesPositions[i], boxSurface, 64, 64);
+    }
 
     theme = loadBMP("../bmp/theme.bmp", charset, screen, screenTexture, window,
                     renderer);
@@ -163,16 +181,14 @@ int main(int argc, char* args[]) {
     int blue = SDL_MapRGB(screen->format, 51, 204, 255);
     int brown = SDL_MapRGB(screen->format, 102, 51, 0);
 
-    int currentTime, delta;
     int lastTime = 0, frames = 0;
-    double fpsTimer = 0, fps = 0, realTime = 0, gameTime = 0;
+    int currentTime, delta;
+    double fpsTimer = 0, fps = 0, realTime = 0, gameTime = 0, timeFactor = 0.01;
     double gameDelta;
     bool quit = false;
-    double timeFactor = 0.01;
     lastTime = SDL_GetTicks();
-    Vector camera = player.hitbox.position;
+    Vector camera;
 
-    double distance = 0;
     double speed = 0.5;
     Vector gravity = Vector(0, 10);
 
@@ -186,8 +202,6 @@ int main(int argc, char* args[]) {
         realTime += delta;
         gameTime += gameDelta;
 
-        distance += speed * gameDelta;
-
         SDL_FillRect(screen, NULL, black);
 
         camera = player.hitbox.position.difference(screenMiddle);
@@ -195,16 +209,25 @@ int main(int argc, char* args[]) {
         DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
 
         player.acceleration = gravity;
-        box.acceleration = gravity;
+        for (int i = 0; i < boxesCount; i++) {
+            boxes[i].acceleration = gravity;
+        }
 
-        quit = control(&player, realTime / 1000, floor, box);
+        quit = control(&player, realTime / 1000, floor, boxes, boxesCount);
 
         player.collide(floor, gameDelta);
-        box.collide(floor, gameDelta);
-        player.collide(box, gameDelta);
+        player.collide(boxes, boxesCount, gameDelta);
+
+        for (int i = 0; i < boxesCount; i++) {
+            boxes[i].collide(floor, gameDelta);
+            boxes[i].collide(boxes, boxesCount, gameDelta);
+        }
+        // dont collide with yourself
 
         floor.draw(screen, camera);
-        box.draw(screen, camera);
+        for (int i = 0; i < boxesCount; i++) {
+            boxes[i].draw(screen, camera);
+        }
         player.draw(screen, camera);
 
         fpsTimer += delta;
@@ -235,13 +258,15 @@ int main(int argc, char* args[]) {
 
         // obsługa zdarzeń (o ile jakieś zaszły)
 
-        player.calculatePosition(gameDelta, floor);
-        box.calculatePosition(gameDelta, floor);
+        player.calculatePosition(gameDelta, boxes, boxesCount);
+        for (int i = 0; i < boxesCount; i++) {
+            boxes[i].calculatePosition(gameDelta, floor);
+        }
 
         printf(
-            "Player's position: x = %.8f y = %.8f "
+            "Player's position: x = %.2f y = %.2f "
             "velocity: x = %.8f y = %.8f "
-            "acceleration: x = %.8f y = %.8f\n",
+            "acceleration: x = %.4f y = %.4f\n",
             player.hitbox.position.x, player.hitbox.position.y,
             player.velocity.x, player.velocity.y, player.acceleration.x,
             player.acceleration.y);
