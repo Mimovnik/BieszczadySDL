@@ -90,6 +90,27 @@ SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset,
     return surface;
 }
 
+int control(Alive* entity, double realTime, RigidBody colObj1, RigidBody box) {
+    SDL_PumpEvents();
+    const Uint8* KeyState = SDL_GetKeyboardState(NULL);
+    if (KeyState[SDL_SCANCODE_ESCAPE]) return 1;
+
+    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP] ||
+        KeyState[SDL_SCANCODE_SPACE]) {
+        entity->jump(colObj1, realTime);
+        entity->jump(box, realTime);
+    }
+    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
+        entity->move('R', colObj1);
+        entity->move('R', box);
+    }
+    if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
+        entity->move('L', colObj1);
+        entity->move('L', box);
+    }
+    return 0;
+}
+
 int main(int argc, char* args[]) {
     SDL_Surface* screen = nullptr;
     SDL_Texture* screenTexture = nullptr;
@@ -111,17 +132,25 @@ int main(int argc, char* args[]) {
 
     SDL_Surface* heroSurface = loadBMP("../bmp/witcher200.bmp", charset, screen,
                                        screenTexture, window, renderer);
-    Alive player = Alive(screenMiddle, heroSurface, 60, 88, 10);
+
+    int hitboxWidth = 60;
+    int hitboxHeigth = 88;
+    double walkAcceleration = 10;
+    double maxSpeed = 30;
+    double jumpHeight = 50;
+    double jumpCooldown = 0.5;
+    Alive player = Alive(screenMiddle, heroSurface, hitboxWidth, hitboxHeigth,
+                         maxSpeed, walkAcceleration, jumpHeight, jumpCooldown);
 
     Vector floorPosition = Vector(320, 750);
     SDL_Surface* floorSurface = loadBMP("../bmp/floor.bmp", charset, screen,
                                         screenTexture, window, renderer);
-    RigidBody floor = RigidBody(floorPosition, floorSurface, 1920, 63, 0);
+    RigidBody floor = RigidBody(floorPosition, floorSurface, 1920, 63);
 
-Vector boxPosition = screenMiddle.add(Vector(200,120));
+    Vector boxPosition = screenMiddle.add(Vector(200, 120));
     SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
-                                        screenTexture, window, renderer);
-    RigidBody box = RigidBody(boxPosition, boxSurface, 64, 64, 0);
+                                      screenTexture, window, renderer);
+    RigidBody box = RigidBody(boxPosition, boxSurface, 64, 64);
 
     theme = loadBMP("../bmp/theme.bmp", charset, screen, screenTexture, window,
                     renderer);
@@ -168,6 +197,8 @@ Vector boxPosition = screenMiddle.add(Vector(200,120));
         player.acceleration = gravity;
         box.acceleration = gravity;
 
+        quit = control(&player, realTime / 1000, floor, box);
+
         player.collide(floor, gameDelta);
         box.collide(floor, gameDelta);
         player.collide(box, gameDelta);
@@ -186,15 +217,14 @@ Vector boxPosition = screenMiddle.add(Vector(200,120));
         // tekst informacyjny
         DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, silver, brown);
 
-        sprintf_s(text,
-                  "Szablon drugiego zadania, czas trwania = %.1lf s  %.0lf "
-                  "klatek / s",
+        sprintf_s(text, "Czas trwania = %.1lf s  %.0lf klatek / s",
                   realTime / 1000, fps);
         DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text,
                    charset);
         //	      "Esc - exit, \030 - faster, \031 - slower"
         sprintf_s(text,
-                  "Esc - wyjscie, \030 - przyspieszenie, \031 - zwolnienie");
+                  "Esc - wyjscie, W / \030 - skok, A / \032 oraz D / \033 - "
+                  "sterowanie");
         DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text,
                    charset);
 
@@ -204,34 +234,17 @@ Vector boxPosition = screenMiddle.add(Vector(200,120));
         SDL_RenderPresent(renderer);
 
         // obsługa zdarzeń (o ile jakieś zaszły)
-        SDL_PumpEvents();
-        const Uint8* KeyState = SDL_GetKeyboardState(NULL);
-        if (KeyState[SDL_SCANCODE_ESCAPE]) quit = 1;
-
-        if (KeyState[SDL_SCANCODE_W]) {
-            player.jump(floor);
-            player.jump(box);
-        }
-        if (KeyState[SDL_SCANCODE_A]) {
-            player.move('R', floor);
-            player.move('R', box);
-        }
-        if (KeyState[SDL_SCANCODE_D]) {
-            player.move('L', floor);
-            player.move('L', box);
-        }
 
         player.calculatePosition(gameDelta, floor);
         box.calculatePosition(gameDelta, floor);
 
-printf(
+        printf(
             "Player's position: x = %.8f y = %.8f "
             "velocity: x = %.8f y = %.8f "
             "acceleration: x = %.8f y = %.8f\n",
             player.hitbox.position.x, player.hitbox.position.y,
             player.velocity.x, player.velocity.y, player.acceleration.x,
             player.acceleration.y);
-
 
         frames++;
     }

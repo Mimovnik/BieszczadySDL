@@ -8,14 +8,14 @@ class RigidBody {
     SDL_Surface* surface = nullptr;
     Vector velocity;
     Vector acceleration;
-    double accelerationRate;
     double mass;
     Rectangle hitbox;
+    double maxSpeed;
 
     RigidBody(){};
 
     RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-              int height, double accelerationRate);
+              int height, double maxSpeed = 10);
 
     void calculatePosition(double gameDelta, RigidBody another);
 

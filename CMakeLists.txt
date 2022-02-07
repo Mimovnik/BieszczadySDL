@@ -15,6 +15,7 @@ add_library(
     src/Vector.h
     src/Vector.cpp
     src/Draw.cpp
+    src/Timer.h
 )
 
 include_directories(${SDL2_INCLUDE_DIR})

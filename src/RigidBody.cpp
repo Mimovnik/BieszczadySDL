@@ -1,19 +1,19 @@
 #include "RigidBody.h"
 
 RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-                     int height, double accelerationRate) {
+                     int height, double maxSpeed) {
     this->hitbox.position = startingPosition;
     this->surface = surface;
     this->hitbox.width = width;
     this->hitbox.height = height;
-    this->accelerationRate = accelerationRate;
+    this->maxSpeed = maxSpeed;
 }
 
 void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
     const double frictionFactor = 7;
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
-    if(velocity.x < 0.5 && velocity.x > -0.5) {
+    if (velocity.x < 0.1 && velocity.x > -0.1) {
         velocity.x = 0;
     }
     if (bottomHitbox().translate(below).overlaps(another.hitbox)) {
@@ -26,9 +26,8 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
     acceleration = acceleration.difference(friction);
 
     velocity = velocity.add(acceleration.rescale(gameDelta));
-    double maxVelocity = 20;
-    if (velocity.x > maxVelocity) velocity.x = maxVelocity;
-    if (velocity.x < -maxVelocity) velocity.x = -maxVelocity;
+    if (velocity.x > maxSpeed) velocity.x = maxSpeed;
+    if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
