@@ -10,7 +10,7 @@ RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
 }
 
 void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
-    const double frictionFactor = 2;
+    const double frictionFactor = 7;
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
     if (bottomHitbox().translate(below).overlaps(another.hitbox)) {
@@ -20,8 +20,12 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
             friction = Vector(-frictionFactor, 0);
         }
     }
-    Vector netAcceleration = acceleration.difference(friction);
-    velocity = velocity.add(netAcceleration.rescale(gameDelta));
+    acceleration = acceleration.difference(friction);
+
+    velocity = velocity.add(acceleration.rescale(gameDelta));
+    double maxVelocity = 20;
+    if (velocity.x > maxVelocity) velocity.x = maxVelocity;
+    if (velocity.x < -maxVelocity) velocity.x = -maxVelocity;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 

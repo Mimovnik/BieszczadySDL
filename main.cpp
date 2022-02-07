@@ -111,12 +111,17 @@ int main(int argc, char* args[]) {
 
     SDL_Surface* heroSurface = loadBMP("../bmp/witcher200.bmp", charset, screen,
                                        screenTexture, window, renderer);
-    Alive player = Alive(screenMiddle, heroSurface, 60, 88, 3);
+    Alive player = Alive(screenMiddle, heroSurface, 60, 88, 10);
 
     Vector floorPosition = Vector(320, 750);
     SDL_Surface* floorSurface = loadBMP("../bmp/floor.bmp", charset, screen,
                                         screenTexture, window, renderer);
     RigidBody floor = RigidBody(floorPosition, floorSurface, 1920, 63, 0);
+
+Vector boxPosition = screenMiddle.add(Vector(200,120));
+    SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
+                                        screenTexture, window, renderer);
+    RigidBody box = RigidBody(boxPosition, boxSurface, 64, 64, 0);
 
     theme = loadBMP("../bmp/theme.bmp", charset, screen, screenTexture, window,
                     renderer);
@@ -161,18 +166,14 @@ int main(int argc, char* args[]) {
         DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
 
         player.acceleration = gravity;
+        box.acceleration = gravity;
 
         player.collide(floor, gameDelta);
-
-        printf(
-            "Player's position: x = %.8f y = %.8f "
-            "velocity: x = %.8f y = %.8f "
-            "acceleration: x = %.8f y = %.8f\n",
-            player.hitbox.position.x, player.hitbox.position.y,
-            player.velocity.x, player.velocity.y, player.acceleration.x,
-            player.acceleration.y);
+        box.collide(floor, gameDelta);
+        player.collide(box, gameDelta);
 
         floor.draw(screen, camera);
+        box.draw(screen, camera);
         player.draw(screen, camera);
 
         fpsTimer += delta;
@@ -209,15 +210,28 @@ int main(int argc, char* args[]) {
 
         if (KeyState[SDL_SCANCODE_W]) {
             player.jump(floor);
+            player.jump(box);
         }
         if (KeyState[SDL_SCANCODE_A]) {
             player.move('R', floor);
+            player.move('R', box);
         }
         if (KeyState[SDL_SCANCODE_D]) {
             player.move('L', floor);
+            player.move('L', box);
         }
 
         player.calculatePosition(gameDelta, floor);
+        box.calculatePosition(gameDelta, floor);
+
+printf(
+            "Player's position: x = %.8f y = %.8f "
+            "velocity: x = %.8f y = %.8f "
+            "acceleration: x = %.8f y = %.8f\n",
+            player.hitbox.position.x, player.hitbox.position.y,
+            player.velocity.x, player.velocity.y, player.acceleration.x,
+            player.acceleration.y);
+
 
         frames++;
     }
