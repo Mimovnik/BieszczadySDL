@@ -15,7 +15,12 @@ add_library(
     src/Vector.h
     src/Vector.cpp
     src/Draw.cpp
+    src/LoadBMP.cpp
     src/Timer.h
+    src/Terrain.h
+    src/Terrain.cpp
+    src/PerlinNoise.h
+    src/PerlinNoise.cpp
 )
 
 include_directories(${SDL2_INCLUDE_DIR})

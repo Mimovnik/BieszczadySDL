@@ -8,14 +8,19 @@
 
 #include "src/Alive.h"
 #include "src/Draw.cpp"
+#include "src/LoadBMP.cpp"
 #include "src/Rectangle.h"
 #include "src/RigidBody.h"
+#include "src/Terrain.h"
 #include "src/Vector.h"
 
 #define FULLSCREEN_ON false
 #define MAX_FPS 150
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 1680
+#define SCREEN_HEIGHT 840
+
+#define CENTER_X 0
+#define CENTER_Y 0
 
 void displaySetUp(SDL_Surface** charset, SDL_Surface** screen,
                   SDL_Texture** screenTexture, SDL_Window** window,
@@ -72,24 +77,6 @@ void displaySetUp(SDL_Surface** charset, SDL_Surface** screen,
     SDL_SetColorKey(*charset, true, 0x000000);
 }
 
-SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset,
-                     SDL_Surface* screen, SDL_Texture* scrtex,
-                     SDL_Window* window, SDL_Renderer* renderer) {
-    SDL_Surface* surface = SDL_LoadBMP(fileName);
-    if (surface == NULL) {
-        printf("SDL_LoadBMP(%s) error: %s\n", fileName, SDL_GetError());
-        SDL_FreeSurface(charset);
-        SDL_FreeSurface(screen);
-        SDL_DestroyTexture(scrtex);
-        SDL_DestroyWindow(window);
-        SDL_DestroyRenderer(renderer);
-        SDL_Quit();
-        throw 1;
-    };
-    SDL_SetColorKey(surface, true, SDL_MapRGB(surface->format, 255, 0, 255));
-    return surface;
-}
-
 bool control(Alive* entity, double realTime, RigidBody colObj1,
              RigidBody* boxes, int boxesCount) {
     SDL_PumpEvents();
@@ -112,6 +99,27 @@ bool control(Alive* entity, double realTime, RigidBody colObj1,
     return false;
 }
 
+bool noclip(Alive* entity) {
+    SDL_PumpEvents();
+    const Uint8* KeyState = SDL_GetKeyboardState(NULL);
+    if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
+
+    double accel = 10;
+    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP]) {
+        entity->acceleration = entity->acceleration.add(Vector(0, -accel));
+    }
+    if (KeyState[SDL_SCANCODE_S] || KeyState[SDL_SCANCODE_DOWN]) {
+        entity->acceleration = entity->acceleration.add(Vector(0, accel));
+    }
+    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
+        entity->acceleration = entity->acceleration.add(Vector(-accel, 0));
+    }
+    if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
+        entity->acceleration = entity->acceleration.add(Vector(accel, 0));
+    }
+    return false;
+}
+
 int main(int argc, char* args[]) {
     SDL_Surface* screen = nullptr;
     SDL_Texture* screenTexture = nullptr;
@@ -121,6 +129,7 @@ int main(int argc, char* args[]) {
     SDL_Surface *charset = nullptr, *theme = nullptr;
 
     Vector screenMiddle = Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    Vector center = Vector(CENTER_X, CENTER_Y);
 
     try {
         displaySetUp(&charset, &screen, &screenTexture, &window, &renderer);
@@ -131,8 +140,8 @@ int main(int argc, char* args[]) {
 
     printf("Log:\n");
 
-    SDL_Surface* heroSurface = loadBMP("../bmp/witcher200.bmp", charset, screen,
-                                       screenTexture, window, renderer);
+    SDL_Surface* heroSurface = loadBMP("../bmp/witcherRight.bmp", charset,
+                                       screen, screenTexture, window, renderer);
 
     int hitboxWidth = 60;
     int hitboxHeigth = 88;
@@ -140,38 +149,55 @@ int main(int argc, char* args[]) {
     double maxSpeed = 30;
     double jumpHeight = 40;
     double jumpCooldown = 0.5;
-    Alive player = Alive(screenMiddle, heroSurface, hitboxWidth, hitboxHeigth,
+    Alive player = Alive(center, heroSurface, hitboxWidth, hitboxHeigth,
                          maxSpeed, walkAcceleration, jumpHeight, jumpCooldown);
+    player.drawScaledToHitbox = false;
 
-    Vector floorPosition = Vector(320, 750);
+    Vector floorPosition = center.add(Vector(320, 400));
     SDL_Surface* floorSurface = loadBMP("../bmp/floor.bmp", charset, screen,
                                         screenTexture, window, renderer);
     RigidBody floor = RigidBody(floorPosition, floorSurface, 1920, 63);
 
+    SDL_Surface* redSurface = loadBMP("../bmp/red.bmp", charset, screen,
+                                      screenTexture, window, renderer);
+    RigidBody air = RigidBody();
+
+
+//int worldWidth, int worldHeight, double noiseValue, double terrainFreq, double caveFreq, float heightMultiplier, float heightAddition, int dirtLayerHeight, unsigned int seed
+    const int worldWidth = 100, worldHeight = 100;
+    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 25, 25, 5, 1234);
+    world.generate(charset, screen, screenTexture, window, renderer);
+
     const int boxesCount = 32;
     Vector boxesPositions[boxesCount];
-    RigidBody boxes[boxesCount];
     SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
                                       screenTexture, window, renderer);
+    RigidBody boxes[boxesCount];
     for (int i = 0; i < boxesCount; i++) {
-        //boxes' positions setup
-        if (i < boxesCount / 4) {
-            boxesPositions[i] = screenMiddle.add(Vector(i * 64, 128));
-        } else if (i < 2 * boxesCount / 4) {
-            boxesPositions[i] =
-                screenMiddle.add(Vector((i - 2) * 64, 192));
-        } else if (i < 3 * boxesCount / 4) {
-            boxesPositions[i] =
-                screenMiddle.add(Vector((i - 13) * 64, 256));
+        // boxes' positions setup
+        if (i < boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 128));
+        } else if (i < 2 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 192));
+        } else if (i < 3 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 256));
+        } else if (i < 4 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 320));
+        } else if (i < 5 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 320));
+        } else if (i < 6 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 256));
+        } else if (i < 7 * boxesCount / 8) {
+            boxesPositions[i] = center.add(Vector(i * 64, 192));
         } else {
-            boxesPositions[i] =
-                screenMiddle.add(Vector((i - 17) * 64, 320));
+            boxesPositions[i] = center.add(Vector(i * 64, 128));
         }
+
         boxes[i] = RigidBody(boxesPositions[i], boxSurface, 64, 64);
     }
 
-    theme = loadBMP("../bmp/theme.bmp", charset, screen, screenTexture, window,
-                    renderer);
+    theme = loadBMP("../bmp/forestTheme3.bmp", charset, screen, screenTexture,
+                    window, renderer);
 
     char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -206,17 +232,16 @@ int main(int argc, char* args[]) {
 
         camera = player.hitbox.position.difference(screenMiddle);
 
-        DrawSurface(screen, theme, screenMiddle.x, screenMiddle.y, camera);
+        DrawSurface(screen, theme, center.x, center.y, camera);
 
-        player.acceleration = gravity;
-        for (int i = 0; i < boxesCount; i++) {
-            boxes[i].acceleration = gravity;
-        }
+        // player.acceleration = gravity;
+        player.acceleration = Vector::ZERO;
 
-        quit = control(&player, realTime / 1000, floor, boxes, boxesCount);
+        // quit = control(&player, realTime / 1000, floor, boxes, boxesCount);
+        quit = noclip(&player);
 
-        player.collide(floor, gameDelta);
-        player.collide(boxes, boxesCount, gameDelta);
+        // player.collide(floor, gameDelta);
+        // player.collide(boxes, boxesCount, gameDelta);
 
         for (int i = 0; i < boxesCount; i++) {
             boxes[i].collide(floor, gameDelta);
@@ -225,8 +250,10 @@ int main(int argc, char* args[]) {
         // dont collide with yourself
 
         floor.draw(screen, camera);
-        for (int i = 0; i < boxesCount; i++) {
-            boxes[i].draw(screen, camera);
+        for (int y = 0; y < worldHeight; y++) {
+            for (int x = 0; x < worldWidth; x++) {
+                world.terrain[y * worldWidth + x].draw(screen, camera);
+            }
         }
         player.draw(screen, camera);
 

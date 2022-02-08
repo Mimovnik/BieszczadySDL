@@ -6,6 +6,7 @@
 class RigidBody {
    public:
     SDL_Surface* surface = nullptr;
+    bool drawScaledToHitbox = true;
     Vector velocity;
     Vector acceleration;
     double mass;

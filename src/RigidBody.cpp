@@ -28,6 +28,8 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
     velocity = velocity.add(acceleration.rescale(gameDelta));
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
+    if (velocity.y > maxSpeed) velocity.y = maxSpeed;
+    if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
@@ -56,16 +58,26 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     velocity = velocity.add(acceleration.rescale(gameDelta));
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
+    if (velocity.y > maxSpeed) velocity.y = maxSpeed;
+    if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
 void RigidBody::draw(SDL_Surface* screen, Vector offset) {
     SDL_Rect dest;
-    dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
-    dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
-    dest.w = hitbox.width;
-    dest.h = hitbox.height;
-    SDL_BlitScaled(surface, NULL, screen, &dest);
+    if (drawScaledToHitbox) {
+        dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
+        dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
+        dest.w = hitbox.width;
+        dest.h = hitbox.height;
+        SDL_BlitScaled(surface, NULL, screen, &dest);
+    } else {
+        dest.x = hitbox.position.x - surface->w / 2 - offset.x;
+        dest.y = hitbox.position.y - surface->h / 2 - offset.y;
+        dest.w = surface->w;
+        dest.h = surface->h;
+        SDL_BlitScaled(surface, NULL, screen, &dest);
+    }
 }
 
 void RigidBody::collide(RigidBody another, double gameDelta) {
@@ -90,7 +102,7 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
         acceleration.rescale(gameDelta * gameDelta / 2));
     Rectangle* othersHitboxes = new Rectangle[othersCount];
     for (int i = 0; i < othersCount; i++) {
-        if(&others[i] == this) continue;
+        if (&others[i] == this) continue;
         othersHitboxes[i] = others[i].hitbox;
     }
     if (topHitbox()
