@@ -9,30 +9,6 @@ RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
     this->maxSpeed = maxSpeed;
 }
 
-void RigidBody::calculatePosition(double gameDelta, RigidBody another) {
-    const double frictionFactor = 7;
-    Vector friction = Vector::ZERO;
-    Vector below = Vector(0, 5);
-    if (velocity.x < 0.1 && velocity.x > -0.1) {
-        velocity.x = 0;
-    }
-    if (bottomHitbox().translate(below).overlaps(another.hitbox)) {
-        if (velocity.x > 0) {
-            friction = Vector(frictionFactor, 0);
-        } else if (velocity.x < 0) {
-            friction = Vector(-frictionFactor, 0);
-        }
-    }
-    acceleration = acceleration.difference(friction);
-
-    velocity = velocity.add(acceleration.rescale(gameDelta));
-    if (velocity.x > maxSpeed) velocity.x = maxSpeed;
-    if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
-    if (velocity.y > maxSpeed) velocity.y = maxSpeed;
-    if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
-    hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
-}
-
 void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
                                   int othersCount) {
     const double frictionFactor = 7;
@@ -58,8 +34,8 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     velocity = velocity.add(acceleration.rescale(gameDelta));
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
-    if (velocity.y > maxSpeed) velocity.y = maxSpeed;
-    if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
+    // if (velocity.y > maxSpeed) velocity.y = maxSpeed;
+    // if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
@@ -77,23 +53,6 @@ void RigidBody::draw(SDL_Surface* screen, Vector offset) {
         dest.w = surface->w;
         dest.h = surface->h;
         SDL_BlitScaled(surface, NULL, screen, &dest);
-    }
-}
-
-void RigidBody::collide(RigidBody another, double gameDelta) {
-    Vector futureOffset = velocity.rescale(gameDelta).add(
-        acceleration.rescale(gameDelta * gameDelta / 2));
-    if (topHitbox().translate(futureOffset).overlaps(another.hitbox) ||
-        bottomHitbox().translate(futureOffset).overlaps(another.hitbox)) {
-        velocity.y = 0;
-        acceleration.y = 0;
-        futureOffset = velocity.rescale(gameDelta).add(
-            acceleration.rescale(gameDelta * gameDelta / 2));
-    }
-    if (leftHitbox().translate(futureOffset).overlaps(another.hitbox) ||
-        rightHitbox().translate(futureOffset).overlaps(another.hitbox)) {
-        velocity.x = 0;
-        acceleration.x = 0;
     }
 }
 

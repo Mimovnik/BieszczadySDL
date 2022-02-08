@@ -1,9 +1,8 @@
 #pragma once
 #include <SDL.h>
+#include <random>
 
 #include <iostream>
-#include <stdlib.h>
-#include <time.h>
 
 #include "LoadBMP.cpp"
 #include "PerlinNoise.h"
@@ -56,8 +55,8 @@ class Terrain {
                     window, renderer);
         this->trunkSurface = loadBMP("../bmp/trunk_side.bmp", charset, screen,
                                      screenTexture, window, renderer);
-        this->leafSurface = loadBMP("../bmp/leaves_transparent.bmp", charset, screen,
-                                    screenTexture, window, renderer);
+        this->leafSurface = loadBMP("../bmp/leaves_transparent.bmp", charset,
+                                    screen, screenTexture, window, renderer);
 
         generateNoiseTexture();
         generateTerrain();
@@ -71,7 +70,6 @@ class Terrain {
                 pn.noise((x + seed) * terrainFreq, seed * terrainFreq, 0.8) *
                     heightMultiplier +
                 heightAddition;
-                srand(time(NULL));
 
             SDL_Surface* tileSurface;
             for (int y = 0; y < height; y++) {
@@ -80,9 +78,14 @@ class Terrain {
                 } else if (y < height - 1) {
                     tileSurface = dirtSurface;
                 } else {
+                    // generate grass
                     tileSurface = grassDirtSurface;
+                    // generate Tree
 
-
+                    // int t = rand() % 100;
+                    // if (t < 10) {
+                    //     placeTree(x, y + 1);
+                    // }
                 }
 
                 if (noiseTexture[y * worldWidth + x] > noiseCaveValue) {
@@ -105,10 +108,19 @@ class Terrain {
         }
     }
 
+    // void placeTree(int x, int y) {
+
+    //     int h = rand() % 4 + 4;
+    //     for (int i = 0; i < h; i++) {
+    //         placeTile(x, y + i, trunkSurface);
+    //     }
+    //     placeTile(x, y + h, leafSurface);
+    // }
+
     void placeTile(int x, int y, SDL_Surface* tileSurface) {
-        terrain[y * worldWidth + x].hitbox.position = Vector(x * 16, -y * 16);
-        terrain[y * worldWidth + x].hitbox.width = 16;
-        terrain[y * worldWidth + x].hitbox.height = 16;
+        terrain[y * worldWidth + x].hitbox.position = Vector(x * 64, -y * 64);
+        terrain[y * worldWidth + x].hitbox.width = 64;
+        terrain[y * worldWidth + x].hitbox.height = 64;
         terrain[y * worldWidth + x].surface = tileSurface;
     }
 };
