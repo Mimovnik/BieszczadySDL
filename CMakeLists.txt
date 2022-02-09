@@ -19,6 +19,8 @@ add_library(
     src/Timer.h
     src/Terrain.h
     src/Terrain.cpp
+    src/QuadTree.h
+    src/QuadTree.cpp
     src/PerlinNoise.h
     src/PerlinNoise.cpp
 )

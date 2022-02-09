@@ -16,6 +16,12 @@ public:
 		this->height = height;
 	}
 
+	Rectangle( int width, int height, Vector position) {
+		this->width = width;
+		this->height = height;
+		this->position = position;
+	}
+
 	bool contains(Vector point);
 
 	bool overlaps(Rectangle another);

@@ -142,7 +142,7 @@ int main(int argc, char* args[]) {
 
     int hitboxWidth = 60;
     int hitboxHeigth = 88;
-    double walkAcceleration = 10;
+    double walkAcceleration = 20;
     double maxSpeed = 30;
     double jumpHeight = 50;
     double jumpCooldown = 0.5;
@@ -154,8 +154,9 @@ int main(int argc, char* args[]) {
                                       screenTexture, window, renderer);
 
 //int worldWidth, int worldHeight, double noiseValue, double terrainFreq, double caveFreq, float heightMultiplier, float heightAddition, int dirtLayerHeight, unsigned int seed
-    const int worldWidth = 100, worldHeight = 100;
-    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 25, 25, 5, 1234);
+    const int worldWidth = 200, worldHeight = 100;
+    int worldSeed= 12323;
+    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 45, 25, 5, worldSeed);
     world.generate(charset, screen, screenTexture, window, renderer);
     const int worldSize = worldWidth * worldHeight;
 
