@@ -215,11 +215,9 @@ int main(int argc, char* args[]) {
         quit = control(&player, realTime / 1000, blocksInRange, blocksInRangeCount);
         //quit = noclip(&player);
 
-
         player.collide(blocksInRange, blocksInRangeCount, gameDelta);
 
-
-        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(Rectangle(2000, 2000, player.hitbox.position));
+        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(Rectangle(SCREEN_WIDTH, SCREEN_HEIGHT, player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
             visibleBlocks[i].draw(screen, camera);
         }

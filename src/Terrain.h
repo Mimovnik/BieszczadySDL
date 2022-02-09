@@ -43,8 +43,8 @@ class Terrain {
         this->heightAddition = heightAddition;
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
-        this->terrain = new QuadTree(Rectangle(
-            20000, 20000, Vector(10000, -10000)));
+        this->terrain =
+            new QuadTree(Rectangle(20000, 20000, Vector(10000, -10000)));
     }
     void generate(SDL_Surface* charset, SDL_Surface* screen,
                   SDL_Texture* screenTexture, SDL_Window* window,
@@ -72,9 +72,9 @@ class Terrain {
                 pn.noise((x + seed) * terrainFreq, seed * terrainFreq, 0.8) *
                     heightMultiplier +
                 heightAddition;
-                if(height > worldHeight){
-                    height = worldHeight;
-                }
+            if (height > worldHeight) {
+                height = worldHeight;
+            }
 
             SDL_Surface* tileSurface;
             for (int y = 0; y < height; y++) {
@@ -87,10 +87,10 @@ class Terrain {
                     tileSurface = grassDirtSurface;
                     // generate Tree
 
-                    // int t = rand() % 100;
-                    // if (t < 10) {
-                    //     placeTree(x, y + 1);
-                    // }
+                    int t = rand() % 100;
+                    if (t < 10) {
+                        placeTree(x, y + 1);
+                    }
                 }
 
                 if (noiseTexture[y * worldWidth + x] > noiseCaveValue) {
@@ -113,14 +113,29 @@ class Terrain {
         }
     }
 
-    // void placeTree(int x, int y) {
+    void placeTree(int x, int y) {
+        int h = rand() % 4 + 4;
+        for (int i = 0; i < h; i++) {
+            placeTile(x, y + i, trunkSurface);
+        }
+        placeTile(x - 2, y + h, leafSurface);
+        placeTile(x - 1, y + h, leafSurface);
+        placeTile(x, y + h, leafSurface);
+        placeTile(x + 1, y + h, leafSurface);
+        placeTile(x + 2, y + h, leafSurface);
 
-    //     int h = rand() % 4 + 4;
-    //     for (int i = 0; i < h; i++) {
-    //         placeTile(x, y + i, trunkSurface);
-    //     }
-    //     placeTile(x, y + h, leafSurface);
-    // }
+        placeTile(x - 2, y + h + 1, leafSurface);
+        placeTile(x - 1, y + h + 1, leafSurface);
+        placeTile(x, y + h + 1, leafSurface);
+        placeTile(x + 1, y + h + 1, leafSurface);
+        placeTile(x + 2, y + h + 1, leafSurface);
+
+        placeTile(x - 1, y + h + 2, leafSurface);
+        placeTile(x, y + h + 2, leafSurface);
+        placeTile(x + 1, y + h + 2, leafSurface);
+        
+        placeTile(x, y + h + 3, leafSurface);
+    }
 
     void placeTile(int x, int y, SDL_Surface* tileSurface) {
         Vector blockPosition = Vector(x * 64, -y * 64);
