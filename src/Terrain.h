@@ -14,6 +14,8 @@ class Terrain {
     int worldWidth;
     int worldHeight;
 
+    int blockCount;
+
     int dirtLayerHeight;
     double terrainFreq;
     double caveFreq;
@@ -28,8 +30,10 @@ class Terrain {
     SDL_Surface* stoneSurface;
     SDL_Surface* dirtSurface;
     SDL_Surface* grassDirtSurface;
-    SDL_Surface* trunkSurface;
+    SDL_Surface* trunkBotSurface;
+    SDL_Surface* trunkMidSurface;
     SDL_Surface* leafSurface;
+    SDL_Surface* treeCrownSurface;
 
     Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
             double terrainFreq, double caveFreq, float heightMultiplier,
@@ -43,6 +47,7 @@ class Terrain {
         this->heightAddition = heightAddition;
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
+        this->blockCount = 0;
         this->terrain =
             new QuadTree(Rectangle(20000, 20000, Vector(10000, -10000)));
     }
@@ -56,10 +61,15 @@ class Terrain {
         this->grassDirtSurface =
             loadBMP("../bmp/dirt_grass.bmp", charset, screen, screenTexture,
                     window, renderer);
-        this->trunkSurface = loadBMP("../bmp/trunk_side.bmp", charset, screen,
-                                     screenTexture, window, renderer);
+        this->trunkBotSurface =
+            loadBMP("../bmp/trunk_bottom.bmp", charset, screen, screenTexture,
+                    window, renderer);
+        this->trunkMidSurface = loadBMP("../bmp/trunk_mid.bmp", charset, screen,
+                                        screenTexture, window, renderer);
         this->leafSurface = loadBMP("../bmp/leaves_transparent.bmp", charset,
                                     screen, screenTexture, window, renderer);
+        this->treeCrownSurface = loadBMP("../bmp/treeCrown.bmp", charset, screen,
+                                    screenTexture, window, renderer);
 
         generateNoiseTexture();
         generateTerrain();
@@ -115,9 +125,12 @@ class Terrain {
 
     void placeTree(int x, int y) {
         int h = rand() % 4 + 4;
-        for (int i = 0; i < h; i++) {
-            placeTile(x, y + i, trunkSurface);
+
+        placeTile(x, y, trunkBotSurface);
+        for (int i = 1; i < h; i++) {
+            placeTile(x, y + i, trunkMidSurface);
         }
+        //placeTile(x-195, y + h, treeCrownSurface);
         placeTile(x - 2, y + h, leafSurface);
         placeTile(x - 1, y + h, leafSurface);
         placeTile(x, y + h, leafSurface);
@@ -133,11 +146,12 @@ class Terrain {
         placeTile(x - 1, y + h + 2, leafSurface);
         placeTile(x, y + h + 2, leafSurface);
         placeTile(x + 1, y + h + 2, leafSurface);
-        
+
         placeTile(x, y + h + 3, leafSurface);
     }
 
     void placeTile(int x, int y, SDL_Surface* tileSurface) {
+        blockCount++;
         Vector blockPosition = Vector(x * 64, -y * 64);
         terrain->insert(RigidBody(blockPosition, tileSurface, 64, 64));
     }
