@@ -2,28 +2,30 @@
 #include <vector>
 
 #include "RigidBody.h"
-#define NODE_CAPACITY 4
+#define NODE_CAPACITY 64
 
 class QuadTree {
    public:
     Rectangle boundary;
 
-    Vector points[NODE_CAPACITY];
-    int pointsAdded;
+    RigidBody blocks[NODE_CAPACITY];
+    int blocksAdded;
 
     QuadTree* topLeft = nullptr;
     QuadTree* topRight = nullptr;
     QuadTree* botLeft = nullptr;
     QuadTree* botRight = nullptr;
 
+    QuadTree();
+
     QuadTree(Rectangle boundary) {
         this->boundary = boundary;
-        this->pointsAdded = 0;
+        this->blocksAdded = 0;
     }
 
-    bool insert(Vector point);
+    bool insert(RigidBody block);
 
-    std::vector<Vector> queryRange(Rectangle range);
+    std::vector<RigidBody> queryRange(Rectangle range);
 
     void subdivide();
 };

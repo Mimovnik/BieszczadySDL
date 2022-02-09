@@ -5,6 +5,7 @@
 #include <SDL.h>
 
 #include <iostream>
+#include <vector>
 
 #include "src/Alive.h"
 #include "src/Draw.cpp"
@@ -77,8 +78,8 @@ void displaySetUp(SDL_Surface** charset, SDL_Surface** screen,
     SDL_SetColorKey(*charset, true, 0x000000);
 }
 
-bool control(Alive* entity, double realTime,
-             RigidBody* colliders, int collidersCount) {
+bool control(Alive* entity, double realTime, RigidBody* colliders,
+             int collidersCount) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
@@ -146,17 +147,21 @@ int main(int argc, char* args[]) {
     double maxSpeed = 30;
     double jumpHeight = 50;
     double jumpCooldown = 0.5;
-    Alive player = Alive(center.add(Vector(3200, -4000)), heroSurface, hitboxWidth, hitboxHeigth,
-                         maxSpeed, walkAcceleration, jumpHeight, jumpCooldown);
+    Alive player = Alive(center.add(Vector(1600, -4000)), heroSurface,
+                         hitboxWidth, hitboxHeigth, maxSpeed, walkAcceleration,
+                         jumpHeight, jumpCooldown);
     player.drawScaledToHitbox = false;
 
     SDL_Surface* redSurface = loadBMP("../bmp/red.bmp", charset, screen,
                                       screenTexture, window, renderer);
 
-//int worldWidth, int worldHeight, double noiseValue, double terrainFreq, double caveFreq, float heightMultiplier, float heightAddition, int dirtLayerHeight, unsigned int seed
-    const int worldWidth = 200, worldHeight = 100;
-    int worldSeed= 12323;
-    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 45, 25, 5, worldSeed);
+    // int worldWidth, int worldHeight, double noiseValue, double terrainFreq,
+    // double caveFreq, float heightMultiplier, float heightAddition, int
+    // dirtLayerHeight, unsigned int seed
+    const int worldWidth = 100, worldHeight = 100;
+    int worldSeed = 12323;
+    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 45, 25,
+                            5, worldSeed);
     world.generate(charset, screen, screenTexture, window, renderer);
     const int worldSize = worldWidth * worldHeight;
 
@@ -201,18 +206,22 @@ int main(int argc, char* args[]) {
         player.acceleration = gravity;
         //player.acceleration = Vector::ZERO;
 
-        quit = control(&player, realTime / 1000, world.terrain, worldSize);
+        std::vector<RigidBody> inRangeList = world.terrain->queryRange(Rectangle(200, 200, player.hitbox.position));
+        int blocksInRangeCount = inRangeList.size();
+        RigidBody* blocksInRange = new RigidBody[blocksInRangeCount];
+        std::copy(inRangeList.begin(), inRangeList.end(), blocksInRange);
+        printf("Blocks in range: %i\n", blocksInRangeCount);
+
+        quit = control(&player, realTime / 1000, blocksInRange, blocksInRangeCount);
         //quit = noclip(&player);
 
-        
-        player.collide(world.terrain, worldSize, gameDelta);
 
-        // dont collide with yourself
+        player.collide(blocksInRange, blocksInRangeCount, gameDelta);
 
-        for (int y = 0; y < worldHeight; y++) {
-            for (int x = 0; x < worldWidth; x++) {
-                world.terrain[y * worldWidth + x].draw(screen, camera);
-            }
+
+        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(Rectangle(2000, 2000, player.hitbox.position));
+        for (int i = 0; i < visibleBlocks.size(); i++) {
+            visibleBlocks[i].draw(screen, camera);
         }
         player.draw(screen, camera);
 
@@ -242,10 +251,9 @@ int main(int argc, char* args[]) {
         SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
-        // obsługa zdarzeń (o ile jakieś zaszły)
+        player.calculatePosition(gameDelta, blocksInRange, blocksInRangeCount);
 
-        player.calculatePosition(gameDelta, world.terrain, worldSize);
-        
+        delete[] blocksInRange;
 
         printf(
             "Player's position: x = %.2f y = %.2f "

@@ -17,6 +17,9 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     if (velocity.x < 0.1 && velocity.x > -0.1) {
         velocity.x = 0;
     }
+    if (velocity.y < 0.1 && velocity.y > -0.1) {
+        velocity.y = 0;
+    }
     Rectangle* othersHitboxes = new Rectangle[othersCount];
     for (int i = 0; i < othersCount; i++) {
         othersHitboxes[i] = others[i].hitbox;
@@ -34,8 +37,8 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     velocity = velocity.add(acceleration.rescale(gameDelta));
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
-    // if (velocity.y > maxSpeed) velocity.y = maxSpeed;
     // if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
+    // if (velocity.y > maxSpeed) velocity.y = maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 

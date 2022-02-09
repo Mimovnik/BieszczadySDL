@@ -1,57 +1,57 @@
 #include "QuadTree.h"
 
-bool QuadTree::insert(Vector point) {
-    if (!boundary.contains(point)) {
+bool QuadTree::insert(RigidBody block) {
+    if (!boundary.contains(block.hitbox.position)) {
         return false;
     }
-    if (pointsAdded < NODE_CAPACITY && topLeft == nullptr) {
-        points[pointsAdded] = point;
-        pointsAdded++;
+    if (blocksAdded < NODE_CAPACITY && topLeft == nullptr) {
+        blocks[blocksAdded] = block;
+        blocksAdded++;
         return true;
     }
     if (topLeft == nullptr) {
         subdivide();
     }
-    if (topLeft->insert(point)) return true;
-    if (topRight->insert(point)) return true;
-    if (botLeft->insert(point)) return true;
-    if (botRight->insert(point)) return true;
+    if (topLeft->insert(block)) return true;
+    if (topRight->insert(block)) return true;
+    if (botLeft->insert(block)) return true;
+    if (botRight->insert(block)) return true;
 
     return false;
 }
 
-std::vector<Vector> QuadTree::queryRange(Rectangle range) {
-    std::vector<Vector> pointsInRange;
+std::vector<RigidBody> QuadTree::queryRange(Rectangle range) {
+    std::vector<RigidBody> blocksInRange;
     if (!boundary.overlaps(range)) {
-        return pointsInRange;
+        return blocksInRange;
     }
 
-    for (int i = 0; i < pointsAdded; i++) {
-        if (range.contains(points[i])) {
-            pointsInRange.push_back(points[i]);
+    for (int i = 0; i < blocksAdded; i++) {
+        if (range.overlaps(blocks[i].hitbox)) {
+            blocksInRange.push_back(blocks[i]);
         }
     }
-    if (topLeft = nullptr) {
-        return pointsInRange;
+    if (topLeft == nullptr) {
+        return blocksInRange;
     }
 
-    std::vector<Vector> topLeftInRange = topLeft->queryRange(range);
-    pointsInRange.insert(pointsInRange.end(), topLeftInRange.begin(),
+    std::vector<RigidBody> topLeftInRange = topLeft->queryRange(range);
+    blocksInRange.insert(blocksInRange.end(), topLeftInRange.begin(),
                          topLeftInRange.end());
 
-    std::vector<Vector> topRightInRange = topRight->queryRange(range);
-    pointsInRange.insert(pointsInRange.end(), topRightInRange.begin(),
+    std::vector<RigidBody> topRightInRange = topRight->queryRange(range);
+    blocksInRange.insert(blocksInRange.end(), topRightInRange.begin(),
                          topRightInRange.end());
 
-    std::vector<Vector> botLeftInRange = botLeft->queryRange(range);
-    pointsInRange.insert(pointsInRange.end(), botLeftInRange.begin(),
+    std::vector<RigidBody> botLeftInRange = botLeft->queryRange(range);
+    blocksInRange.insert(blocksInRange.end(), botLeftInRange.begin(),
                          botLeftInRange.end());
 
-    std::vector<Vector> botRightInRange = botRight->queryRange(range);
-    pointsInRange.insert(pointsInRange.end(), botRightInRange.begin(),
+    std::vector<RigidBody> botRightInRange = botRight->queryRange(range);
+    blocksInRange.insert(blocksInRange.end(), botRightInRange.begin(),
                          botRightInRange.end());
 
-    return pointsInRange;
+    return blocksInRange;
 }
 
 void QuadTree::subdivide() {

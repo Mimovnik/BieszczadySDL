@@ -1,11 +1,12 @@
 #pragma once
 #include <SDL.h>
-#include <random>
 
 #include <iostream>
+#include <random>
 
 #include "LoadBMP.cpp"
 #include "PerlinNoise.h"
+#include "QuadTree.h"
 #include "RigidBody.h"
 
 class Terrain {
@@ -23,7 +24,7 @@ class Terrain {
 
     double* noiseTexture;
 
-    RigidBody* terrain;
+    QuadTree* terrain;
     SDL_Surface* stoneSurface;
     SDL_Surface* dirtSurface;
     SDL_Surface* grassDirtSurface;
@@ -42,6 +43,8 @@ class Terrain {
         this->heightAddition = heightAddition;
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
+        this->terrain = new QuadTree(Rectangle(
+            20000, 20000, Vector(10000, -10000)));
     }
     void generate(SDL_Surface* charset, SDL_Surface* screen,
                   SDL_Texture* screenTexture, SDL_Window* window,
@@ -63,13 +66,15 @@ class Terrain {
     }
 
     void generateTerrain() {
-        terrain = new RigidBody[worldHeight * worldWidth];
         PerlinNoise pn(seed);
         for (int x = 0; x < worldWidth; x++) {
             double height =
                 pn.noise((x + seed) * terrainFreq, seed * terrainFreq, 0.8) *
                     heightMultiplier +
                 heightAddition;
+                if(height > worldHeight){
+                    height = worldHeight;
+                }
 
             SDL_Surface* tileSurface;
             for (int y = 0; y < height; y++) {
@@ -118,9 +123,7 @@ class Terrain {
     // }
 
     void placeTile(int x, int y, SDL_Surface* tileSurface) {
-        terrain[y * worldWidth + x].hitbox.position = Vector(x * 64, -y * 64);
-        terrain[y * worldWidth + x].hitbox.width = 64;
-        terrain[y * worldWidth + x].hitbox.height = 64;
-        terrain[y * worldWidth + x].surface = tileSurface;
+        Vector blockPosition = Vector(x * 64, -y * 64);
+        terrain->insert(RigidBody(blockPosition, tileSurface, 64, 64));
     }
 };
