@@ -1,11 +1,12 @@
 #include "RigidBody.h"
 
 RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-                     int height, double maxSpeed) {
+                     int height, bool drawScaledToHitbox, double maxSpeed) {
     this->hitbox.position = startingPosition;
     this->surface = surface;
     this->hitbox.width = width;
     this->hitbox.height = height;
+    this->drawScaledToHitbox = drawScaledToHitbox;
     this->maxSpeed = maxSpeed;
 }
 

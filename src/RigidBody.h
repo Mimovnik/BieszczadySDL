@@ -6,7 +6,7 @@
 class RigidBody {
    public:
     SDL_Surface* surface = nullptr;
-    bool drawScaledToHitbox = true;
+    bool drawScaledToHitbox;
     Vector velocity;
     Vector acceleration;
     double mass;
@@ -16,7 +16,7 @@ class RigidBody {
     RigidBody(){};
 
     RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-              int height, double maxSpeed = 10);
+              int height, bool drawScaledToHitbox = true, double maxSpeed = 10);
 
     void calculatePosition(double gameDelta, RigidBody* others, int othersCount);
 

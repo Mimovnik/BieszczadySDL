@@ -17,8 +17,8 @@
 
 #define FULLSCREEN_ON false
 #define MAX_FPS 150
-#define SCREEN_WIDTH 1680
-#define SCREEN_HEIGHT 840
+#define SCREEN_WIDTH 840
+#define SCREEN_HEIGHT 620
 
 #define CENTER_X 0
 #define CENTER_Y 0
@@ -159,11 +159,17 @@ int main(int argc, char* args[]) {
     // double caveFreq, float heightMultiplier, float heightAddition, int
     // dirtLayerHeight, unsigned int seed
     const int worldWidth = 100, worldHeight = 100;
-    int worldSeed = 12323;
+    int worldSeed = 1234;
     Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 45, 25,
                             5, worldSeed);
     world.generate(charset, screen, screenTexture, window, renderer);
     const int worldSize = worldWidth * worldHeight;
+
+    const int boxCount = 32;
+    RigidBody* boxes = new RigidBody[boxCount];
+    for (int i = 0; i < boxCount; i++) {
+        
+    }
 
     theme = loadBMP("../bmp/forestTheme3.bmp", charset, screen, screenTexture,
                     window, renderer);
@@ -204,20 +210,23 @@ int main(int argc, char* args[]) {
         DrawSurface(screen, theme, center.x, center.y, camera);
 
         player.acceleration = gravity;
-        //player.acceleration = Vector::ZERO;
+        // player.acceleration = Vector::ZERO;
 
-        std::vector<RigidBody> inRangeList = world.terrain->queryRange(Rectangle(200, 200, player.hitbox.position));
+        std::vector<RigidBody> inRangeList = world.terrain->queryRange(
+            Rectangle(200, 200, player.hitbox.position));
         int blocksInRangeCount = inRangeList.size();
         RigidBody* blocksInRange = new RigidBody[blocksInRangeCount];
         std::copy(inRangeList.begin(), inRangeList.end(), blocksInRange);
         printf("Blocks in range: %i\n", blocksInRangeCount);
 
-        quit = control(&player, realTime / 1000, blocksInRange, blocksInRangeCount);
-        //quit = noclip(&player);
+        quit = control(&player, realTime / 1000, blocksInRange,
+                       blocksInRangeCount);
+        // quit = noclip(&player);
 
         player.collide(blocksInRange, blocksInRangeCount, gameDelta);
 
-        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(Rectangle(SCREEN_WIDTH, SCREEN_HEIGHT, player.hitbox.position));
+        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(
+            Rectangle(3*SCREEN_WIDTH/2, 3*SCREEN_HEIGHT/2, player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
             visibleBlocks[i].draw(screen, camera);
         }
