@@ -1,3 +1,4 @@
+#pragma once
 #include <SDL.h>
 #include "Vector.h"
 // narysowanie napisu txt na powierzchni screen, zaczynając od punktu (x, y)

@@ -7,11 +7,11 @@
 #include <iostream>
 #include <vector>
 
+#include "src/RigidBody.h"
 #include "src/Alive.h"
 #include "src/Draw.cpp"
 #include "src/LoadBMP.cpp"
 #include "src/Rectangle.h"
-#include "src/RigidBody.h"
 #include "src/Terrain.h"
 #include "src/Vector.h"
 
@@ -79,7 +79,7 @@ void displaySetUp(SDL_Surface** charset, SDL_Surface** screen,
 }
 
 bool control(Alive* entity, double realTime, RigidBody* colliders,
-             int collidersCount) {
+             int collidersCount, RigidBody block, QuadTree* terrain) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
@@ -94,6 +94,17 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
         entity->move('L', colliders, collidersCount);
     }
+
+    int mouseX, mouseY;
+    Uint32 buttons;
+    buttons = SDL_GetMouseState(&mouseX, &mouseY);
+    Vector mousePos = entity->hitbox.position.add(
+        Vector(mouseX, mouseY)
+            .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
+    if ((buttons & SDL_BUTTON_LMASK) != 0) {
+        entity->place(block, mousePos, terrain, realTime);
+    }
+
     return false;
 }
 
@@ -155,21 +166,21 @@ int main(int argc, char* args[]) {
     SDL_Surface* redSurface = loadBMP("../bmp/red.bmp", charset, screen,
                                       screenTexture, window, renderer);
 
-    // int worldWidth, int worldHeight, double noiseValue, double terrainFreq,
-    // double caveFreq, float heightMultiplier, float heightAddition, int
-    // dirtLayerHeight, unsigned int seed
-    const int worldWidth = 100, worldHeight = 100;
-    int worldSeed = 1234;
-    Terrain world = Terrain(worldWidth, worldHeight, 0.35, 0.05, 0.08, 45, 25,
-                            5, worldSeed);
+    SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
+                                      screenTexture, window, renderer);
+
+    RigidBody box = RigidBody(Vector::ZERO, boxSurface, 64, 64);
+
+        // int worldWidth, int worldHeight, double noiseValue, double
+        // terrainFreq, double caveFreq, float heightMultiplier, float
+        // heightAddition, int dirtLayerHeight, unsigned int seed
+        const int worldWidth = 200,
+              worldHeight = 100;
+    int worldSeed = 0;
+    Terrain world =
+        Terrain(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5, worldSeed);
     world.generate(charset, screen, screenTexture, window, renderer);
     const int worldSize = worldWidth * worldHeight;
-
-    const int boxCount = 32;
-    RigidBody* boxes = new RigidBody[boxCount];
-    for (int i = 0; i < boxCount; i++) {
-        
-    }
 
     theme = loadBMP("../bmp/forestTheme3.bmp", charset, screen, screenTexture,
                     window, renderer);
@@ -220,13 +231,14 @@ int main(int argc, char* args[]) {
         printf("Blocks in range: %i\n", blocksInRangeCount);
 
         quit = control(&player, realTime / 1000, blocksInRange,
-                       blocksInRangeCount);
+                       blocksInRangeCount, box, world.terrain);
         // quit = noclip(&player);
 
         player.collide(blocksInRange, blocksInRangeCount, gameDelta);
 
         std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(
-            Rectangle(3*SCREEN_WIDTH/2, 3*SCREEN_HEIGHT/2, player.hitbox.position));
+            Rectangle(3 * SCREEN_WIDTH / 2, 3 * SCREEN_HEIGHT / 2,
+                      player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
             visibleBlocks[i].draw(screen, camera);
         }

@@ -14,6 +14,17 @@ Alive::Alive(Vector startingPosition, SDL_Surface* surface, int width,
     this->walkAccel = walkAccel;
     this->jumpHeight = jumpHeight;
     this->jumpTimer.coolDown = jumpCooldown;
+    this->placeTimer.coolDown = 0.1;
+}
+
+void Alive::place(RigidBody block, Vector blockPos, QuadTree* terrain,
+                  double realTime) {
+    block.hitbox.position = blockPos;
+    if (placeTimer.isUp(realTime)) {
+        placeTimer.start(realTime);
+
+        terrain->insert(block);
+    }
 }
 
 void Alive::jump(RigidBody base, double realTime) {

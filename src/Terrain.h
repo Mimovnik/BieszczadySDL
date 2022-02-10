@@ -124,30 +124,13 @@ class Terrain {
     }
 
     void placeTree(int x, int y) {
-        int h = rand() % 4 + 4;
+        int h = rand() % 4 + 2;
 
         placeTile(x, y, trunkBotSurface, false);
         for (int i = 1; i < h; i++) {
             placeTile(x, y + i, trunkMidSurface, false);
         }
         placeTile(x, y + h + 2, treeCrownSurface, false, false);
-        // placeTile(x - 2, y + h, leafSurface);
-        // placeTile(x - 1, y + h, leafSurface);
-        // placeTile(x, y + h, leafSurface);
-        // placeTile(x + 1, y + h, leafSurface);
-        // placeTile(x + 2, y + h, leafSurface);
-
-        // placeTile(x - 2, y + h + 1, leafSurface);
-        // placeTile(x - 1, y + h + 1, leafSurface);
-        // placeTile(x, y + h + 1, leafSurface);
-        // placeTile(x + 1, y + h + 1, leafSurface);
-        // placeTile(x + 2, y + h + 1, leafSurface);
-
-        // placeTile(x - 1, y + h + 2, leafSurface);
-        // placeTile(x, y + h + 2, leafSurface);
-        // placeTile(x + 1, y + h + 2, leafSurface);
-
-        // placeTile(x, y + h + 3, leafSurface);
     }
 
     void placeTile(int x, int y, SDL_Surface* tileSurface, bool collidable = true, bool drawScaledToHitbox = true) {
