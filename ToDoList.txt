@@ -1,3 +1,4 @@
--tablica kolizji dla klasy Alive
--kafelkowanie bloków
 -lepsze tekstury
+-stawianie blokow
+-kopanie blokow
+-ekwipunek

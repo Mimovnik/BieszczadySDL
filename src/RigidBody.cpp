@@ -1,11 +1,14 @@
 #include "RigidBody.h"
+#include <iostream>
 
 RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-                     int height, bool drawScaledToHitbox, double maxSpeed) {
+                     int height, bool collidable, bool drawScaledToHitbox,
+                     double maxSpeed) {
     this->hitbox.position = startingPosition;
     this->surface = surface;
     this->hitbox.width = width;
     this->hitbox.height = height;
+    this->collidable = collidable;
     this->drawScaledToHitbox = drawScaledToHitbox;
     this->maxSpeed = maxSpeed;
 }
@@ -63,17 +66,22 @@ void RigidBody::draw(SDL_Surface* screen, Vector offset) {
 void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
     Vector futureOffset = velocity.rescale(gameDelta).add(
         acceleration.rescale(gameDelta * gameDelta / 2));
-    Rectangle* othersHitboxes = new Rectangle[othersCount];
+
+    std::vector<Rectangle> collidableHitboxList;
     for (int i = 0; i < othersCount; i++) {
-        if (&others[i] == this) continue;
-        othersHitboxes[i] = others[i].hitbox;
+        if (others[i].collidable) collidableHitboxList.push_back(others[i].hitbox);
     }
+
+    int collidableCount = collidableHitboxList.size();
+    Rectangle* collidableHitboxes = new Rectangle[collidableCount];
+    std::copy(collidableHitboxList.begin(),collidableHitboxList.end(), collidableHitboxes);
+
     if (topHitbox()
             .translate(futureOffset)
-            .overlaps(othersHitboxes, othersCount) ||
+            .overlaps(collidableHitboxes, collidableCount) ||
         bottomHitbox()
             .translate(futureOffset)
-            .overlaps(othersHitboxes, othersCount)) {
+            .overlaps(collidableHitboxes, collidableCount)) {
         velocity.y = 0;
         acceleration.y = 0;
         futureOffset = velocity.rescale(gameDelta).add(
@@ -81,14 +89,14 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
     }
     if (leftHitbox()
             .translate(futureOffset)
-            .overlaps(othersHitboxes, othersCount) ||
+            .overlaps(collidableHitboxes, collidableCount) ||
         rightHitbox()
             .translate(futureOffset)
-            .overlaps(othersHitboxes, othersCount)) {
+            .overlaps(collidableHitboxes, collidableCount)) {
         velocity.x = 0;
         acceleration.x = 0;
     }
-    delete[] othersHitboxes;
+    delete[] collidableHitboxes;
 }
 
 Rectangle RigidBody::leftHitbox() {

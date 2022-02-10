@@ -18,7 +18,7 @@
 #define FULLSCREEN_ON false
 #define MAX_FPS 150
 #define SCREEN_WIDTH 840
-#define SCREEN_HEIGHT 620
+#define SCREEN_HEIGHT 420
 
 #define CENTER_X 0
 #define CENTER_Y 0

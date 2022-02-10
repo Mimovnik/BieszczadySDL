@@ -3,10 +3,12 @@
 
 #include "Rectangle.h"
 #include "Vector.h"
+#include <vector>
 class RigidBody {
    public:
     SDL_Surface* surface = nullptr;
     bool drawScaledToHitbox;
+    bool collidable;
     Vector velocity;
     Vector acceleration;
     double mass;
@@ -16,7 +18,7 @@ class RigidBody {
     RigidBody(){};
 
     RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
-              int height, bool drawScaledToHitbox = true, double maxSpeed = 10);
+              int height, bool collidable = true, bool drawScaledToHitbox = true, double maxSpeed = 10);
 
     void calculatePosition(double gameDelta, RigidBody* others, int othersCount);
 
