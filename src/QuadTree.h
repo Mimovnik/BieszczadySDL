@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "RigidBody.h"
-#define NODE_CAPACITY 64
+#define NODE_CAPACITY 1
 
 class QuadTree {
    public:
@@ -27,5 +27,5 @@ class QuadTree {
 
     std::vector<RigidBody> queryRange(Rectangle range);
 
-    void subdivide();
+    void subdivide(RigidBody* blocks);
 };
