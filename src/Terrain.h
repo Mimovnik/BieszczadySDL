@@ -124,7 +124,7 @@ class Terrain {
     }
 
     void placeTree(int x, int y) {
-        int h = rand() % 4 + 2;
+        int h = rand() % 4 + 4;
 
         placeTile(x, y, trunkBotSurface);
         for (int i = 1; i < h; i++) {
