@@ -1,5 +1,7 @@
 #include "Alive.h"
 
+#include <math.h>
+
 #include "RigidBody.h"
 #include "Vector.h"
 
@@ -18,15 +20,20 @@ Alive::Alive(Vector startingPosition, SDL_Surface* surface, int width,
     this->digTimer.coolDown = 0.1;
 }
 
-void Alive::place(RigidBody block, Vector blockPos, QuadTree* terrain,
+void Alive::place(RigidBody block, Vector mousePos, QuadTree* terrain,
                   double realTime) {
+    Vector blockPos;
+    blockPos.x = round(mousePos.x) - ((int)round(mousePos.x) % 64) + 32;
+    blockPos.y = round(mousePos.y) - ((int)round(mousePos.y) % 64) - 32;
     block.hitbox.position = blockPos;
+    if(!this->hitbox.overlaps(block.hitbox)){
     if (terrain->queryRange(block.hitbox).size() == 0) {
         if (placeTimer.isUp(realTime)) {
             placeTimer.start(realTime);
 
             terrain->insert(block);
         }
+    }
     }
 }
 

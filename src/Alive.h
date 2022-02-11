@@ -12,7 +12,7 @@ class Alive : public RigidBody {
 
 	Alive(Vector startingPosition, SDL_Surface* surface,int width, int height, double maxSpeed, double walkAccel, double jumpHeight, double jumpCooldown);
 
-    void place(RigidBody block, Vector blockPos, QuadTree* terrain, double realTime);
+    void place(RigidBody block, Vector mousePos, QuadTree* terrain, double realTime);
 
     void dig(Vector digPos, QuadTree* terrain, double realTime);
 
