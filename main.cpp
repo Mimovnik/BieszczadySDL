@@ -7,11 +7,11 @@
 #include <iostream>
 #include <vector>
 
-#include "src/RigidBody.h"
 #include "src/Alive.h"
 #include "src/Draw.cpp"
 #include "src/LoadBMP.cpp"
 #include "src/Rectangle.h"
+#include "src/RigidBody.h"
 #include "src/Terrain.h"
 #include "src/Vector.h"
 
@@ -88,11 +88,30 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
         KeyState[SDL_SCANCODE_SPACE]) {
         entity->jump(colliders, collidersCount, realTime);
     }
-    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
-        entity->move('R', colliders, collidersCount);
-    }
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
+        entity->move('R', colliders, collidersCount);
+        entity->startAnimation(entity->walkRightSurfaceList);
+    }
+    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
         entity->move('L', colliders, collidersCount);
+        entity->startAnimation(entity->walkLeftSurfaceList);
+    }
+    if (entity->velocity.x == 0) {
+        entity->startAnimation(entity->idleRightSurfaceList);
+    }
+
+    if (entity->velocity.y > 40) {
+        if (entity->velocity.x >= 0)
+            entity->startAnimation(entity->fallRightSurfaceList);
+        if (entity->velocity.x < 0)
+            entity->startAnimation(entity->fallLeftSurfaceList);
+    }
+
+    if (entity->velocity.y < 0) {
+        if (entity->velocity.x >= 0)
+            entity->startAnimation(entity->jumpRightSurfaceList);
+        if (entity->velocity.x < 0)
+            entity->startAnimation(entity->jumpLeftSurfaceList);
     }
 
     int mouseXRelToScreen, mouseYRelToScreen;
@@ -102,11 +121,11 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
         Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
 
-            printf("Mousepos: x = %.1f y = %.1f", mousePos.x, mousePos.y);
-    if ((buttons & SDL_BUTTON_LMASK) != 0) {
+    printf("Mousepos: x = %.1f y = %.1f", mousePos.x, mousePos.y);
+    if ((buttons & SDL_BUTTON_RMASK) != 0) {
         entity->place(block, mousePos, terrain, realTime);
     }
-    if ((buttons & SDL_BUTTON_RMASK) != 0) {
+    if ((buttons & SDL_BUTTON_LMASK) != 0) {
         entity->dig(mousePos, terrain, realTime);
     }
 
@@ -153,34 +172,153 @@ int main(int argc, char* args[]) {
     }
 
     printf("Log:\n");
+    std::vector<SDL_Surface*> heroIdleLeftSurfaceList;
+    heroIdleLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-left-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-left-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-left-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-left-03.bmp", charset,
+                screen, screenTexture, window, renderer));
 
-    SDL_Surface* heroSurface = loadBMP("../bmp/witcherRight.bmp", charset,
-                                       screen, screenTexture, window, renderer);
+    std::vector<SDL_Surface*> heroIdleRightSurfaceList;
+    heroIdleRightSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-right-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleRightSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-right-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleRightSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-right-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroIdleRightSurfaceList.push_back(
+        loadBMP("../bmp/player/idle/adventurer-idle-right-03.bmp", charset,
+                screen, screenTexture, window, renderer));
 
-    int hitboxWidth = 60;
-    int hitboxHeigth = 88;
+    std::vector<SDL_Surface*> heroWalkLeftSurfaceList;
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-03.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-04.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-left-05.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<SDL_Surface*> heroWalkRightSurfaceList;
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-03.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-04.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroWalkRightSurfaceList.push_back(
+        loadBMP("../bmp/player/walk/adventurer-run-right-05.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<SDL_Surface*> heroJumpLeftSurfaceList;
+    heroJumpLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-left-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-left-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-left-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-left-03.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<SDL_Surface*> heroJumpRightSurfaceList;
+    heroJumpRightSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-right-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpRightSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-right-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpRightSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-right-02.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroJumpRightSurfaceList.push_back(
+        loadBMP("../bmp/player/jump/adventurer-jump-right-03.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<SDL_Surface*> heroFallLeftSurfaceList;
+    heroFallLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/fall/adventurer-fall-left-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroFallLeftSurfaceList.push_back(
+        loadBMP("../bmp/player/fall/adventurer-fall-left-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<SDL_Surface*> heroFallRightSurfaceList;
+    heroFallRightSurfaceList.push_back(
+        loadBMP("../bmp/player/fall/adventurer-fall-right-00.bmp", charset,
+                screen, screenTexture, window, renderer));
+    heroFallRightSurfaceList.push_back(
+        loadBMP("../bmp/player/fall/adventurer-fall-right-01.bmp", charset,
+                screen, screenTexture, window, renderer));
+
+    std::vector<std::vector<SDL_Surface*>> heroSurfaceListList;
+    heroSurfaceListList.push_back(heroIdleLeftSurfaceList);
+    heroSurfaceListList.push_back(heroIdleRightSurfaceList);
+    heroSurfaceListList.push_back(heroWalkLeftSurfaceList);
+    heroSurfaceListList.push_back(heroWalkRightSurfaceList);
+    heroSurfaceListList.push_back(heroJumpLeftSurfaceList);
+    heroSurfaceListList.push_back(heroJumpRightSurfaceList);
+    heroSurfaceListList.push_back(heroFallLeftSurfaceList);
+    heroSurfaceListList.push_back(heroFallRightSurfaceList);
+
+    int hitboxWidth = 84;
+    int hitboxHeigth = 120;
     double walkAcceleration = 20;
     double maxSpeed = 30;
-    double jumpHeight = 50;
+    double jumpHeight = 40;
     double jumpCooldown = 0.5;
-    Alive player = Alive(center.add(Vector(1600, -4000)), heroSurface,
+    Alive player = Alive(center.add(Vector(1600, -4000)), heroSurfaceListList,
                          hitboxWidth, hitboxHeigth, maxSpeed, walkAcceleration,
                          jumpHeight, jumpCooldown);
     player.drawScaledToHitbox = false;
 
-    SDL_Surface* redSurface = loadBMP("../bmp/red.bmp", charset, screen,
-                                      screenTexture, window, renderer);
+    std::vector<SDL_Surface*> redSurfaceList;
+    redSurfaceList.push_back(loadBMP("../bmp/red.bmp", charset, screen,
+                                     screenTexture, window, renderer));
 
-    SDL_Surface* boxSurface = loadBMP("../bmp/box.bmp", charset, screen,
-                                      screenTexture, window, renderer);
+    std::vector<SDL_Surface*> boxSurfaceList;
+    boxSurfaceList.push_back(loadBMP("../bmp/box.bmp", charset, screen,
+                                     screenTexture, window, renderer));
 
-    RigidBody box = RigidBody(Vector::ZERO, boxSurface, 64, 64);
+    RigidBody box = RigidBody(Vector::ZERO, boxSurfaceList, 64, 64);
 
-        // int worldWidth, int worldHeight, double noiseValue, double
-        // terrainFreq, double caveFreq, float heightMultiplier, float
-        // heightAddition, int dirtLayerHeight, unsigned int seed
-        const int worldWidth = 200,
-              worldHeight = 100;
+    // int worldWidth, int worldHeight, double noiseValue, double
+    // terrainFreq, double caveFreq, float heightMultiplier, float
+    // heightAddition, int dirtLayerHeight, unsigned int seed
+    const int worldWidth = 200, worldHeight = 100, blockSize = 64;
     int worldSeed = 0;
     Terrain world =
         Terrain(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5, worldSeed);
@@ -245,9 +383,9 @@ int main(int argc, char* args[]) {
             Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
                       player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
-            visibleBlocks[i].draw(screen, camera);
+            visibleBlocks[i].draw(screen, camera, realTime / 1000);
         }
-        player.draw(screen, camera);
+        player.draw(screen, camera, realTime / 1000);
 
         fpsTimer += delta;
         if (fpsTimer > 500) {

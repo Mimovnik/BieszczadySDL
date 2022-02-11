@@ -5,19 +5,32 @@
 #include "RigidBody.h"
 #include "Vector.h"
 
-Alive::Alive(Vector startingPosition, SDL_Surface* surface, int width,
+Alive::Alive(Vector startingPosition, std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, int width,
              int height, double maxSpeed, double walkAccel, double jumpHeight,
              double jumpCooldown) {
     this->hitbox.position = startingPosition;
-    this->surface = surface;
     this->hitbox.width = width;
     this->hitbox.height = height;
+
     this->maxSpeed = maxSpeed;
     this->walkAccel = walkAccel;
     this->jumpHeight = jumpHeight;
     this->jumpTimer.coolDown = jumpCooldown;
+
     this->placeTimer.coolDown = 0.2;
     this->digTimer.coolDown = 0.1;
+
+    this->idleLeftSurfaceList = heroSurfaceListList[0];
+    this->idleRightSurfaceList = heroSurfaceListList[1];
+    this->walkLeftSurfaceList = heroSurfaceListList[2];
+    this->walkRightSurfaceList = heroSurfaceListList[3];
+    this->jumpLeftSurfaceList = heroSurfaceListList[4];
+    this->jumpRightSurfaceList = heroSurfaceListList[5];
+    this->fallLeftSurfaceList = heroSurfaceListList[6];
+    this->fallRightSurfaceList = heroSurfaceListList[7];
+    this->currentSurfaceList = idleRightSurfaceList;
+    this->animation.coolDown = 0.15;
+    this->currentSurfaceIndex = 0;
 }
 
 void Alive::place(RigidBody block, Vector mousePos, QuadTree* terrain,
@@ -71,22 +84,30 @@ void Alive::move(char direction, RigidBody* bases, int basesCount) {
         othersHitboxes[i] = bases[i].hitbox;
     }
     if (bottomHitbox().translate(below).overlaps(othersHitboxes, basesCount)) {
-        if (direction == 'R') {
+        if (direction == 'L') {
             acceleration = acceleration.add(Vector(-walkAccel, 0));
             return;
         }
-        if (direction == 'L') {
+        if (direction == 'R') {
             acceleration = acceleration.add(Vector(walkAccel, 0));
             return;
         }
     }
-    if (direction == 'R') {
+    if (direction == 'L') {
         acceleration = acceleration.add(Vector(-walkAccel * 0.1, 0));
         return;
     }
-    if (direction == 'L') {
+    if (direction == 'R') {
         acceleration = acceleration.add(Vector(walkAccel * 0.1, 0));
         return;
     }
     delete[] othersHitboxes;
 }
+
+    void Alive::startAnimation(std::vector<SDL_Surface*> surfaceList){
+        if(currentSurfaceList != surfaceList){
+            currentSurfaceList = surfaceList;
+            currentSurfaceIndex = 0;
+        }
+    }
+

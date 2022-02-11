@@ -1,16 +1,21 @@
 #include "RigidBody.h"
+
 #include <iostream>
 
-RigidBody::RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
+RigidBody::RigidBody(Vector startingPosition,
+                     std::vector<SDL_Surface*> idleSurfaceList, int width,
                      int height, bool collidable, bool drawScaledToHitbox,
                      double maxSpeed) {
     this->hitbox.position = startingPosition;
-    this->surface = surface;
+    this->currentSurfaceList = idleSurfaceList;
     this->hitbox.width = width;
     this->hitbox.height = height;
     this->collidable = collidable;
     this->drawScaledToHitbox = drawScaledToHitbox;
     this->maxSpeed = maxSpeed;
+
+    this->animation.coolDown = 0.5;
+    this->currentSurfaceIndex = 0;
 }
 
 void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
@@ -46,20 +51,28 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
-void RigidBody::draw(SDL_Surface* screen, Vector offset) {
+void RigidBody::draw(SDL_Surface* screen, Vector offset, double realTime) {
+    if (animation.isUp(realTime)) {
+        animation.start(realTime);
+
+        currentSurfaceIndex++;
+        currentSurfaceIndex = currentSurfaceIndex % currentSurfaceList.size();
+    }
     SDL_Rect dest;
     if (drawScaledToHitbox) {
         dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
         dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
         dest.w = hitbox.width;
         dest.h = hitbox.height;
-        SDL_BlitScaled(surface, NULL, screen, &dest);
+        SDL_BlitScaled(currentSurfaceList[currentSurfaceIndex], NULL, screen, &dest);
     } else {
-        dest.x = hitbox.position.x - surface->w / 2 - offset.x;
-        dest.y = hitbox.position.y - surface->h / 2 - offset.y;
-        dest.w = surface->w;
-        dest.h = surface->h;
-        SDL_BlitScaled(surface, NULL, screen, &dest);
+        dest.x = hitbox.position.x - currentSurfaceList[currentSurfaceIndex]->w / 2 -
+                 offset.x;
+        dest.y = hitbox.position.y - currentSurfaceList[currentSurfaceIndex]->h / 2 -
+                 offset.y;
+        dest.w = currentSurfaceList[currentSurfaceIndex]->w;
+        dest.h = currentSurfaceList[currentSurfaceIndex]->h;
+        SDL_BlitScaled(currentSurfaceList[currentSurfaceIndex], NULL, screen, &dest);
     }
 }
 
@@ -69,12 +82,14 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
 
     std::vector<Rectangle> collidableHitboxList;
     for (int i = 0; i < othersCount; i++) {
-        if (others[i].collidable) collidableHitboxList.push_back(others[i].hitbox);
+        if (others[i].collidable)
+            collidableHitboxList.push_back(others[i].hitbox);
     }
 
     int collidableCount = collidableHitboxList.size();
     Rectangle* collidableHitboxes = new Rectangle[collidableCount];
-    std::copy(collidableHitboxList.begin(),collidableHitboxList.end(), collidableHitboxes);
+    std::copy(collidableHitboxList.begin(), collidableHitboxList.end(),
+              collidableHitboxes);
 
     if (topHitbox()
             .translate(futureOffset)

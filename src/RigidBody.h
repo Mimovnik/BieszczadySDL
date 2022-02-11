@@ -4,9 +4,12 @@
 #include "Rectangle.h"
 #include "Vector.h"
 #include <vector>
+#include "Timer.h"
 class RigidBody {
    public:
-    SDL_Surface* surface = nullptr;
+    std::vector<SDL_Surface*> currentSurfaceList;
+    int currentSurfaceIndex;
+    Timer animation;
     bool drawScaledToHitbox;
     bool collidable;
     Vector velocity;
@@ -17,12 +20,12 @@ class RigidBody {
 
     RigidBody(){};
 
-    RigidBody(Vector startingPosition, SDL_Surface* surface, int width,
+    RigidBody(Vector startingPosition, std::vector<SDL_Surface*> idleSurfaceList, int width,
               int height, bool collidable = true, bool drawScaledToHitbox = true, double maxSpeed = 10);
 
     void calculatePosition(double gameDelta, RigidBody* others, int othersCount);
 
-    void draw(SDL_Surface* screen, Vector offset);
+    void draw(SDL_Surface* screen, Vector offset, double realTime);
 
     void collide(RigidBody* others, int othersCount, double gameDelta);
 

@@ -155,7 +155,9 @@ class Terrain {
                    bool collidable = true, bool drawScaledToHitbox = true) {
         blockCount++;
         Vector blockPosition = Vector(x * 64 + 64 / 2, -y * 64 - 64 / 2);
-        terrain->insert(RigidBody(blockPosition, tileSurface, 64, 64,
+        std::vector <SDL_Surface*> tileSurfaceList;
+        tileSurfaceList.push_back(tileSurface);
+        terrain->insert(RigidBody(blockPosition, tileSurfaceList, 64, 64,
                                   collidable, drawScaledToHitbox));
     }
 };

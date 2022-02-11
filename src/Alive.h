@@ -1,7 +1,7 @@
 #pragma once
+#include "QuadTree.h"
 #include "RigidBody.h"
 #include "Timer.h"
-#include "QuadTree.h"
 class Alive : public RigidBody {
    public:
     Timer jumpTimer;
@@ -10,13 +10,27 @@ class Alive : public RigidBody {
     double walkAccel;
     double jumpHeight;
 
-	Alive(Vector startingPosition, SDL_Surface* surface,int width, int height, double maxSpeed, double walkAccel, double jumpHeight, double jumpCooldown);
+    std::vector<SDL_Surface*> idleLeftSurfaceList;
+    std::vector<SDL_Surface*> idleRightSurfaceList;
+    std::vector<SDL_Surface*> walkLeftSurfaceList;
+    std::vector<SDL_Surface*> walkRightSurfaceList;
+    std::vector<SDL_Surface*> jumpLeftSurfaceList;
+    std::vector<SDL_Surface*> jumpRightSurfaceList;
+    std::vector<SDL_Surface*> fallLeftSurfaceList;
+    std::vector<SDL_Surface*> fallRightSurfaceList;
 
-    void place(RigidBody block, Vector mousePos, QuadTree* terrain, double realTime);
+    Alive(Vector startingPosition, std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, int width, int height,
+          double maxSpeed, double walkAccel, double jumpHeight,
+          double jumpCooldown);
+
+    void place(RigidBody block, Vector mousePos, QuadTree* terrain,
+               double realTime);
 
     void dig(Vector digPos, QuadTree* terrain, double realTime);
 
     void jump(RigidBody* bases, int basesCount, double realTime);
 
     void move(char direction, RigidBody* bases, int basesCount);
+
+    void startAnimation(std::vector<SDL_Surface*> surfaceList);
 };
