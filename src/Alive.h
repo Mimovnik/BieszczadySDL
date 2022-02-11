@@ -6,6 +6,7 @@ class Alive : public RigidBody {
    public:
     Timer jumpTimer;
     Timer placeTimer;
+    Timer digTimer;
     double walkAccel;
     double jumpHeight;
 
@@ -13,9 +14,9 @@ class Alive : public RigidBody {
 
     void place(RigidBody block, Vector blockPos, QuadTree* terrain, double realTime);
 
-    void jump(RigidBody base, double realTime);
+    void dig(Vector digPos, QuadTree* terrain, double realTime);
+
     void jump(RigidBody* bases, int basesCount, double realTime);
 
-    void move(char direction, RigidBody base);
     void move(char direction, RigidBody* bases, int basesCount);
 };

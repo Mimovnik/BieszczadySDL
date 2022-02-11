@@ -14,26 +14,28 @@ Alive::Alive(Vector startingPosition, SDL_Surface* surface, int width,
     this->walkAccel = walkAccel;
     this->jumpHeight = jumpHeight;
     this->jumpTimer.coolDown = jumpCooldown;
-    this->placeTimer.coolDown = 0.1;
+    this->placeTimer.coolDown = 0.2;
+    this->digTimer.coolDown = 0.1;
 }
 
 void Alive::place(RigidBody block, Vector blockPos, QuadTree* terrain,
                   double realTime) {
     block.hitbox.position = blockPos;
-    if (placeTimer.isUp(realTime)) {
-        placeTimer.start(realTime);
+    if (terrain->queryRange(block.hitbox).size() == 0) {
+        if (placeTimer.isUp(realTime)) {
+            placeTimer.start(realTime);
 
-        terrain->insert(block);
+            terrain->insert(block);
+        }
     }
 }
 
-void Alive::jump(RigidBody base, double realTime) {
-    Vector below = Vector(0, 1);
-    if (bottomHitbox().translate(below).overlaps(base.hitbox)) {
-        if (jumpTimer.isUp(realTime)) {
-            jumpTimer.start(realTime);
+void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
+    if (terrain->queryRange(digPos).size() > 0) {
+        if (digTimer.isUp(realTime)) {
+            digTimer.start(realTime);
 
-            velocity.y = -jumpHeight;
+            terrain->destroy(digPos);
         }
     }
 }
@@ -52,28 +54,6 @@ void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
         }
     }
     delete[] othersHitboxes;
-}
-
-void Alive::move(char direction, RigidBody base) {
-    Vector below = Vector(0, 1);
-    if (bottomHitbox().translate(below).overlaps(base.hitbox)) {
-        if (direction == 'R') {
-            acceleration = acceleration.add(Vector(-walkAccel, 0));
-            return;
-        }
-        if (direction == 'L') {
-            acceleration = acceleration.add(Vector(walkAccel, 0));
-            return;
-        }
-    }
-    if (direction == 'R') {
-        acceleration = acceleration.add(Vector(-walkAccel * 0.1, 0));
-        return;
-    }
-    if (direction == 'L') {
-        acceleration = acceleration.add(Vector(walkAccel * 0.1, 0));
-        return;
-    }
 }
 
 void Alive::move(char direction, RigidBody* bases, int basesCount) {

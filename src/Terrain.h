@@ -3,11 +3,12 @@
 
 #include <iostream>
 #include <random>
+#include <vector>
 
-#include "LoadBMP.cpp"
 #include "PerlinNoise.h"
 #include "QuadTree.h"
 #include "RigidBody.h"
+#include "loadBMP.cpp"
 
 class Terrain {
    public:
@@ -27,13 +28,12 @@ class Terrain {
     double* noiseTexture;
 
     QuadTree* terrain;
-    SDL_Surface* stoneSurface;
-    SDL_Surface* dirtSurface;
-    SDL_Surface* grassDirtSurface;
-    SDL_Surface* trunkBotSurface;
-    SDL_Surface* trunkMidSurface;
-    SDL_Surface* leafSurface;
-    SDL_Surface* treeCrownSurface;
+
+    std::vector<SDL_Surface*> stoneSurfaceList;
+    std::vector<SDL_Surface*> dirtSurfaceList;
+    std::vector<SDL_Surface*> grassDirtSurfaceList;
+
+    std::vector<SDL_Surface*> treeSurfaceList;
 
     Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
             double terrainFreq, double caveFreq, float heightMultiplier,
@@ -48,28 +48,37 @@ class Terrain {
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
         this->blockCount = 0;
-        this->terrain =
-            new QuadTree(Rectangle(20000, 20000, Vector(10000, -10000)));
+        this->terrain = new QuadTree(
+            Rectangle(worldWidth * 64, worldHeight * 64,
+                      Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
     }
     void generate(SDL_Surface* charset, SDL_Surface* screen,
                   SDL_Texture* screenTexture, SDL_Window* window,
                   SDL_Renderer* renderer) {
-        this->stoneSurface = loadBMP("../bmp/stone.bmp", charset, screen,
-                                     screenTexture, window, renderer);
-        this->dirtSurface = loadBMP("../bmp/dirt.bmp", charset, screen,
-                                    screenTexture, window, renderer);
-        this->grassDirtSurface =
+        this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp", charset,
+                                                 screen, screenTexture, window,
+                                                 renderer));
+
+        this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp", charset,
+                                                screen, screenTexture, window,
+                                                renderer));
+        this->dirtSurfaceList.push_back(loadBMP("../bmp/gravel_dirt.bmp",
+                                                charset, screen, screenTexture,
+                                                window, renderer));
+
+        this->grassDirtSurfaceList.push_back(
             loadBMP("../bmp/dirt_grass.bmp", charset, screen, screenTexture,
-                    window, renderer);
-        this->trunkBotSurface =
-            loadBMP("../bmp/trunk_bottom.bmp", charset, screen, screenTexture,
-                    window, renderer);
-        this->trunkMidSurface = loadBMP("../bmp/trunk_mid.bmp", charset, screen,
-                                        screenTexture, window, renderer);
-        this->leafSurface = loadBMP("../bmp/leaves_transparent.bmp", charset,
-                                    screen, screenTexture, window, renderer);
-        this->treeCrownSurface = loadBMP("../bmp/treeCrown.bmp", charset, screen,
-                                    screenTexture, window, renderer);
+                    window, renderer));
+
+        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp",
+                                                charset, screen, screenTexture,
+                                                window, renderer));
+        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp", charset,
+                                                screen, screenTexture, window,
+                                                renderer));
+        this->treeSurfaceList.push_back(loadBMP("../bmp/treeCrown.bmp", charset,
+                                                screen, screenTexture, window,
+                                                renderer));
 
         generateNoiseTexture();
         generateTerrain();
@@ -89,17 +98,26 @@ class Terrain {
             SDL_Surface* tileSurface;
             for (int y = 0; y < height; y++) {
                 if (y < height - dirtLayerHeight) {
-                    tileSurface = stoneSurface;
+                    int tileVariant = rand() % stoneSurfaceList.size();
+                    tileSurface = stoneSurfaceList[tileVariant];
                 } else if (y < height - 1) {
-                    tileSurface = dirtSurface;
+                    int tileVariant = rand() % dirtSurfaceList.size();
+                    tileSurface = dirtSurfaceList[tileVariant];
                 } else {
                     // generate grass
-                    tileSurface = grassDirtSurface;
+                    int t = rand() % grassDirtSurfaceList.size();
+                    tileSurface = grassDirtSurfaceList[t];
                     // generate Tree
 
-                    int t = rand() % 100;
-                    if (t < 10) {
-                        placeTree(x, y + 1);
+                    if (noiseTexture[(y + 1) * worldWidth + x] >
+                        noiseCaveValue) {
+                        int t = rand() % 100;
+                        if (t < 10) {
+                            placeTree(x, y + 1);
+                        }
+                        int b = rand() % 100;
+                        if (b < 20) {
+                        }
                     }
                 }
 
@@ -126,16 +144,18 @@ class Terrain {
     void placeTree(int x, int y) {
         int h = rand() % 4 + 2;
 
-        placeTile(x, y, trunkBotSurface, false);
+        placeTile(x, y, treeSurfaceList[0], false);
         for (int i = 1; i < h; i++) {
-            placeTile(x, y + i, trunkMidSurface, false);
+            placeTile(x, y + i, treeSurfaceList[1], false);
         }
-        placeTile(x, y + h + 2, treeCrownSurface, false, false);
+        placeTile(x, y + h + 2, treeSurfaceList[2], false, false);
     }
 
-    void placeTile(int x, int y, SDL_Surface* tileSurface, bool collidable = true, bool drawScaledToHitbox = true) {
+    void placeTile(int x, int y, SDL_Surface* tileSurface,
+                   bool collidable = true, bool drawScaledToHitbox = true) {
         blockCount++;
-        Vector blockPosition = Vector(x * 64, -y * 64);
-        terrain->insert(RigidBody(blockPosition, tileSurface, 64, 64, collidable, drawScaledToHitbox));
+        Vector blockPosition = Vector(x * 64 + 64 / 2, -y * 64 - 64 / 2);
+        terrain->insert(RigidBody(blockPosition, tileSurface, 64, 64,
+                                  collidable, drawScaledToHitbox));
     }
 };

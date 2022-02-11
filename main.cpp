@@ -95,14 +95,19 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
         entity->move('L', colliders, collidersCount);
     }
 
-    int mouseX, mouseY;
+    int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;
-    buttons = SDL_GetMouseState(&mouseX, &mouseY);
+    buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);
     Vector mousePos = entity->hitbox.position.add(
-        Vector(mouseX, mouseY)
+        Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
+
+            printf("Mousepos: x = %.1f y = %.1f", mousePos.x, mousePos.y);
     if ((buttons & SDL_BUTTON_LMASK) != 0) {
         entity->place(block, mousePos, terrain, realTime);
+    }
+    if ((buttons & SDL_BUTTON_RMASK) != 0) {
+        entity->dig(mousePos, terrain, realTime);
     }
 
     return false;
@@ -237,7 +242,7 @@ int main(int argc, char* args[]) {
         player.collide(blocksInRange, blocksInRangeCount, gameDelta);
 
         std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(
-            Rectangle(3 * SCREEN_WIDTH / 2, 3 * SCREEN_HEIGHT / 2,
+            Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
                       player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
             visibleBlocks[i].draw(screen, camera);
@@ -274,13 +279,13 @@ int main(int argc, char* args[]) {
 
         delete[] blocksInRange;
 
-        printf(
-            "Player's position: x = %.2f y = %.2f "
-            "velocity: x = %.8f y = %.8f "
-            "acceleration: x = %.4f y = %.4f\n",
-            player.hitbox.position.x, player.hitbox.position.y,
-            player.velocity.x, player.velocity.y, player.acceleration.x,
-            player.acceleration.y);
+        // printf(
+        //     "Player's position: x = %.2f y = %.2f "
+        //     "velocity: x = %.8f y = %.8f "
+        //     "acceleration: x = %.4f y = %.4f\n",
+        //     player.hitbox.position.x, player.hitbox.position.y,
+        //     player.velocity.x, player.velocity.y, player.acceleration.x,
+        //     player.acceleration.y);
 
         frames++;
     }

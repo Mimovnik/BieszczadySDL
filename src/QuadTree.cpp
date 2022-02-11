@@ -20,6 +20,26 @@ bool QuadTree::insert(RigidBody block) {
     return false;
 }
 
+bool QuadTree::destroy(Vector point) {
+    if (!boundary.contains(point)) {
+        return false;
+    }
+    if (topLeft != nullptr) {
+        topLeft->destroy(point);
+        topRight->destroy(point);
+        botLeft->destroy(point);
+        botRight->destroy(point);
+    }
+
+for (int i = 0; i < blocksAdded; i++) {
+        if (blocks[i].hitbox.contains(point)) {
+           blocks[i]= RigidBody();
+        }
+    }
+
+    return true;
+}
+
 std::vector<RigidBody> QuadTree::queryRange(Rectangle range) {
     std::vector<RigidBody> blocksInRange;
     if (!boundary.overlaps(range)) {
@@ -53,9 +73,50 @@ std::vector<RigidBody> QuadTree::queryRange(Rectangle range) {
     return blocksInRange;
 }
 
+std::vector<RigidBody> QuadTree::queryRange(Vector containingPoint) {
+    std::vector<RigidBody> blocksContainingPoint;
+    if (!boundary.contains(containingPoint)) {
+        return blocksContainingPoint;
+    }
+
+    if (topLeft != nullptr) {
+        std::vector<RigidBody> topLeftInRange =
+            topLeft->queryRange(containingPoint);
+        blocksContainingPoint.insert(blocksContainingPoint.end(),
+                                     topLeftInRange.begin(),
+                                     topLeftInRange.end());
+
+        std::vector<RigidBody> topRightInRange =
+            topRight->queryRange(containingPoint);
+        blocksContainingPoint.insert(blocksContainingPoint.end(),
+                                     topRightInRange.begin(),
+                                     topRightInRange.end());
+
+        std::vector<RigidBody> botLeftInRange =
+            botLeft->queryRange(containingPoint);
+        blocksContainingPoint.insert(blocksContainingPoint.end(),
+                                     botLeftInRange.begin(),
+                                     botLeftInRange.end());
+
+        std::vector<RigidBody> botRightInRange =
+            botRight->queryRange(containingPoint);
+        blocksContainingPoint.insert(blocksContainingPoint.end(),
+                                     botRightInRange.begin(),
+                                     botRightInRange.end());
+    }
+
+    for (int i = 0; i < blocksAdded; i++) {
+        if (blocks[i].hitbox.contains(containingPoint)) {
+            blocksContainingPoint.push_back(blocks[i]);
+        }
+    }
+
+    return blocksContainingPoint;
+}
+
 void QuadTree::subdivide(RigidBody* blocks) {
-    Vector topLeftPosition =
-        boundary.position.add(Vector(-boundary.width / 4, -boundary.height / 4));
+    Vector topLeftPosition = boundary.position.add(
+        Vector(-boundary.width / 4, -boundary.height / 4));
     Rectangle topLeftBoundary =
         Rectangle(boundary.width / 2, boundary.height / 2, topLeftPosition);
     topLeft = new QuadTree(topLeftBoundary);
@@ -66,8 +127,8 @@ void QuadTree::subdivide(RigidBody* blocks) {
         Rectangle(boundary.width / 2, boundary.height / 2, topRightPosition);
     topRight = new QuadTree(topRightBoundary);
 
-    Vector botLeftPosition = boundary.position.add(
-        Vector(-boundary.width / 4, boundary.height / 4));
+    Vector botLeftPosition =
+        boundary.position.add(Vector(-boundary.width / 4, boundary.height / 4));
     Rectangle botLeftBoundary =
         Rectangle(boundary.width / 2, boundary.height / 2, botLeftPosition);
     botLeft = new QuadTree(botLeftBoundary);

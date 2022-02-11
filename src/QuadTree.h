@@ -25,7 +25,10 @@ class QuadTree {
 
     bool insert(RigidBody block);
 
+    bool destroy(Vector point);
+
     std::vector<RigidBody> queryRange(Rectangle range);
+    std::vector<RigidBody> queryRange(Vector containingPoint);
 
     void subdivide(RigidBody* blocks);
 };
