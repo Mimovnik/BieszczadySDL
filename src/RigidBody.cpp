@@ -20,8 +20,8 @@ void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     delete[] othersHitboxes;
 
     acceleration = acceleration.difference(friction);
-    if ((velocity.add(acceleration.rescale(gameDelta)).magnitude() > 0 &&
-            velocity.magnitude() > 0 )||
+    if ((velocity.add(acceleration.rescale(gameDelta)).magnitude() >= 0 &&
+            velocity.magnitude() >= 0 )||
         (velocity.add(acceleration.rescale(gameDelta)).magnitude() < 0 &&
             velocity.magnitude() < 0)) {
 

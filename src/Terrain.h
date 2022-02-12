@@ -17,6 +17,8 @@ class Terrain {
     int worldHeight;
 
     int blockCount;
+    int blockWidth;
+    int blockHeight;
 
     int dirtLayerHeight;
     double terrainFreq;
@@ -49,6 +51,8 @@ class Terrain {
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
         this->blockCount = 0;
+        this->blockWidth = 64;
+        this->blockHeight = 64;
         this->terrain = new QuadTree(
             Rectangle(worldWidth * 64, worldHeight * 64,
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
@@ -156,10 +160,10 @@ class Terrain {
     void placeTile(int x, int y, SDL_Surface* tileSurface,
                    bool collidable = true, bool drawScaledToHitbox = true) {
         blockCount++;
-        Vector blockPosition = Vector(x * 64 + 64 / 2, -y * 64 - 64 / 2);
+        Vector blockPosition = Vector(x * blockWidth + blockWidth / 2, -y * blockHeight - blockHeight / 2);
         std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
-        terrain->insert(RigidBody(blockPosition, tileSurfaceList, 64, 64,
+        terrain->insert(RigidBody(blockPosition, tileSurfaceList, blockWidth, blockHeight,
                                   collidable, drawScaledToHitbox));
     }
 };

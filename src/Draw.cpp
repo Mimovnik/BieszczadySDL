@@ -7,7 +7,7 @@
 
 // narysowanie napisu txt na powierzchni screen, zaczynając od punktu (x, y)
 // charset to bitmapa 128x128 zawierająca znaki
-void DrawString(SDL_Surface* screen, int x, int y, const char* text,
+void DrawString(SDL_Surface* screen, double x, double y, const char* text,
                 SDL_Surface* charset) {
     int px, py, c;
     SDL_Rect s, d;
@@ -21,8 +21,8 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
         py = (c / 16) * 8;
         s.x = px;
         s.y = py;
-        d.x = x;
-        d.y = y;
+        d.x = static_cast<int>(x);
+        d.y = static_cast<int>(y);
         SDL_BlitSurface(charset, &s, screen, &d);
         x += 8;
         text++;
@@ -31,11 +31,11 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y)
 // (x, y) to punkt środka obrazka sprite na ekranie
-void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y,
+void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, double x, double y,
                  Vector offset) {
     SDL_Rect dest;
     dest.x = static_cast<int>(x - sprite->w / 2 - offset.x);
-    dest.y = y - sprite->h / 2 - offset.y;
+    dest.y = static_cast<int>(y - sprite->h / 2 - offset.y);
     dest.w = sprite->w;
     dest.h = sprite->h;
     SDL_BlitSurface(sprite, NULL, screen, &dest);

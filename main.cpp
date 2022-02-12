@@ -233,8 +233,8 @@ int main(int argc, char* args[]) {
         // player.acceleration = Vector::ZERO;
 
         std::vector<RigidBody> inRangeList = world.terrain->queryRange(
-            Rectangle(200, 200, player.hitbox.position));
-        int blocksInRangeCount = inRangeList.size();
+            Rectangle(player.hitbox.width + 100, player.hitbox.height + 100,player.hitbox.position));
+        int blocksInRangeCount = static_cast<int>(inRangeList.size());
         RigidBody* blocksInRange = new RigidBody[blocksInRangeCount];
         std::copy(inRangeList.begin(), inRangeList.end(), blocksInRange);
 
@@ -264,13 +264,13 @@ int main(int argc, char* args[]) {
 
         sprintf_s(text, "Czas trwania = %.1lf s  %.0lf klatek / s",
                   realTime / 1000, fps);
-        DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text,
+        DrawString(screen, static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10, text,
                    charset);
         //	      "Esc - exit, \030 - faster, \031 - slower"
         sprintf_s(text,
                   "Esc - wyjscie, W / \030 - skok, A / \032 oraz D / \033 - "
                   "sterowanie");
-        DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text,
+        DrawString(screen, static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 26, text,
                    charset);
 
         SDL_UpdateTexture(screenTexture, NULL, screen->pixels, screen->pitch);
