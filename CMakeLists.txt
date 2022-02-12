@@ -6,21 +6,36 @@ set(SDL2_LIB_DIR lib/SDL2/x64)
 
 add_library(
     SOURCE_FILES
+    src/settings.h
+    
+    src/displaySetup.cpp
+    src/loadBMP.cpp
+    src/control.cpp
+    src/draw.cpp
+
     src/Rectangle.h
     src/Rectangle.cpp
+
     src/RigidBody.h
     src/RigidBody.cpp
+
     src/Alive.h
     src/Alive.cpp
+
     src/Vector.h
     src/Vector.cpp
-    src/Draw.cpp
-    src/LoadBMP.cpp
+
     src/Timer.h
+
+    src/Animation.h
+    src/Animation.cpp
+
     src/Terrain.h
     src/Terrain.cpp
+
     src/QuadTree.h
     src/QuadTree.cpp
+
     src/PerlinNoise.h
     src/PerlinNoise.cpp
 )

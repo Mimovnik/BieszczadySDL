@@ -1,6 +1,7 @@
-#pragma once
 #include "Vector.h"
 
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
 class Rectangle {
    public:
     Vector position;
@@ -35,3 +36,5 @@ class Rectangle {
 
     double bottomSide() { return position.y + height / 2; }
 };
+
+#endif

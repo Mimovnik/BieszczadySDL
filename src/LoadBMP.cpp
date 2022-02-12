@@ -1,6 +1,8 @@
-#pragma once
 #include <SDL.h>
 #include <iostream>
+
+#ifndef LOADBMP_CPP
+#define LOADBMP_CPP
 
 SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset,
                      SDL_Surface* screen, SDL_Texture* screenTexture,
@@ -19,3 +21,5 @@ SDL_Surface* loadBMP(const char* fileName, SDL_Surface* charset,
     SDL_SetColorKey(surface, true, SDL_MapRGB(surface->format, 255, 0, 255));
     return surface;
 }
+
+#endif

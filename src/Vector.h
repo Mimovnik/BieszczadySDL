@@ -1,6 +1,8 @@
-#pragma once
 #include<math.h>
 #include<stdio.h>
+
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #define PI 3.14159265
 class Vector
@@ -72,4 +74,4 @@ public:
 		return setAngle(getAngle() + angle);
 	}
 };
-
+#endif

@@ -1,4 +1,3 @@
-#pragma once
 #include <SDL.h>
 
 #include <iostream>
@@ -10,6 +9,8 @@
 #include "RigidBody.h"
 #include "loadBMP.cpp"
 
+#ifndef TERRAIN_H
+#define TERRAIN_H
 class Terrain {
    public:
     int worldWidth;
@@ -52,6 +53,7 @@ class Terrain {
             Rectangle(worldWidth * 64, worldHeight * 64,
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
     }
+    
     void generate(SDL_Surface* charset, SDL_Surface* screen,
                   SDL_Texture* screenTexture, SDL_Window* window,
                   SDL_Renderer* renderer) {
@@ -155,9 +157,11 @@ class Terrain {
                    bool collidable = true, bool drawScaledToHitbox = true) {
         blockCount++;
         Vector blockPosition = Vector(x * 64 + 64 / 2, -y * 64 - 64 / 2);
-        std::vector <SDL_Surface*> tileSurfaceList;
+        std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
         terrain->insert(RigidBody(blockPosition, tileSurfaceList, 64, 64,
                                   collidable, drawScaledToHitbox));
     }
 };
+
+#endif

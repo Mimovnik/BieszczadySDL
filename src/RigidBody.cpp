@@ -2,33 +2,10 @@
 
 #include <iostream>
 
-RigidBody::RigidBody(Vector startingPosition,
-                     std::vector<SDL_Surface*> idleSurfaceList, int width,
-                     int height, bool collidable, bool drawScaledToHitbox,
-                     double maxSpeed) {
-    this->hitbox.position = startingPosition;
-    this->currentSurfaceList = idleSurfaceList;
-    this->hitbox.width = width;
-    this->hitbox.height = height;
-    this->collidable = collidable;
-    this->drawScaledToHitbox = drawScaledToHitbox;
-    this->maxSpeed = maxSpeed;
-
-    this->animation.coolDown = 0.5;
-    this->currentSurfaceIndex = 0;
-}
-
-void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
-                                  int othersCount) {
+void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     const double frictionFactor = 7;
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
-    if (velocity.x < 0.1 && velocity.x > -0.1) {
-        velocity.x = 0;
-    }
-    if (velocity.y < 0.1 && velocity.y > -0.1) {
-        velocity.y = 0;
-    }
     Rectangle* othersHitboxes = new Rectangle[othersCount];
     for (int i = 0; i < othersCount; i++) {
         othersHitboxes[i] = others[i].hitbox;
@@ -43,7 +20,22 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     delete[] othersHitboxes;
 
     acceleration = acceleration.difference(friction);
-    velocity = velocity.add(acceleration.rescale(gameDelta));
+    if ((velocity.add(acceleration.rescale(gameDelta)).magnitude() > 0 &&
+            velocity.magnitude() > 0 )||
+        (velocity.add(acceleration.rescale(gameDelta)).magnitude() < 0 &&
+            velocity.magnitude() < 0)) {
+
+        velocity = velocity.add(acceleration.rescale(gameDelta));
+    } else {
+        velocity = Vector::ZERO;
+    }
+
+    if (velocity.x < 0.1 && velocity.x > -0.1) {
+        velocity.x = 0;
+    }
+    if (velocity.y < 0.1 && velocity.y > -0.1) {
+        velocity.y = 0;
+    }
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
     // if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
@@ -51,28 +43,20 @@ void RigidBody::calculatePosition(double gameDelta, RigidBody* others,
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
-void RigidBody::draw(SDL_Surface* screen, Vector offset, double realTime) {
-    if (animation.isUp(realTime)) {
-        animation.start(realTime);
-
-        currentSurfaceIndex++;
-        currentSurfaceIndex = currentSurfaceIndex % currentSurfaceList.size();
-    }
+void RigidBody::draw(SDL_Surface* screen, Vector offset) {
     SDL_Rect dest;
     if (drawScaledToHitbox) {
         dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
         dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
         dest.w = hitbox.width;
         dest.h = hitbox.height;
-        SDL_BlitScaled(currentSurfaceList[currentSurfaceIndex], NULL, screen, &dest);
+        SDL_BlitScaled(active.currentSurface, NULL, screen, &dest);
     } else {
-        dest.x = hitbox.position.x - currentSurfaceList[currentSurfaceIndex]->w / 2 -
-                 offset.x;
-        dest.y = hitbox.position.y - currentSurfaceList[currentSurfaceIndex]->h / 2 -
-                 offset.y;
-        dest.w = currentSurfaceList[currentSurfaceIndex]->w;
-        dest.h = currentSurfaceList[currentSurfaceIndex]->h;
-        SDL_BlitScaled(currentSurfaceList[currentSurfaceIndex], NULL, screen, &dest);
+        dest.x = hitbox.position.x - active.currentSurface->w / 2 - offset.x;
+        dest.y = hitbox.position.y - active.currentSurface->h / 2 - offset.y;
+        dest.w = active.currentSurface->w;
+        dest.h = active.currentSurface->h;
+        SDL_BlitScaled(active.currentSurface, NULL, screen, &dest);
     }
 }
 

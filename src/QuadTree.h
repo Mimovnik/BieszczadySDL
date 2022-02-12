@@ -1,9 +1,11 @@
-#pragma once
 #include <vector>
 
 #include "RigidBody.h"
-#define NODE_CAPACITY 1
 
+#ifndef QUADTREE_H
+#define QUADTREE_H
+
+#define NODE_CAPACITY 1
 class QuadTree {
    public:
     Rectangle boundary;
@@ -16,7 +18,7 @@ class QuadTree {
     QuadTree* botLeft = nullptr;
     QuadTree* botRight = nullptr;
 
-    QuadTree();
+    QuadTree(){};
 
     QuadTree(Rectangle boundary) {
         this->boundary = boundary;
@@ -32,3 +34,4 @@ class QuadTree {
 
     void subdivide(RigidBody* blocks);
 };
+#endif
