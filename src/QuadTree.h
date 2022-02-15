@@ -1,6 +1,7 @@
 #include <vector>
 
 #include "RigidBody.h"
+#include "settings.h"
 
 #ifndef QUADTREE_H
 #define QUADTREE_H

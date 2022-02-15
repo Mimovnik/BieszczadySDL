@@ -1,7 +1,6 @@
 -lepsze tekstury
 -ekwipunek
 Błędy:
--czasami nie da sie zniszczyc bloku, np. klikajac na rogi bloku(bloki tak na prawde nie sa niszczone tylko zastepowane pustymi)
 -bedac w pewnych miejscach(tam gdzie visibleRange obejmuje pewne bloki) wyskakuje error ze Surface jest nullptr
 -tarcie przy malych predkosciach zmienia zwrot ruchu zamiast kończyć na wyzerowaniu
 -kiedy jest za duze przyspieszenie lub za maly hitbox przekazywany zeby sprawdzic blocksInRange gracz wpada w hitbox bloku

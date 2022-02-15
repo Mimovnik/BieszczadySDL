@@ -23,13 +23,13 @@ void Alive::place(RigidBody block, Vector mousePos, QuadTree* terrain,
 }
 
 void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
-    if (terrain->queryRange(digPos).size() > 0) {
+    //if (terrain->queryRange(Rectangle(64, 64, digPos)).size() > 0) {
         if (digTimer.isUp(realTime)) {
             digTimer.start(realTime);
 
             terrain->destroy(digPos);
         }
-    }
+   // }
 }
 
 void Alive::jump(RigidBody* bases, int basesCount, double realTime) {

@@ -9,4 +9,7 @@
 #define CENTER_X 0
 #define CENTER_Y 0
 
+#define BLOCK_WIDTH 64
+#define BLOCK_HEIGHT 64
+
 #endif

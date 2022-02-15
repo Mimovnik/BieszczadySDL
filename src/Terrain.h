@@ -8,6 +8,7 @@
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "loadBMP.cpp"
+#include "settings.h"
 
 #ifndef TERRAIN_H
 #define TERRAIN_H
@@ -51,8 +52,8 @@ class Terrain {
         this->dirtLayerHeight = dirtLayerHeight;
         this->seed = seed;
         this->blockCount = 0;
-        this->blockWidth = 64;
-        this->blockHeight = 64;
+        this->blockWidth = BLOCK_WIDTH;
+        this->blockHeight = BLOCK_HEIGHT;
         this->terrain = new QuadTree(
             Rectangle(worldWidth * 64, worldHeight * 64,
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));

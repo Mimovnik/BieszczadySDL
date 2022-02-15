@@ -1,5 +1,5 @@
 ﻿#define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <SDL.h>

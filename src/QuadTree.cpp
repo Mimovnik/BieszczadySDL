@@ -21,7 +21,7 @@ bool QuadTree::insert(RigidBody block) {
 }
 
 bool QuadTree::destroy(Vector point) {
-    if (!boundary.contains(point)) {
+    if (!boundary.overlaps(Rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, point))) {
         return false;
     }
     if (topLeft != nullptr) {
