@@ -36,7 +36,7 @@ bool Rectangle::overlaps(Rectangle another) {
            thisLeftSide < anotherRightSide && thisRightSide > anotherLeftSide;
 }
 
-bool Rectangle::overlaps(Rectangle* others, int othersCount) {
+bool Rectangle::overlapsAny(Rectangle* others, int othersCount) {
     float thisLeftSide = position.x - width / 2;
     float thisRightSide = position.x + width / 2;
     float thisTopSide = position.y - height / 2;

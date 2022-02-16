@@ -38,7 +38,7 @@ void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlaps(othersHitboxes, basesCount)) {
+    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
         if (jumpTimer.isUp(realTime)) {
             jumpTimer.start(realTime);
 
@@ -55,7 +55,7 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlaps(othersHitboxes, basesCount)) {
+    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
         if (direction == 'L') {
             acceleration = acceleration.add(Vector(-walkAccel, 0));
             return;

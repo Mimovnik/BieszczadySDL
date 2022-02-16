@@ -1,45 +1,38 @@
 #include "RigidBody.h"
-
+#include "settings.h"
 #include <iostream>
 
 void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
-    const double frictionFactor = 7;
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
     Rectangle* othersHitboxes = new Rectangle[othersCount];
     for (int i = 0; i < othersCount; i++) {
         othersHitboxes[i] = others[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlaps(othersHitboxes, othersCount)) {
+    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, othersCount)) {
         if (velocity.x > 0) {
-            friction = Vector(frictionFactor, 0);
+            friction = Vector(FRICTION_FACTOR, 0);
         } else if (velocity.x < 0) {
-            friction = Vector(-frictionFactor, 0);
+            friction = Vector(-FRICTION_FACTOR, 0);
         }
     }
     delete[] othersHitboxes;
 
     acceleration = acceleration.difference(friction);
-    if ((velocity.add(acceleration.rescale(gameDelta)).magnitude() >= 0 &&
-            velocity.magnitude() >= 0 )||
-        (velocity.add(acceleration.rescale(gameDelta)).magnitude() < 0 &&
-            velocity.magnitude() < 0)) {
-
+    if((velocity.x >= 0 && velocity.add(acceleration.rescale(gameDelta)).x >= 0) || (velocity.x <= 0 && velocity.add(acceleration.rescale(gameDelta)).x <= 0)){
         velocity = velocity.add(acceleration.rescale(gameDelta));
-    } else {
-        velocity = Vector::ZERO;
-    }
-
-    if (velocity.x < 0.1 && velocity.x > -0.1) {
+    } else{
         velocity.x = 0;
     }
-    if (velocity.y < 0.1 && velocity.y > -0.1) {
+
+    if (velocity.x < MIN_SPEED && velocity.x > -MIN_SPEED) {
+        velocity.x = 0;
+    }
+    if (velocity.y < MIN_SPEED && velocity.y > -MIN_SPEED) {
         velocity.y = 0;
     }
     if (velocity.x > maxSpeed) velocity.x = maxSpeed;
     if (velocity.x < -maxSpeed) velocity.x = -maxSpeed;
-    // if (velocity.y < -maxSpeed) velocity.y = -maxSpeed;
-    // if (velocity.y > maxSpeed) velocity.y = maxSpeed;
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
@@ -77,10 +70,10 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
 
     if (topHitbox()
             .translate(futureOffset)
-            .overlaps(collidableHitboxes, collidableCount) ||
+            .overlapsAny(collidableHitboxes, collidableCount) ||
         bottomHitbox()
             .translate(futureOffset)
-            .overlaps(collidableHitboxes, collidableCount)) {
+            .overlapsAny(collidableHitboxes, collidableCount)) {
         velocity.y = 0;
         acceleration.y = 0;
         futureOffset = velocity.rescale(gameDelta).add(
@@ -88,10 +81,10 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
     }
     if (leftHitbox()
             .translate(futureOffset)
-            .overlaps(collidableHitboxes, collidableCount) ||
+            .overlapsAny(collidableHitboxes, collidableCount) ||
         rightHitbox()
             .translate(futureOffset)
-            .overlaps(collidableHitboxes, collidableCount)) {
+            .overlapsAny(collidableHitboxes, collidableCount)) {
         velocity.x = 0;
         acceleration.x = 0;
     }
