@@ -10,7 +10,8 @@
 #define RIGIDBODY_H
 class RigidBody {
    public:
-    Animation active;
+    Animation* active = nullptr;
+    SDL_Surface* surface = nullptr;
     bool drawScaledToHitbox;
     bool collidable;
     Vector velocity;
@@ -31,8 +32,7 @@ class RigidBody {
         this->collidable = collidable;
         this->drawScaledToHitbox = drawScaledToHitbox;
         this->maxSpeed = maxSpeed;
-
-        this->active = Animation(idleSurfaceList, idleSurfaceList, "idle", 0.2);
+        this->surface = idleSurfaceList[0];
     }
 
     void move(double gameDelta, RigidBody* others,

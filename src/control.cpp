@@ -10,8 +10,11 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
     if (entity->velocity.magnitude() < 10 && entity->velocity.magnitude() > -10) {
         entity->startAnimation(&entity->idle);
     }
-    if (entity->active.leftSurfaceList != entity->jumping.leftSurfaceList && entity->velocity.y < 10) {
-        if (entity->velocity.x > 10 || entity->velocity.x < -10) {
+    if (entity->velocity.y < 10) {
+        if(entity->velocity.y < 0){
+        entity->startAnimation(&entity->jumping);
+        }
+        else if ((entity->velocity.x > 10 || entity->velocity.x < -10) && entity->velocity.y < 10) {
             entity->startAnimation(&entity->walking);
         }
     }
@@ -21,10 +24,10 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
     }
 
     if (entity->velocity.x > 0) {
-        entity->active.changeSide('R');
+        entity->active->changeSide('R');
     }
     if (entity->velocity.x < 0) {
-        entity->active.changeSide('L');
+        entity->active->changeSide('L');
     }
 
     SDL_PumpEvents();
@@ -34,18 +37,15 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP] ||
         KeyState[SDL_SCANCODE_SPACE]) {
         entity->jump(colliders, collidersCount, realTime);
-        entity->startAnimation(&entity->jumping);
     }
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
         entity->walk('R', colliders, collidersCount);
-        entity->active.changeSide('R');
     }
     if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
         entity->walk('L', colliders, collidersCount);
-        entity->active.changeSide('L');
     }
 
-    entity->active.changeSurface(realTime);
+    entity->active->changeSurface(realTime);
 
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;

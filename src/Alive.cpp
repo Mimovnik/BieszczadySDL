@@ -66,20 +66,20 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
         }
     }
     if (direction == 'L') {
-        acceleration = acceleration.add(Vector(-walkAccel * 0.1, 0));
+        acceleration = acceleration.add(Vector(-walkAccel * 0.3, 0));
         return;
     }
     if (direction == 'R') {
-        acceleration = acceleration.add(Vector(walkAccel * 0.1, 0));
+        acceleration = acceleration.add(Vector(walkAccel * 0.3, 0));
         return;
     }
     delete[] othersHitboxes;
 }
 
 void Alive::startAnimation(Animation* animation) {
-    if (active.leftSurfaceList != animation->leftSurfaceList) {
-        double time =  active.nextSprite.time;
-        active = *animation;
-        active.nextSprite.time = time;
+    if (active->leftSurfaceList != animation->leftSurfaceList) {
+        double time =  active->nextSprite.time;
+        active = animation;
+        active->nextSprite.time = time;
     }
 }
