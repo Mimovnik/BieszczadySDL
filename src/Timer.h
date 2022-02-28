@@ -1,14 +1,17 @@
 #ifndef TIMER_H
 #define TIMER_H
 class Timer {
-   public:
-    double time;
+    double deadline;
+
     double coolDown;
+   public:
 
-    Timer() { this->time = 0; }
+    Timer() { this->deadline = 0; }
 
-    void start(double realTime) { time = realTime + coolDown; }
+    void start(double realTime) { deadline = realTime + coolDown; }
 
-    bool isUp(double realTime) { return realTime > time; }
+    bool isUp(double realTime) { return realTime > deadline; }
+
+    void setCooldown(double cooldown) { this->coolDown = cooldown; }
 };
 #endif

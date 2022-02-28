@@ -30,10 +30,10 @@ class Alive : public RigidBody {
         this->maxSpeed = maxSpeed;
         this->walkAccel = walkAccel;
         this->jumpHeight = jumpHeight;
-        this->jumpTimer.coolDown = jumpCooldown;
+        this->jumpTimer.setCooldown(jumpCooldown);
 
-        this->placeTimer.coolDown = 0;
-        this->digTimer.coolDown = 0;
+        this->placeTimer.setCooldown(0);
+        this->digTimer.setCooldown(0);
 
         idle = Animation(heroSurfaceListList[0], heroSurfaceListList[1], "idle", 0.2);
         walking =

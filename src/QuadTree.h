@@ -6,7 +6,7 @@
 #ifndef QUADTREE_H
 #define QUADTREE_H
 
-#define NODE_CAPACITY 1
+#define NODE_CAPACITY 4
 class QuadTree {
    public:
     Rectangle boundary;

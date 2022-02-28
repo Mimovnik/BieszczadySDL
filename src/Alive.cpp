@@ -65,6 +65,7 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
             return;
         }
     }
+    //airborne
     if (direction == 'L') {
         acceleration = acceleration.add(Vector(-walkAccel * 0.3, 0));
         return;
@@ -77,9 +78,5 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
 }
 
 void Alive::startAnimation(Animation* animation) {
-    if (active->leftSurfaceList != animation->leftSurfaceList) {
-        double time =  active->nextSprite.time;
         active = animation;
-        active->nextSprite.time = time;
-    }
 }

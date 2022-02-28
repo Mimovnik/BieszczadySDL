@@ -7,20 +7,14 @@
 
 bool control(Alive* entity, double realTime, RigidBody* colliders,
              int collidersCount, RigidBody block, QuadTree* terrain) {
-    if (entity->velocity.magnitude() < 10 && entity->velocity.magnitude() > -10) {
-        entity->startAnimation(&entity->idle);
-    }
-    if (entity->velocity.y < 10) {
-        if(entity->velocity.y < 0){
-        entity->startAnimation(&entity->jumping);
-        }
-        else if ((entity->velocity.x > 10 || entity->velocity.x < -10) && entity->velocity.y < 10) {
-            entity->startAnimation(&entity->walking);
-        }
-    }
-
     if (entity->velocity.y > 10) {
         entity->startAnimation(&entity->falling);
+    } else if (entity->velocity.y < 0) {
+        entity->startAnimation(&entity->jumping);
+    } else if (entity->velocity.x > 10 || entity->velocity.x < -10) {
+        entity->startAnimation(&entity->walking);
+    } else {
+        entity->startAnimation(&entity->idle);
     }
 
     if (entity->velocity.x > 0) {
