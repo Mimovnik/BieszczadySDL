@@ -40,14 +40,14 @@ void RigidBody::draw(SDL_Surface* screen, Vector offset) {
     SDL_Rect dest;
     if(active != nullptr){
     if (drawScaledToHitbox) {
-        dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
-        dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
-        dest.w = hitbox.width;
-        dest.h = hitbox.height;
+        dest.x = static_cast<int>(hitbox.position.x - hitbox.width / 2 - offset.x);
+        dest.y = static_cast<int>(hitbox.position.y - hitbox.height / 2 - offset.y);
+        dest.w = static_cast<int>(hitbox.width);
+        dest.h = static_cast<int>(hitbox.height);
         SDL_BlitScaled(active->currentSurface, NULL, screen, &dest);
     } else {
-        dest.x = hitbox.position.x - active->currentSurface->w / 2 - offset.x;
-        dest.y = hitbox.position.y - active->currentSurface->h / 2 - offset.y;
+        dest.x = static_cast<int>(hitbox.position.x - active->currentSurface->w / 2 - offset.x);
+        dest.y = static_cast<int>(hitbox.position.y - active->currentSurface->h / 2 - offset.y);
         dest.w = active->currentSurface->w;
         dest.h = active->currentSurface->h;
         SDL_BlitScaled(active->currentSurface, NULL, screen, &dest);
@@ -55,14 +55,14 @@ void RigidBody::draw(SDL_Surface* screen, Vector offset) {
     }
     else{
         if (drawScaledToHitbox) {
-        dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
-        dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
-        dest.w = hitbox.width;
-        dest.h = hitbox.height;
+        dest.x = static_cast<int>(hitbox.position.x - hitbox.width / 2 - offset.x);
+        dest.y = static_cast<int>(hitbox.position.y - hitbox.height / 2 - offset.y);
+        dest.w = static_cast<int>(hitbox.width);
+        dest.h = static_cast<int>(hitbox.height);
         SDL_BlitScaled(surface, NULL, screen, &dest);
     } else {
-        dest.x = hitbox.position.x - surface->w / 2 - offset.x;
-        dest.y = hitbox.position.y - surface->h / 2 - offset.y;
+        dest.x = static_cast<int>(hitbox.position.x - surface->w / 2 - offset.x);
+        dest.y = static_cast<int>(hitbox.position.y - surface->h / 2 - offset.y);
         dest.w = surface->w;
         dest.h = surface->h;
         SDL_BlitScaled(surface, NULL, screen, &dest);
@@ -80,7 +80,7 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
             collidableHitboxList.push_back(others[i].hitbox);
     }
 
-    int collidableCount = collidableHitboxList.size();
+    int collidableCount = static_cast<int>(collidableHitboxList.size());
     Rectangle* collidableHitboxes = new Rectangle[collidableCount];
     std::copy(collidableHitboxList.begin(), collidableHitboxList.end(),
               collidableHitboxes);
