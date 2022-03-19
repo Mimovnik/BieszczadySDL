@@ -13,6 +13,9 @@ add_library(
     src/control.cpp
     src/draw.cpp
 
+    src/Framework.h
+    src/Framework.cpp
+
     src/Rectangle.h
     src/Rectangle.cpp
 

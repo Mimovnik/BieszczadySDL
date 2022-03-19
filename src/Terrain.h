@@ -9,6 +9,7 @@
 #include "RigidBody.h"
 #include "loadBMP.cpp"
 #include "settings.h"
+#include "Framework.h"
 
 #ifndef TERRAIN_H
 #define TERRAIN_H
@@ -59,33 +60,18 @@ class Terrain {
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
     }
     
-    void generate(SDL_Surface* charset, SDL_Surface* screen,
-                  SDL_Texture* screenTexture, SDL_Window* window,
-                  SDL_Renderer* renderer) {
-        this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp", charset,
-                                                 screen, screenTexture, window,
-                                                 renderer));
+    void generate(SDL_Surface* charset, SDL_Surface* screen) {
+        this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp"));
 
-        this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp", charset,
-                                                screen, screenTexture, window,
-                                                renderer));
-        this->dirtSurfaceList.push_back(loadBMP("../bmp/gravel_dirt.bmp",
-                                                charset, screen, screenTexture,
-                                                window, renderer));
+        this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp"));
+        this->dirtSurfaceList.push_back(loadBMP("../bmp/gravel_dirt.bmp"));
 
         this->grassDirtSurfaceList.push_back(
-            loadBMP("../bmp/dirt_grass.bmp", charset, screen, screenTexture,
-                    window, renderer));
+            loadBMP("../bmp/dirt_grass.bmp"));
 
-        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp",
-                                                charset, screen, screenTexture,
-                                                window, renderer));
-        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp", charset,
-                                                screen, screenTexture, window,
-                                                renderer));
-        this->treeSurfaceList.push_back(loadBMP("../bmp/treeCrown.bmp", charset,
-                                                screen, screenTexture, window,
-                                                renderer));
+        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp"));
+        this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp"));
+        this->treeSurfaceList.push_back(loadBMP("../bmp/treeCrown.bmp"));
 
         generateNoiseTexture();
         generateTerrain();
