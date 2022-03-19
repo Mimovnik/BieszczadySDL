@@ -5,14 +5,14 @@
 #include "RigidBody.h"
 #include "Vector.h"
 
-void Alive::place(RigidBody block, Vector mousePos, QuadTree* terrain,
+void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
                   double realTime) {
     Vector blockPos;
     blockPos.x = round(mousePos.x) - ((int)round(mousePos.x) % 64) + 32;
     blockPos.y = round(mousePos.y) - ((int)round(mousePos.y) % 64) - 32;
-    block.hitbox.position = blockPos;
-    if (!this->hitbox.overlaps(block.hitbox)) {
-        if (terrain->queryRange(block.hitbox).size() == 0) {
+    block.rb->hitbox.position = blockPos;
+    if (!this->rb->hitbox.overlaps(block.rb->hitbox)) {
+        if (terrain->queryRange(block.rb->hitbox).size() == 0) {
             if (placeTimer.isUp(realTime)) {
                 placeTimer.start(realTime);
 
@@ -38,11 +38,11 @@ void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
+    if (rb->bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
         if (jumpTimer.isUp(realTime)) {
             jumpTimer.start(realTime);
 
-            velocity.y = -jumpHeight;
+            rb->velocity.y = -jumpHeight;
         }
     }
     delete[] othersHitboxes;
@@ -55,28 +55,28 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
+    if (rb->bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
         if (direction == 'L') {
-            acceleration = acceleration.add(Vector(-walkAccel, 0));
+            rb->acceleration = rb->acceleration.add(Vector(-walkAccel, 0));
             return;
         }
         if (direction == 'R') {
-            acceleration = acceleration.add(Vector(walkAccel, 0));
+            rb->acceleration = rb->acceleration.add(Vector(walkAccel, 0));
             return;
         }
     }
     //airborne
     if (direction == 'L') {
-        acceleration = acceleration.add(Vector(-walkAccel * 0.3, 0));
+        rb->acceleration = rb->acceleration.add(Vector(-walkAccel * 0.3, 0));
         return;
     }
     if (direction == 'R') {
-        acceleration = acceleration.add(Vector(walkAccel * 0.3, 0));
+        rb->acceleration = rb->acceleration.add(Vector(walkAccel * 0.3, 0));
         return;
     }
     delete[] othersHitboxes;
 }
 
 void Alive::startAnimation(Animation* animation) {
-        active = animation;
+        renderer.active = animation;
 }

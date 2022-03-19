@@ -58,7 +58,7 @@ class Terrain {
             Rectangle(worldWidth * 64, worldHeight * 64,
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
     }
-    
+
     void generate(SDL_Surface* charset, SDL_Surface* screen,
                   SDL_Texture* screenTexture, SDL_Window* window,
                   SDL_Renderer* renderer) {
@@ -155,17 +155,17 @@ class Terrain {
         for (int i = 1; i < h; i++) {
             placeTile(x, y + i, treeSurfaceList[1], false);
         }
-        placeTile(x, y + h + 2, treeSurfaceList[2], false, false);
+        placeTile(x, y + h + 2, treeSurfaceList[2], false);
     }
 
     void placeTile(int x, int y, SDL_Surface* tileSurface,
-                   bool collidable = true, bool drawScaledToHitbox = true) {
+                   bool collidable = true) {
         blockCount++;
-        Vector blockPosition = Vector(x * blockWidth + blockWidth / 2, -y * blockHeight - blockHeight / 2);
+        Vector blockPosition = Vector(x * blockWidth + blockWidth / 2,
+                                      -y * blockHeight - blockHeight / 2);
         std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
-        terrain->insert(RigidBody(blockPosition, tileSurfaceList, blockWidth, blockHeight,
-                                  collidable, drawScaledToHitbox));
+        terrain->insert(GameObject(Renderer (tileSurfaceList), new RigidBody(blockPosition, blockWidth, blockHeight, collidable)));
     }
 };
 

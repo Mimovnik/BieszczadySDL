@@ -1,17 +1,19 @@
+#ifndef QUADTREE_H
+#define QUADTREE_H
+
 #include <vector>
 
 #include "RigidBody.h"
 #include "settings.h"
+#include "GameObject.h"
 
-#ifndef QUADTREE_H
-#define QUADTREE_H
 
 #define NODE_CAPACITY 4
 class QuadTree {
    public:
     Rectangle boundary;
 
-    RigidBody blocks[NODE_CAPACITY];
+    GameObject blocks[NODE_CAPACITY];
     int blocksAdded;
 
     QuadTree* topLeft = nullptr;
@@ -26,13 +28,13 @@ class QuadTree {
         this->blocksAdded = 0;
     }
 
-    bool insert(RigidBody block);
+    bool insert(GameObject block);
 
     bool destroy(Vector point);
 
-    std::vector<RigidBody> queryRange(Rectangle range);
-    std::vector<RigidBody> queryRange(Vector containingPoint);
+    std::vector<GameObject> queryRange(Rectangle range);
+    std::vector<GameObject> queryRange(Vector containingPoint);
 
-    void subdivide(RigidBody* blocks);
+    void subdivide(GameObject* blocks);
 };
 #endif

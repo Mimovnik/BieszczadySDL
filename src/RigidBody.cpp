@@ -36,39 +36,6 @@ void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     hitbox.position = hitbox.position.add(velocity.rescale(gameDelta));
 }
 
-void RigidBody::draw(SDL_Surface* screen, Vector offset) {
-    SDL_Rect dest;
-    if(active != nullptr){
-    if (drawScaledToHitbox) {
-        dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
-        dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
-        dest.w = hitbox.width;
-        dest.h = hitbox.height;
-        SDL_BlitScaled(active->currentSurface, NULL, screen, &dest);
-    } else {
-        dest.x = hitbox.position.x - active->currentSurface->w / 2 - offset.x;
-        dest.y = hitbox.position.y - active->currentSurface->h / 2 - offset.y;
-        dest.w = active->currentSurface->w;
-        dest.h = active->currentSurface->h;
-        SDL_BlitScaled(active->currentSurface, NULL, screen, &dest);
-    }
-    }
-    else{
-        if (drawScaledToHitbox) {
-        dest.x = hitbox.position.x - hitbox.width / 2 - offset.x;
-        dest.y = hitbox.position.y - hitbox.height / 2 - offset.y;
-        dest.w = hitbox.width;
-        dest.h = hitbox.height;
-        SDL_BlitScaled(surface, NULL, screen, &dest);
-    } else {
-        dest.x = hitbox.position.x - surface->w / 2 - offset.x;
-        dest.y = hitbox.position.y - surface->h / 2 - offset.y;
-        dest.w = surface->w;
-        dest.h = surface->h;
-        SDL_BlitScaled(surface, NULL, screen, &dest);
-    }
-    }
-}
 
 void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
     Vector futureOffset = velocity.rescale(gameDelta).add(

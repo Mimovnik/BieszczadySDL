@@ -1,4 +1,5 @@
 #include <SDL.h>
+
 #include <vector>
 
 #include "Animation.h"
@@ -10,9 +11,7 @@
 #define RIGIDBODY_H
 class RigidBody {
    public:
-    Animation* active = nullptr;
-    SDL_Surface* surface = nullptr;
-    bool drawScaledToHitbox;
+    
     bool collidable;
     Vector velocity;
     Vector acceleration;
@@ -23,26 +22,22 @@ class RigidBody {
     RigidBody(){};
 
     RigidBody(Vector startingPosition,
-              std::vector<SDL_Surface*> idleSurfaceList, int width, int height,
-              bool collidable = true, bool drawScaledToHitbox = true,
+               int width, int height,
+              bool collidable = true,
               double maxSpeed = 10) {
         this->hitbox.position = startingPosition;
         this->hitbox.width = width;
         this->hitbox.height = height;
         this->collidable = collidable;
-        this->drawScaledToHitbox = drawScaledToHitbox;
         this->maxSpeed = maxSpeed;
-        this->surface = idleSurfaceList[0];
     }
 
-    void move(double gameDelta, RigidBody* others,
-                           int othersCount);
+    void move(double gameDelta, RigidBody* others, int othersCount);
 
-    void draw(SDL_Surface* screen, Vector offset);
 
     void collide(RigidBody* others, int othersCount, double gameDelta);
 
-   protected:
+   
     Rectangle leftHitbox();
     Rectangle rightHitbox();
     Rectangle topHitbox();

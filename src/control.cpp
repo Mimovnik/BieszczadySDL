@@ -4,24 +4,25 @@
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "settings.h"
+#include "GameObject.h"
 
 bool control(Alive* entity, double realTime, RigidBody* colliders,
-             int collidersCount, RigidBody block, QuadTree* terrain) {
-    if (entity->velocity.y > 10) {
+             int collidersCount, GameObject block, QuadTree* terrain) {
+    if (entity->rb->velocity.y > 10) {
         entity->startAnimation(&entity->falling);
-    } else if (entity->velocity.y < 0) {
+    } else if (entity->rb->velocity.y < 0) {
         entity->startAnimation(&entity->jumping);
-    } else if (entity->velocity.x > 10 || entity->velocity.x < -10) {
+    } else if (entity->rb->velocity.x > 10 || entity->rb->velocity.x < -10) {
         entity->startAnimation(&entity->walking);
     } else {
         entity->startAnimation(&entity->idle);
     }
 
-    if (entity->velocity.x > 0) {
-        entity->active->changeSide('R');
+    if (entity->rb->velocity.x > 0) {
+        entity->renderer.active->changeSide('R');
     }
-    if (entity->velocity.x < 0) {
-        entity->active->changeSide('L');
+    if (entity->rb->velocity.x < 0) {
+        entity->renderer.active->changeSide('L');
     }
 
     SDL_PumpEvents();
@@ -39,12 +40,12 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
         entity->walk('L', colliders, collidersCount);
     }
 
-    entity->active->changeSurface(realTime);
+    entity->renderer.active->changeSurface(realTime);
 
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;
     buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);
-    Vector mousePos = entity->hitbox.position.add(
+    Vector mousePos = entity->rb->hitbox.position.add(
         Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
 
@@ -65,16 +66,16 @@ bool noclip(Alive* entity) {
 
     double accel = 10;
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP]) {
-        entity->acceleration = entity->acceleration.add(Vector(0, -accel));
+        entity->rb->acceleration = entity->rb->acceleration.add(Vector(0, -accel));
     }
     if (KeyState[SDL_SCANCODE_S] || KeyState[SDL_SCANCODE_DOWN]) {
-        entity->acceleration = entity->acceleration.add(Vector(0, accel));
+        entity->rb->acceleration = entity->rb->acceleration.add(Vector(0, accel));
     }
     if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
-        entity->acceleration = entity->acceleration.add(Vector(-accel, 0));
+        entity->rb->acceleration = entity->rb->acceleration.add(Vector(-accel, 0));
     }
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
-        entity->acceleration = entity->acceleration.add(Vector(accel, 0));
+        entity->rb->acceleration = entity->rb->acceleration.add(Vector(accel, 0));
     }
     return false;
 }
