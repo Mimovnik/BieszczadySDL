@@ -42,7 +42,7 @@ class Alive : public RigidBody {
             Animation(heroSurfaceListList[4], heroSurfaceListList[5], "jumping", 0.15);
         falling =
             Animation(heroSurfaceListList[6], heroSurfaceListList[7], "falling", 0.1);
-        active = &idle;
+        renderer.active = &idle;
     }
 
     void place(RigidBody block, Vector mousePos, QuadTree* terrain,

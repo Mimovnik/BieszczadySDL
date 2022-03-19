@@ -78,5 +78,5 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
 }
 
 void Alive::startAnimation(Animation* animation) {
-        active = animation;
+        renderer.active = animation;
 }

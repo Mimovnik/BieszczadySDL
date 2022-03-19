@@ -16,6 +16,9 @@ add_library(
     src/Framework.h
     src/Framework.cpp
 
+    src/Renderer.h
+    src/Renderer.cpp
+
     src/Rectangle.h
     src/Rectangle.cpp
 

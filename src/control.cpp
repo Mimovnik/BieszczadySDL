@@ -18,10 +18,10 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
     }
 
     if (entity->velocity.x > 0) {
-        entity->active->changeSide('R');
+        entity->renderer.active->changeSide('R');
     }
     if (entity->velocity.x < 0) {
-        entity->active->changeSide('L');
+        entity->renderer.active->changeSide('L');
     }
 
     SDL_PumpEvents();
@@ -39,7 +39,7 @@ bool control(Alive* entity, double realTime, RigidBody* colliders,
         entity->walk('L', colliders, collidersCount);
     }
 
-    entity->active->changeSurface(realTime);
+    entity->renderer.active->changeSurface(realTime);
 
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;

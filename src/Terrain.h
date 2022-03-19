@@ -1,3 +1,6 @@
+
+#ifndef TERRAIN_H
+#define TERRAIN_H
 #include <SDL.h>
 
 #include <iostream>
@@ -10,9 +13,6 @@
 #include "loadBMP.cpp"
 #include "settings.h"
 #include "Framework.h"
-
-#ifndef TERRAIN_H
-#define TERRAIN_H
 class Terrain {
    public:
     int worldWidth;
@@ -150,8 +150,8 @@ class Terrain {
         Vector blockPosition = Vector(x * blockWidth + blockWidth / 2, -y * blockHeight - blockHeight / 2);
         std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
-        terrain->insert(RigidBody(blockPosition, tileSurfaceList, blockWidth, blockHeight,
-                                  collidable, drawScaledToHitbox));
+        terrain->insert(RigidBody(blockPosition, Renderer(tileSurfaceList, drawScaledToHitbox), blockWidth, blockHeight,
+                                  collidable));
     }
 };
 

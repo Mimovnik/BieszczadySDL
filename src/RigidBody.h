@@ -1,18 +1,19 @@
+#ifndef RIGIDBODY_H
+#define RIGIDBODY_H
 #include <SDL.h>
+
 #include <vector>
 
 #include "Animation.h"
 #include "Rectangle.h"
+#include "Renderer.h"
 #include "Timer.h"
 #include "Vector.h"
 
-#ifndef RIGIDBODY_H
-#define RIGIDBODY_H
 class RigidBody {
    public:
-    Animation* active = nullptr;
-    SDL_Surface* surface = nullptr;
-    bool drawScaledToHitbox;
+    Renderer renderer;
+
     bool collidable;
     Vector velocity;
     Vector acceleration;
@@ -22,23 +23,17 @@ class RigidBody {
 
     RigidBody(){};
 
-    RigidBody(Vector startingPosition,
-              std::vector<SDL_Surface*> idleSurfaceList, int width, int height,
-              bool collidable = true, bool drawScaledToHitbox = true,
-              double maxSpeed = 10) {
+    RigidBody(Vector startingPosition, Renderer renderer, int width, int height,
+              bool collidable = true, double maxSpeed = 10) {
         this->hitbox.position = startingPosition;
         this->hitbox.width = width;
         this->hitbox.height = height;
         this->collidable = collidable;
-        this->drawScaledToHitbox = drawScaledToHitbox;
+        this->renderer = renderer;
         this->maxSpeed = maxSpeed;
-        this->surface = idleSurfaceList[0];
     }
 
-    void move(double gameDelta, RigidBody* others,
-                           int othersCount);
-
-    void draw(SDL_Surface* screen, Vector offset);
+    void move(double gameDelta, RigidBody* others, int othersCount);
 
     void collide(RigidBody* others, int othersCount, double gameDelta);
 

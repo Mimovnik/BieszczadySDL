@@ -45,7 +45,7 @@ int main(int argc, char* args[]) {
     Alive player = Alive(center.add(Vector(1600, -4000)), heroSurfaceListList,
                          hitboxWidth, hitboxHeigth, maxSpeed, walkAcceleration,
                          jumpHeight, jumpCooldown);
-    player.drawScaledToHitbox = false;
+    player.renderer.setDrawScaledToHitbox(false);
 
     std::vector<SDL_Surface*> redSurfaceList;
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
@@ -68,7 +68,7 @@ int main(int argc, char* args[]) {
 
     theme = loadBMP("../bmp/forestTheme3.bmp");
 
-    char text[128];
+    //char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
     int silver = SDL_MapRGB(screen->format, 192, 192, 192);
     int green = SDL_MapRGB(screen->format, 0, 153, 51);
@@ -128,9 +128,9 @@ int main(int argc, char* args[]) {
             Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
                       player.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
-            visibleBlocks[i].draw(screen, camera);
+            visibleBlocks[i].renderer.draw(screen, camera, visibleBlocks[i].hitbox);
         }
-        player.draw(screen, camera);
+        player.renderer.draw(screen, camera, player.hitbox);
 
         // tekst informacyjny
         // DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, silver, brown);
