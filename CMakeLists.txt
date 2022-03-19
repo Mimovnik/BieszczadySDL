@@ -16,6 +16,8 @@ add_library(
     src/Framework.h
     src/Framework.cpp
 
+    src/GameObject.h
+
     src/Renderer.h
     src/Renderer.cpp
 

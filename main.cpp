@@ -10,6 +10,7 @@
 #include "src/Alive.h"
 #include "src/Animation.h"
 #include "src/Framework.h"
+#include "src/GameObject.h"
 #include "src/Rectangle.h"
 #include "src/RigidBody.h"
 #include "src/Terrain.h"
@@ -45,7 +46,7 @@ int main(int argc, char* args[]) {
     Alive player = Alive(center.add(Vector(1600, -4000)), heroSurfaceListList,
                          hitboxWidth, hitboxHeigth, maxSpeed, walkAcceleration,
                          jumpHeight, jumpCooldown);
-    player.renderer.setDrawScaledToHitbox(false);
+    player.rndr.setDrawScaledToHitbox(false);
 
     std::vector<SDL_Surface*> redSurfaceList;
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
@@ -53,8 +54,9 @@ int main(int argc, char* args[]) {
     std::vector<SDL_Surface*> boxSurfaceList;
     boxSurfaceList.push_back(loadBMP("../bmp/box.bmp"));
 
-    RigidBody box =
-        RigidBody(Vector::ZERO, boxSurfaceList, BLOCK_WIDTH, BLOCK_HEIGHT);
+    GameObject box =
+        GameObject(Renderer(boxSurfaceList),
+                   RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
 
     // int worldWidth, int worldHeight, double noiseValue, double
     // terrainFreq, double caveFreq, float heightMultiplier, float
@@ -68,7 +70,7 @@ int main(int argc, char* args[]) {
 
     theme = loadBMP("../bmp/forestTheme3.bmp");
 
-    //char text[128];
+    // char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
     int silver = SDL_MapRGB(screen->format, 192, 192, 192);
     int green = SDL_MapRGB(screen->format, 0, 153, 51);
@@ -95,42 +97,46 @@ int main(int argc, char* args[]) {
         realTime += delta;
         gameTime += gameDelta;
 
-        player.acceleration = gravity;
+        player.rb.acceleration = gravity;
 
         // handle input
 
-        std::vector<RigidBody> inRangeList = world.terrain->queryRange(
-            Rectangle(player.hitbox.width + 100, player.hitbox.height + 100,
-                      player.hitbox.position));
-        int blocksInRangeCount = static_cast<int>(inRangeList.size());
-        RigidBody* blocksInRange = new RigidBody[blocksInRangeCount];
-        std::copy(inRangeList.begin(), inRangeList.end(), blocksInRange);
+        std::vector<GameObject> inRangeList =
+            world.terrain->queryRange(Rectangle(player.rb.hitbox.width + 100,
+                                                player.rb.hitbox.height + 100,
+                                                player.rb.hitbox.position));
+        int collidersCount = static_cast<int>(inRangeList.size());
+        RigidBody* colliders = new RigidBody[collidersCount];
+        for (int i = 0; i < collidersCount; i++) {
+            colliders[i] = inRangeList[i].rb;
+        }
 
-        quit = control(&player, realTime / 1000, blocksInRange,
-                       blocksInRangeCount, box, world.terrain);
+        quit = control(&player, realTime / 1000, colliders, collidersCount, box,
+                       world.terrain);
 
         // change gamestate
 
-        player.collide(blocksInRange, blocksInRangeCount, gameDelta);
+        player.rb.collide(colliders, collidersCount, gameDelta);
 
-        player.move(gameDelta, blocksInRange, blocksInRangeCount);
+        player.rb.move(gameDelta, colliders, collidersCount);
 
-        delete[] blocksInRange;
+        delete[] colliders;
 
         // output
         SDL_FillRect(screen, NULL, skyblue);
 
-        camera = player.hitbox.position.difference(screenMiddle);
+        camera = player.rb.hitbox.position.difference(screenMiddle);
 
         DrawSurface(screen, theme, center.x, center.y, camera);
 
-        std::vector<RigidBody> visibleBlocks = world.terrain->queryRange(
+        std::vector<GameObject> visibleBlocks = world.terrain->queryRange(
             Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
-                      player.hitbox.position));
+                      player.rb.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
-            visibleBlocks[i].renderer.draw(screen, camera, visibleBlocks[i].hitbox);
+            visibleBlocks[i].rndr.draw(screen, camera,
+                                       visibleBlocks[i].rb.hitbox);
         }
-        player.renderer.draw(screen, camera, player.hitbox);
+        player.rndr.draw(screen, camera, player.rb.hitbox);
 
         // tekst informacyjny
         // DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, silver, brown);
@@ -138,14 +144,14 @@ int main(int argc, char* args[]) {
         // sprintf_s(text, "Czas trwania = %.1lf s  %.0lf klatek / s",
         //           realTime / 1000, fps);
         // DrawString(screen,
-        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
-        //            text, charset);
+        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2),
+        //            10, text, charset);
         // sprintf_s(text,
         //           "Esc - wyjscie, W / \030 - skok, A / \032 oraz D / \033 - "
         //           "sterowanie");
         // DrawString(screen,
-        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 26,
-        //            text, charset);
+        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2),
+        //            26, text, charset);
 
         display.update(screen);
 
@@ -161,9 +167,9 @@ int main(int argc, char* args[]) {
             "Player's position: x = %.2f y = %.2f "
             "velocity: x = %.8f y = %.8f "
             "acceleration: x = %.4f y = %.4f\n",
-            player.hitbox.position.x, player.hitbox.position.y,
-            player.velocity.x, player.velocity.y, player.acceleration.x,
-            player.acceleration.y);
+            player.rb.hitbox.position.x, player.rb.hitbox.position.y,
+            player.rb.velocity.x, player.rb.velocity.y, player.rb.acceleration.x,
+            player.rb.acceleration.y);
 
         frames++;
     }

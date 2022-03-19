@@ -6,14 +6,11 @@
 
 #include "Animation.h"
 #include "Rectangle.h"
-#include "Renderer.h"
 #include "Timer.h"
 #include "Vector.h"
 
 class RigidBody {
    public:
-    Renderer renderer;
-
     bool collidable;
     Vector velocity;
     Vector acceleration;
@@ -23,13 +20,12 @@ class RigidBody {
 
     RigidBody(){};
 
-    RigidBody(Vector startingPosition, Renderer renderer, int width, int height,
+    RigidBody(Vector startingPosition, int width, int height,
               bool collidable = true, double maxSpeed = 10) {
         this->hitbox.position = startingPosition;
         this->hitbox.width = width;
         this->hitbox.height = height;
         this->collidable = collidable;
-        this->renderer = renderer;
         this->maxSpeed = maxSpeed;
     }
 
@@ -37,7 +33,6 @@ class RigidBody {
 
     void collide(RigidBody* others, int othersCount, double gameDelta);
 
-   protected:
     Rectangle leftHitbox();
     Rectangle rightHitbox();
     Rectangle topHitbox();
