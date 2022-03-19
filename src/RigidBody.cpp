@@ -47,7 +47,7 @@ void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
             collidableHitboxList.push_back(others[i].hitbox);
     }
 
-    int collidableCount = collidableHitboxList.size();
+    int collidableCount = static_cast<int>(collidableHitboxList.size());
     Rectangle* collidableHitboxes = new Rectangle[collidableCount];
     std::copy(collidableHitboxList.begin(), collidableHitboxList.end(),
               collidableHitboxes);

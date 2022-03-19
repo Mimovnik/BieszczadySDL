@@ -3,10 +3,10 @@
 #include "Vector.h"
 
 bool Rectangle::contains(Vector point) {
-    float thisLeftSide = position.x - width / 2;
-    float thisRightSide = position.x + width / 2;
-    float thisUpperSide = position.y - height / 2;
-    float thisBottomSide = position.y + height / 2;
+    double thisLeftSide = position.x - width / 2;
+    double thisRightSide = position.x + width / 2;
+    double thisUpperSide = position.y - height / 2;
+    double thisBottomSide = position.y + height / 2;
     if (point.x >= thisLeftSide && point.x <= thisRightSide &&
         point.y >= thisUpperSide && point.y <= thisBottomSide) {
         return true;
@@ -22,30 +22,30 @@ Rectangle Rectangle::translate(Vector offset) {
 }
 
 bool Rectangle::overlaps(Rectangle another) {
-    float thisLeftSide = position.x - width / 2;
-    float thisRightSide = position.x + width / 2;
-    float thisTopSide = position.y - height / 2;
-    float thisBottomSide = position.y + height / 2;
+    double thisLeftSide = position.x - width / 2;
+    double thisRightSide = position.x + width / 2;
+    double thisTopSide = position.y - height / 2;
+    double thisBottomSide = position.y + height / 2;
 
-    float anotherLeftSide = another.position.x - another.width / 2;
-    float anotherRightSide = another.position.x + another.width / 2;
-    float anotherTopSide = another.position.y - another.height / 2;
-    float anotherBottomSide = another.position.y + another.height / 2;
+    double anotherLeftSide = another.position.x - another.width / 2;
+    double anotherRightSide = another.position.x + another.width / 2;
+    double anotherTopSide = another.position.y - another.height / 2;
+    double anotherBottomSide = another.position.y + another.height / 2;
 
     return thisBottomSide > anotherTopSide && thisTopSide < anotherBottomSide &&
            thisLeftSide < anotherRightSide && thisRightSide > anotherLeftSide;
 }
 
 bool Rectangle::overlapsAny(Rectangle* others, int othersCount) {
-    float thisLeftSide = position.x - width / 2;
-    float thisRightSide = position.x + width / 2;
-    float thisTopSide = position.y - height / 2;
-    float thisBottomSide = position.y + height / 2;
+    double thisLeftSide = position.x - width / 2;
+    double thisRightSide = position.x + width / 2;
+    double thisTopSide = position.y - height / 2;
+    double thisBottomSide = position.y + height / 2;
 
-    float anotherLeftSide;
-    float anotherRightSide;
-    float anotherTopSide;
-    float anotherBottomSide;
+    double anotherLeftSide;
+    double anotherRightSide;
+    double anotherTopSide;
+    double anotherBottomSide;
 
     for (int i = 0; i < othersCount; i++) {
         anotherLeftSide = others[i].position.x - others[i].width / 2;
