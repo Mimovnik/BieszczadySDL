@@ -1,6 +1,8 @@
 #include "RigidBody.h"
-#include "settings.h"
+
 #include <iostream>
+
+#include "settings.h"
 
 void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     Vector friction = Vector::ZERO;
@@ -9,7 +11,8 @@ void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     for (int i = 0; i < othersCount; i++) {
         othersHitboxes[i] = others[i].hitbox;
     }
-    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes, othersCount)) {
+    if (bottomHitbox().translate(below).overlapsAny(othersHitboxes,
+                                                    othersCount)) {
         if (velocity.x > 0) {
             friction = Vector(FRICTION_FACTOR, 0);
         } else if (velocity.x < 0) {
@@ -19,9 +22,12 @@ void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     delete[] othersHitboxes;
 
     acceleration = acceleration.difference(friction);
-    if((velocity.x >= 0 && velocity.add(acceleration.rescale(gameDelta)).x >= 0) || (velocity.x <= 0 && velocity.add(acceleration.rescale(gameDelta)).x <= 0)){
+    if ((velocity.x >= 0 &&
+         velocity.add(acceleration.rescale(gameDelta)).x >= 0) ||
+        (velocity.x <= 0 &&
+         velocity.add(acceleration.rescale(gameDelta)).x <= 0)) {
         velocity = velocity.add(acceleration.rescale(gameDelta));
-    } else{
+    } else {
         velocity.x = 0;
     }
 

@@ -1,5 +1,7 @@
 #include <SDL.h>
+
 #include <iostream>
+
 #include "settings.h"
 
 void displaySetUp(SDL_Surface** charset, SDL_Surface** screen,

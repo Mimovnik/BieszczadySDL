@@ -65,13 +65,15 @@ bool noclip(Alive* entity) {
 
     double accel = 10;
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP]) {
-        entity->rb.acceleration = entity->rb.acceleration.add(Vector(0, -accel));
+        entity->rb.acceleration =
+            entity->rb.acceleration.add(Vector(0, -accel));
     }
     if (KeyState[SDL_SCANCODE_S] || KeyState[SDL_SCANCODE_DOWN]) {
         entity->rb.acceleration = entity->rb.acceleration.add(Vector(0, accel));
     }
     if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
-        entity->rb.acceleration = entity->rb.acceleration.add(Vector(-accel, 0));
+        entity->rb.acceleration =
+            entity->rb.acceleration.add(Vector(-accel, 0));
     }
     if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
         entity->rb.acceleration = entity->rb.acceleration.add(Vector(accel, 0));

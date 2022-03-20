@@ -5,8 +5,8 @@
 
 #include <iostream>
 #include <vector>
-#include "Framework.h"
 
+#include "Framework.h"
 
 SDL_Surface* loadBMP(const char* fileName) {
     SDL_Surface* surface = SDL_LoadBMP(fileName);
@@ -19,7 +19,6 @@ SDL_Surface* loadBMP(const char* fileName) {
 }
 
 std::vector<std::vector<SDL_Surface*>> loadHeroSurfaces() {
-
     std::vector<std::vector<SDL_Surface*>> heroSurfaceListList;
 
     std::vector<SDL_Surface*> heroIdleLeftSurfaceList;

@@ -9,7 +9,7 @@ class GameObject {
     Renderer rndr;
     RigidBody rb;
 
-    GameObject(){}
+    GameObject() {}
 
     GameObject(Renderer rndr, RigidBody rb) {
         this->rndr = rndr;

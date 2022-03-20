@@ -2,10 +2,12 @@
 #define RENDERER_H
 
 #include <SDL.h>
+
 #include <vector>
+
 #include "Animation.h"
-#include "Vector.h"
 #include "Rectangle.h"
+#include "Vector.h"
 
 class Renderer {
     SDL_Surface* surface = nullptr;

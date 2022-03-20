@@ -4,8 +4,8 @@ class Timer {
     double deadline;
 
     double coolDown;
-   public:
 
+   public:
     Timer() { this->deadline = 0; }
 
     void start(double realTime) { deadline = realTime + coolDown; }

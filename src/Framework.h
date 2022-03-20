@@ -12,7 +12,8 @@ class Display {
     SDL_Renderer* renderer = nullptr;
 
    public:
-    Display(int width_, int height_, const char* windowTitle) : width(width_), height(height_) {
+    Display(int width_, int height_, const char* windowTitle)
+        : width(width_), height(height_) {
         this->width = width;
         this->height = height;
         SDL_Init(SDL_INIT_EVERYTHING);
@@ -36,9 +37,9 @@ class Display {
 
     void update(SDL_Surface* surface);
 
-    SDL_Surface* createScreen(){
-        return SDL_CreateRGBSurface(0, getWidth(), getHeight(), 32,
-                             0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+    SDL_Surface* createScreen() {
+        return SDL_CreateRGBSurface(0, getWidth(), getHeight(), 32, 0x00FF0000,
+                                    0x0000FF00, 0x000000FF, 0xFF000000);
     }
 
     int getWidth() { return width; }
@@ -54,12 +55,11 @@ class Sound {
 
    public:
     Sound(const char* fileName) {
-        if(SDL_LoadWAV(fileName, &wavSpec, &wavBuffer, &wavLength) == nullptr){
-            std::cerr << "Audio load error:\n"
-                      << SDL_GetError() << std::endl;
+        if (SDL_LoadWAV(fileName, &wavSpec, &wavBuffer, &wavLength) ==
+            nullptr) {
+            std::cerr << "Audio load error:\n" << SDL_GetError() << std::endl;
         }
-        deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr,
-                                       0);
+        deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr, 0);
         if (deviceId == 0) {
             std::cerr << "Open audio device error:\n"
                       << SDL_GetError() << std::endl;
@@ -71,22 +71,19 @@ class Sound {
     }
     void play() {
         status = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-        if(status!=0){
-            std::cerr << "Queue audio error:\n"
-                      << SDL_GetError() << std::endl;
+        if (status != 0) {
+            std::cerr << "Queue audio error:\n" << SDL_GetError() << std::endl;
         }
         SDL_PauseAudioDevice(deviceId, 0);
     }
 
-    void loop(){
-        if(SDL_GetQueuedAudioSize(deviceId)<=wavLength){
+    void loop() {
+        if (SDL_GetQueuedAudioSize(deviceId) <= wavLength) {
             play();
         }
     }
 
-    void stop(){
-        SDL_PauseAudioDevice(deviceId, 1);
-    }
+    void stop() { SDL_PauseAudioDevice(deviceId, 1); }
 };
 
 #endif

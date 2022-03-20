@@ -7,12 +7,12 @@
 #include <random>
 #include <vector>
 
+#include "Framework.h"
 #include "PerlinNoise.h"
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "loadBMP.cpp"
 #include "settings.h"
-#include "Framework.h"
 class Terrain {
    public:
     int worldWidth;
@@ -59,15 +59,14 @@ class Terrain {
             Rectangle(worldWidth * 64, worldHeight * 64,
                       Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
     }
-    
+
     void generate(SDL_Surface* charset, SDL_Surface* screen) {
         this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp"));
 
         this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp"));
         this->dirtSurfaceList.push_back(loadBMP("../bmp/gravel_dirt.bmp"));
 
-        this->grassDirtSurfaceList.push_back(
-            loadBMP("../bmp/dirt_grass.bmp"));
+        this->grassDirtSurfaceList.push_back(loadBMP("../bmp/dirt_grass.bmp"));
 
         this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp"));
         this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp"));
@@ -147,11 +146,13 @@ class Terrain {
     void placeTile(int x, int y, SDL_Surface* tileSurface,
                    bool collidable = true, bool drawScaledToHitbox = true) {
         blockCount++;
-        Vector blockPosition = Vector(x * blockWidth + blockWidth / 2, -y * blockHeight - blockHeight / 2);
+        Vector blockPosition = Vector(x * blockWidth + blockWidth / 2,
+                                      -y * blockHeight - blockHeight / 2);
         std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
-        terrain->insert(GameObject(Renderer(tileSurfaceList, drawScaledToHitbox), RigidBody(blockPosition, blockWidth, blockHeight,
-                                  collidable)));
+        terrain->insert(GameObject(
+            Renderer(tileSurfaceList, drawScaledToHitbox),
+            RigidBody(blockPosition, blockWidth, blockHeight, collidable)));
     }
 };
 

@@ -1,12 +1,11 @@
+#ifndef ANIMATION_H
+#define ANIMATION_H
 #include <SDL.h>
 
 #include <string>
 #include <vector>
 
 #include "Timer.h"
-
-#ifndef ANIMATION_H
-#define ANIMATION_H
 
 class Animation {
    public:
@@ -32,7 +31,7 @@ class Animation {
         changeSide('R');
     }
 
-    void changeSide(char side) {  this->side = side; }
+    void changeSide(char side) { this->side = side; }
 
     void changeSurface(double realTime) {
         if (nextSprite.isUp(realTime)) {

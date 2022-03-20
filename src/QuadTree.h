@@ -1,10 +1,9 @@
+#ifndef QUADTREE_H
+#define QUADTREE_H
 #include <vector>
 
 #include "GameObject.h"
 #include "settings.h"
-
-#ifndef QUADTREE_H
-#define QUADTREE_H
 
 #define NODE_CAPACITY 4
 class QuadTree {

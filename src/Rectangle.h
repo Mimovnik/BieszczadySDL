@@ -1,7 +1,7 @@
-#include "Vector.h"
-
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
+#include "Vector.h"
+
 class Rectangle {
    public:
     Vector position;

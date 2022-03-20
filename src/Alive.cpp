@@ -23,13 +23,13 @@ void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
 }
 
 void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
-    //if (terrain->queryRange(Rectangle(64, 64, digPos)).size() > 0) {
-        if (digTimer.isUp(realTime)) {
-            digTimer.start(realTime);
+    // if (terrain->queryRange(Rectangle(64, 64, digPos)).size() > 0) {
+    if (digTimer.isUp(realTime)) {
+        digTimer.start(realTime);
 
-            terrain->destroy(digPos);
-        }
-   // }
+        terrain->destroy(digPos);
+    }
+    // }
 }
 
 void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
@@ -38,7 +38,8 @@ void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
+    if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes,
+                                                       basesCount)) {
         if (jumpTimer.isUp(realTime)) {
             jumpTimer.start(realTime);
 
@@ -55,7 +56,8 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
     for (int i = 0; i < basesCount; i++) {
         othersHitboxes[i] = bases[i].hitbox;
     }
-    if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes, basesCount)) {
+    if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes,
+                                                       basesCount)) {
         if (direction == 'L') {
             rb.acceleration = rb.acceleration.add(Vector(-walkAccel, 0));
             return;
@@ -65,7 +67,7 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
             return;
         }
     }
-    //airborne
+    // airborne
     if (direction == 'L') {
         rb.acceleration = rb.acceleration.add(Vector(-walkAccel * 0.3, 0));
         return;
@@ -77,6 +79,4 @@ void Alive::walk(char direction, RigidBody* bases, int basesCount) {
     delete[] othersHitboxes;
 }
 
-void Alive::startAnimation(Animation* animation) {
-        rndr.active = animation;
-}
+void Alive::startAnimation(Animation* animation) { rndr.active = animation; }

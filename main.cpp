@@ -168,16 +168,14 @@ int main(int argc, char* args[]) {
             "velocity: x = %.8f y = %.8f "
             "acceleration: x = %.4f y = %.4f\n",
             player.rb.hitbox.position.x, player.rb.hitbox.position.y,
-            player.rb.velocity.x, player.rb.velocity.y, player.rb.acceleration.x,
-            player.rb.acceleration.y);
+            player.rb.velocity.x, player.rb.velocity.y,
+            player.rb.acceleration.x, player.rb.acceleration.y);
 
         frames++;
     }
 
-    // zwolnienie powierzchni
     SDL_FreeSurface(charset);
     SDL_FreeSurface(screen);
-
     SDL_Quit();
 
     return 0;

@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-
 Renderer::Renderer() {}
 
 Renderer::Renderer(std::vector<SDL_Surface*> idleSurfaceList,
