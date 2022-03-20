@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#include <utility>
+
 #define PI 3.14159265
 class Vector {
    public:
@@ -15,9 +17,54 @@ class Vector {
         y = 0;
     }
 
+    Vector(const Vector& other) {
+        this->x = other.x;
+        this->y = other.y;
+    }
+
+    Vector(Vector&& other) {
+        this->x = std::move(other.x);
+        this->y = std::move(other.y);
+    }
+
     Vector(double x, double y) {
         this->x = x;
         this->y = y;
+    }
+
+    Vector& operator=(const Vector& right) {
+        Vector tmp = right;
+        std::swap(x, tmp.x);
+        std::swap(y, tmp.y);
+        return *this;
+    }
+
+    Vector& operator=(Vector&& right) {
+        std::swap(x, right.x);
+        std::swap(y, right.y);
+        return *this;
+    }
+
+    Vector operator+(const Vector& right) { return this->add(right); }
+
+    Vector& operator+=(const Vector& right) { return *this = this->add(right); }
+
+    Vector operator-(const Vector& right) { return this->difference(right); }
+
+    Vector& operator-=(const Vector& right) {
+        return *this = this->difference(right);
+    }
+
+    Vector operator*(const double& right) { return this->rescale(right); }
+
+    Vector operator*(const Vector& right) { return this->rescale(right); }
+
+    Vector& operator*=(const double& right) {
+        return *this = this->rescale(right);
+    }
+
+    Vector& operator*=(const Vector& right) {
+        return *this = this->rescale(right);
     }
 
     static Vector fromAngle(double length, double angle) {

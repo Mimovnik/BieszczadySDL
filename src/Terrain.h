@@ -150,6 +150,7 @@ class Terrain {
                                       -y * blockHeight - blockHeight / 2);
         std::vector<SDL_Surface*> tileSurfaceList;
         tileSurfaceList.push_back(tileSurface);
+
         terrain->insert(GameObject(
             Renderer(tileSurfaceList, drawScaledToHitbox),
             RigidBody(blockPosition, blockWidth, blockHeight, collidable)));

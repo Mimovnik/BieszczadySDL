@@ -11,7 +11,7 @@
 
 class RigidBody {
    public:
-    bool collidable;
+   bool collidable;
     Vector velocity;
     Vector acceleration;
     double mass;
@@ -20,8 +20,16 @@ class RigidBody {
 
     RigidBody(){};
 
-    RigidBody(Vector startingPosition, int width, int height,
-              bool collidable = true, double maxSpeed = 10) {
+    RigidBody(const RigidBody& other)
+        : velocity(other.velocity),
+          acceleration(other.acceleration),
+          mass(other.mass),
+          hitbox(other.hitbox),
+          collidable(other.collidable),
+          maxSpeed(other.maxSpeed) {}
+
+    RigidBody(Vector startingPosition, int width, int height, bool collidable = true,
+              double maxSpeed = 10) {
         this->hitbox.position = startingPosition;
         this->hitbox.width = width;
         this->hitbox.height = height;

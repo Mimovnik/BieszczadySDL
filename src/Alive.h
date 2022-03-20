@@ -19,14 +19,10 @@ class Alive : public GameObject {
     Animation jumping;
     Animation falling;
 
-    Alive(Vector startingPosition,
-          std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, int width,
-          int height, double maxSpeed, double walkAccel, double jumpHeight,
+    Alive(RigidBody rb,
+          std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, double walkAccel, double jumpHeight,
           double jumpCooldown) {
-        this->rb.hitbox.position = startingPosition;
-        this->rb.hitbox.width = width;
-        this->rb.hitbox.height = height;
-        this->rb.maxSpeed = maxSpeed;
+        this->rb = rb;
 
         this->walkAccel = walkAccel;
         this->jumpHeight = jumpHeight;

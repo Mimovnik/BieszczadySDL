@@ -43,9 +43,10 @@ int main(int argc, char* args[]) {
     double maxSpeed = 30;
     double jumpHeight = 45;
     double jumpCooldown = 0.5;
-    Alive player = Alive(center.add(Vector(1600, -4000)), heroSurfaceListList,
-                         hitboxWidth, hitboxHeigth, maxSpeed, walkAcceleration,
-                         jumpHeight, jumpCooldown);
+    Alive player =
+        Alive(RigidBody(center.add(Vector(1600, -4000)), hitboxWidth,
+                        hitboxHeigth, true, maxSpeed),
+              heroSurfaceListList, walkAcceleration, jumpHeight, jumpCooldown);
     player.rndr.setDrawScaledToHitbox(false);
 
     std::vector<SDL_Surface*> redSurfaceList;
