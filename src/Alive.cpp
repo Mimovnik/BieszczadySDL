@@ -88,20 +88,19 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
         const int areaH = 64;
         const int knockbackStrength = 50;
         Vector weaponDir;
-        if(direction == 'L'){
+        if (direction == 'L') {
             weaponDir = rb.hitbox.position.addX(-areaW / 2);
         }
-        if(direction == 'R'){
+        if (direction == 'R') {
             weaponDir = rb.hitbox.position.addX(areaW / 2);
         }
-        Rectangle weaponDamageArea(areaW, areaH,
-                                   weaponDir);
+        Rectangle weaponDamageArea(areaW, areaH, weaponDir);
         if (weaponDamageArea.overlaps(creature->rb.hitbox)) {
             creature->health -= weaponDamage;
             Vector knockback;
-            if(direction == 'L'){
+            if (direction == 'L') {
                 knockback = Vector(-knockbackStrength, 0);
-            } else if(direction == 'R'){
+            } else if (direction == 'R') {
                 knockback = Vector(knockbackStrength, 0);
             }
             creature->rb.velocity += knockback;
@@ -113,14 +112,16 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
     }
 }
 
-void Alive::flyTo(Vector position, double realTime){
-    Vector direction((position  - rb.hitbox.position).addY(-32));
+void Alive::flyTo(Vector position, double realTime) {
+    Vector direction((position - rb.hitbox.position).addY(-32));
+    rb.acceleration += Vector::fromAngle(moveAccel, direction.getAngle());
+}
+
+void Alive::die() {
     printf("A creature died");
     alive = false;
 }
 
-bool Alive::isAlive(){
-    return alive;
-}
+bool Alive::isAlive() { return alive; }
 
 void Alive::startAnimation(Animation* animation) { rndr.active = animation; }

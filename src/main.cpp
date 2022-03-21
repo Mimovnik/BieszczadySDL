@@ -7,19 +7,19 @@
 #include <iostream>
 #include <vector>
 
-#include "src/Alive.h"
-#include "src/Animation.h"
-#include "src/Framework.h"
-#include "src/GameObject.h"
-#include "src/Rectangle.h"
-#include "src/RigidBody.h"
-#include "src/Terrain.h"
-#include "src/Vector.h"
-#include "src/control.cpp"
-#include "src/displaySetup.cpp"
-#include "src/draw.cpp"
-#include "src/loadBMP.cpp"
-#include "src/settings.h"
+#include "Alive.h"
+#include "Animation.h"
+#include "Framework.h"
+#include "GameObject.h"
+#include "Rectangle.h"
+#include "RigidBody.h"
+#include "Terrain.h"
+#include "Vector.h"
+#include "control.cpp"
+#include "displaySetup.cpp"
+#include "draw.cpp"
+#include "loadBMP.cpp"
+#include "settings.h"
 
 void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
     if (rb->colliders != nullptr) {

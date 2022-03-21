@@ -26,6 +26,21 @@ void animationControl(Alive* entity, double realTime) {
 
     entity->rndr.active->changeSurface(realTime);
 
+}
+
+bool control(Alive* player, double realTime, Alive* creature, GameObject block,
+             QuadTree* terrain) {
+    SDL_PumpEvents();
+    const Uint8* KeyState = SDL_GetKeyboardState(NULL);
+    if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
+
+    if (!player->isAlive()) {
+        return false;
+    }
+    
+    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
+        player->jump(realTime);
+    }
     if (KeyState[SDL_SCANCODE_D]) {
         player->walk('R');
     }
