@@ -1,12 +1,14 @@
 #ifndef ALIVE_H
 #define ALIVE_H
 
+#include <vector>
 #include "Animation.h"
 #include "GameObject.h"
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "Timer.h"
 class Alive : public GameObject {
+
    public:
     Timer jumpTimer;
     Timer placeTimer;
@@ -47,9 +49,11 @@ class Alive : public GameObject {
 
     void dig(Vector digPos, QuadTree* terrain, double realTime);
 
-    void jump(RigidBody* bases, int basesCount, double realTime);
+    void jump(double realTime);
 
-    void walk(char direction, RigidBody* bases, int basesCount);
+    void walk(char direction);
+
+    
 
     void startAnimation(Animation* animation);
 };

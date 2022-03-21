@@ -70,7 +70,15 @@ class Terrain {
 
         this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp"));
         this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp"));
-        this->treeSurfaceList.push_back(loadBMP("../bmp/treeCrown.bmp"));
+        SDL_Surface* treeCrown = loadBMP("../bmp/treeCrown.bmp");
+        double resizeFactorW = 64 / BLOCK_WIDTH;
+        double resizeFactorH = 64 / BLOCK_HEIGHT;
+        SDL_Surface* treeCrownScaled = SDL_CreateRGBSurface(
+            0, static_cast<int>(treeCrown->w / resizeFactorW),
+            static_cast<int>(treeCrown->h / resizeFactorH), 32, 0x00FF0000,
+            0x0000FF00, 0x000000FF, 0xFF000000);
+        SDL_BlitScaled(treeCrown, NULL, treeCrownScaled, NULL);
+        this->treeSurfaceList.push_back(treeCrownScaled);
 
         generateNoiseTexture();
         generateTerrain();

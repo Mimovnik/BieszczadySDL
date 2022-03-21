@@ -21,6 +21,20 @@
 #include "src/loadBMP.cpp"
 #include "src/settings.h"
 
+void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
+        if (rb->colliders != nullptr) {
+            delete[] rb->colliders;
+            rb->collidersCount = 0;
+        }
+        std::vector<GameObject> inRangeList = terrain->queryRange(Rectangle(
+            rb->hitbox.width + 100, rb->hitbox.height + 100, rb->hitbox.position));
+        rb->collidersCount = static_cast<int>(inRangeList.size());
+        rb->colliders = new RigidBody[rb->collidersCount];
+        for (int i = 0; i < rb->collidersCount; i++) {
+            rb->colliders[i] = inRangeList[i].rb;
+        }
+    }
+
 int main(int argc, char* args[]) {
     Display display(SCREEN_WIDTH, SCREEN_HEIGHT, "Bieszczady");
 
@@ -29,34 +43,52 @@ int main(int argc, char* args[]) {
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     SDL_Surface *charset = nullptr, *theme = nullptr;
 
-    Vector screenMiddle = Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    Vector center = Vector(CENTER_X, CENTER_Y);
+    Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    Vector center(CENTER_X, CENTER_Y);
 
     printf("Log:\n");
 
     std::vector<std::vector<SDL_Surface*>> heroSurfaceListList =
         loadHeroSurfaces();
 
-    int hitboxWidth = 84;
-    int hitboxHeigth = 120;
-    double walkAcceleration = 20;
-    double maxSpeed = 30;
-    double jumpHeight = 45;
-    double jumpCooldown = 0.5;
-    Alive player =
-        Alive(RigidBody(center.add(Vector(1600, -4000)), hitboxWidth,
-                        hitboxHeigth, true, maxSpeed),
-              heroSurfaceListList, walkAcceleration, jumpHeight, jumpCooldown);
-    player.rndr.setDrawScaledToHitbox(false);
-
     std::vector<SDL_Surface*> redSurfaceList;
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
+
+    std::vector<std::vector<SDL_Surface*>> redSurfaceListList;
+    for (int i = 0; i < 8; i++) {
+        redSurfaceListList.push_back(redSurfaceList);
+    }
 
     std::vector<SDL_Surface*> boxSurfaceList;
     boxSurfaceList.push_back(loadBMP("../bmp/box.bmp"));
 
-    GameObject box =
-        GameObject(Renderer(boxSurfaceList),
+    int playerHitboxWidth = 42;
+    int playerHitboxHeigth = 60;
+    double playerWalkAcceleration = 20;
+    double playerMaxSpeed = 30;
+    double playerJumpHeight = 45;
+    double playerJumpCooldown = 0.5;
+    bool playerDrawScaledToHitbox = false;
+    Alive player(RigidBody(center.add(Vector(1600, -4000)), playerHitboxWidth,
+                           playerHitboxHeigth, true, playerMaxSpeed),
+                 heroSurfaceListList, playerWalkAcceleration, playerJumpHeight,
+                 playerJumpCooldown);
+    player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
+
+    int wolfHitboxWidth = 60;
+    int wolfHitboxHeigth = 42;
+    double wolfWalkAcceleration = 15;
+    double wolfMaxSpeed = 25;
+    double wolfJumpHeight = 35;
+    double wolfJumpCooldown = 1;
+    bool wolfDrawScaledToHitbox = true;
+
+    Alive wolf(RigidBody(center.add(Vector(1700, -4000)), wolfHitboxWidth,
+                         wolfHitboxHeigth, false, wolfMaxSpeed),
+               redSurfaceListList, wolfWalkAcceleration, wolfJumpHeight,
+               wolfJumpCooldown);
+
+    GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
 
     // int worldWidth, int worldHeight, double noiseValue, double
@@ -64,8 +96,8 @@ int main(int argc, char* args[]) {
     // heightAddition, int dirtLayerHeight, unsigned int seed
     const int worldWidth = 600, worldHeight = 100, blockSize = 64;
     int worldSeed = 1;
-    Terrain world =
-        Terrain(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5, worldSeed);
+    Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
+                  worldSeed);
     world.generate(charset, screen);
     const int worldSize = worldWidth * worldHeight;
 
@@ -87,7 +119,7 @@ int main(int argc, char* args[]) {
     lastTime = SDL_GetTicks();
     Vector camera;
 
-    Vector gravity = Vector(0, 10);
+    Vector gravity(0, 10);
 
     while (!quit) {
         currentTime = SDL_GetTicks();
@@ -98,30 +130,24 @@ int main(int argc, char* args[]) {
         realTime += delta;
         gameTime += gameDelta;
 
+        wolf.rb.acceleration = gravity;
         player.rb.acceleration = gravity;
 
         // handle input
+        
 
-        std::vector<GameObject> inRangeList =
-            world.terrain->queryRange(Rectangle(player.rb.hitbox.width + 100,
-                                                player.rb.hitbox.height + 100,
-                                                player.rb.hitbox.position));
-        int collidersCount = static_cast<int>(inRangeList.size());
-        RigidBody* colliders = new RigidBody[collidersCount];
-        for (int i = 0; i < collidersCount; i++) {
-            colliders[i] = inRangeList[i].rb;
-        }
-
-        quit = control(&player, realTime / 1000, colliders, collidersCount, box,
+        quit = control(&player, realTime / 1000, box,
                        world.terrain);
 
         // change gamestate
+        calculateNearbyColliders(&wolf.rb , world.terrain);
+        calculateNearbyColliders(&player.rb, world.terrain);
 
-        player.rb.collide(colliders, collidersCount, gameDelta);
+        wolf.rb.collide(gameDelta);
+        player.rb.collide(gameDelta);
 
-        player.rb.move(gameDelta, colliders, collidersCount);
-
-        delete[] colliders;
+        wolf.rb.move(gameDelta);
+        player.rb.move(gameDelta);
 
         // output
         SDL_FillRect(screen, NULL, skyblue);
@@ -137,6 +163,7 @@ int main(int argc, char* args[]) {
             visibleBlocks[i].rndr.draw(screen, camera,
                                        visibleBlocks[i].rb.hitbox);
         }
+        wolf.rndr.draw(screen, camera, wolf.rb.hitbox);
         player.rndr.draw(screen, camera, player.rb.hitbox);
 
         // tekst informacyjny

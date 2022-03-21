@@ -11,7 +11,9 @@
 
 class RigidBody {
    public:
-   bool collidable;
+    RigidBody* colliders = nullptr;
+    int collidersCount;
+    bool collidable;
     Vector velocity;
     Vector acceleration;
     double mass;
@@ -28,8 +30,8 @@ class RigidBody {
           collidable(other.collidable),
           maxSpeed(other.maxSpeed) {}
 
-    RigidBody(Vector startingPosition, int width, int height, bool collidable = true,
-              double maxSpeed = 10) {
+    RigidBody(Vector startingPosition, int width, int height,
+              bool collidable = true, double maxSpeed = 10) {
         this->hitbox.position = startingPosition;
         this->hitbox.width = width;
         this->hitbox.height = height;
@@ -37,9 +39,9 @@ class RigidBody {
         this->maxSpeed = maxSpeed;
     }
 
-    void move(double gameDelta, RigidBody* others, int othersCount);
+    void move(double gameDelta);
 
-    void collide(RigidBody* others, int othersCount, double gameDelta);
+    void collide(double gameDelta);
 
     Rectangle leftHitbox();
     Rectangle rightHitbox();

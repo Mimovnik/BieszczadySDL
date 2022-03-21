@@ -4,15 +4,15 @@
 
 #include "settings.h"
 
-void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
+void RigidBody::move(double gameDelta) {
     Vector friction = Vector::ZERO;
     Vector below = Vector(0, 5);
-    Rectangle* othersHitboxes = new Rectangle[othersCount];
-    for (int i = 0; i < othersCount; i++) {
-        othersHitboxes[i] = others[i].hitbox;
+    Rectangle* othersHitboxes = new Rectangle[collidersCount];
+    for (int i = 0; i < collidersCount; i++) {
+        othersHitboxes[i] = colliders[i].hitbox;
     }
     if (bottomHitbox().translate(below).overlapsAny(othersHitboxes,
-                                                    othersCount)) {
+                                                    collidersCount)) {
         if (velocity.x > 0) {
             friction = Vector(FRICTION_FACTOR, 0);
         } else if (velocity.x < 0) {
@@ -40,14 +40,14 @@ void RigidBody::move(double gameDelta, RigidBody* others, int othersCount) {
     hitbox.position += velocity * gameDelta;
 }
 
-void RigidBody::collide(RigidBody* others, int othersCount, double gameDelta) {
+void RigidBody::collide(double gameDelta) {
     Vector futureOffset = velocity * gameDelta +
         acceleration * (gameDelta * gameDelta / 2);
 
     std::vector<Rectangle> collidableHitboxList;
-    for (int i = 0; i < othersCount; i++) {
-        if (others[i].collidable)
-            collidableHitboxList.push_back(others[i].hitbox);
+    for (int i = 0; i < collidersCount; i++) {
+        if (colliders[i].collidable)
+            collidableHitboxList.push_back(colliders[i].hitbox);
     }
 
     int collidableCount = static_cast<int>(collidableHitboxList.size());

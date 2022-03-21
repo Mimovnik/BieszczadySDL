@@ -9,8 +9,8 @@
 #define CENTER_X 0
 #define CENTER_Y 0
 
-#define BLOCK_WIDTH 64
-#define BLOCK_HEIGHT 64
+#define BLOCK_WIDTH 32
+#define BLOCK_HEIGHT 32
 
 #define FRICTION_FACTOR 7
 #define MIN_SPEED 0.3

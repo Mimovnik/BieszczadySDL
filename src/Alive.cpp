@@ -4,12 +4,15 @@
 
 #include "RigidBody.h"
 #include "Vector.h"
+#include "settings.h"
 
 void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
                   double realTime) {
     Vector blockPos;
-    blockPos.x = round(mousePos.x) - ((int)round(mousePos.x) % 64) + 32;
-    blockPos.y = round(mousePos.y) - ((int)round(mousePos.y) % 64) - 32;
+    blockPos.x = round(mousePos.x) - ((int)round(mousePos.x) % BLOCK_WIDTH) +
+                 (BLOCK_WIDTH / 2);
+    blockPos.y = round(mousePos.y) - ((int)round(mousePos.y) % BLOCK_HEIGHT) -
+                 (BLOCK_HEIGHT / 2);
     block.rb.hitbox.position = blockPos;
     if (!this->rb.hitbox.overlaps(block.rb.hitbox)) {
         if (terrain->queryRange(block.rb.hitbox).size() == 0) {
@@ -23,23 +26,21 @@ void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
 }
 
 void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
-    // if (terrain->queryRange(Rectangle(64, 64, digPos)).size() > 0) {
     if (digTimer.isUp(realTime)) {
         digTimer.start(realTime);
 
         terrain->destroy(digPos);
     }
-    // }
 }
 
-void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
+void Alive::jump(double realTime) {
     Vector below = Vector(0, 1);
-    Rectangle* othersHitboxes = new Rectangle[basesCount];
-    for (int i = 0; i < basesCount; i++) {
-        othersHitboxes[i] = bases[i].hitbox;
+    Rectangle* othersHitboxes = new Rectangle[rb.collidersCount];
+    for (int i = 0; i < rb.collidersCount; i++) {
+        othersHitboxes[i] = rb.colliders[i].hitbox;
     }
     if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes,
-                                                       basesCount)) {
+                                                       rb.collidersCount)) {
         if (jumpTimer.isUp(realTime)) {
             jumpTimer.start(realTime);
 
@@ -49,15 +50,15 @@ void Alive::jump(RigidBody* bases, int basesCount, double realTime) {
     delete[] othersHitboxes;
 }
 
-void Alive::walk(char direction, RigidBody* bases, int basesCount) {
+void Alive::walk(char direction) {
     Vector below = Vector(0, 1);
 
-    Rectangle* othersHitboxes = new Rectangle[basesCount];
-    for (int i = 0; i < basesCount; i++) {
-        othersHitboxes[i] = bases[i].hitbox;
+    Rectangle* othersHitboxes = new Rectangle[rb.collidersCount];
+    for (int i = 0; i < rb.collidersCount; i++) {
+        othersHitboxes[i] = rb.colliders[i].hitbox;
     }
     if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes,
-                                                       basesCount)) {
+                                                       rb.collidersCount)) {
         if (direction == 'L') {
             rb.acceleration = rb.acceleration.add(Vector(-walkAccel, 0));
             return;
