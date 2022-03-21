@@ -15,6 +15,10 @@ class GameObject {
         this->rndr = rndr;
         this->rb = rb;
     }
+
+    Vector getPosition() const{
+        return rb.hitbox.position;
+    }
 };
 
 #endif

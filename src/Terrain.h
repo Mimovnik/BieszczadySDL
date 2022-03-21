@@ -11,6 +11,7 @@
 #include "PerlinNoise.h"
 #include "QuadTree.h"
 #include "RigidBody.h"
+#include "Vector.h"
 #include "loadBMP.cpp"
 #include "settings.h"
 class Terrain {
@@ -29,6 +30,8 @@ class Terrain {
     float heightAddition;
     double noiseCaveValue;
     unsigned int seed;
+
+    Vector spawnPoint;
 
     double* noiseTexture;
 
@@ -56,8 +59,8 @@ class Terrain {
         this->blockWidth = BLOCK_WIDTH;
         this->blockHeight = BLOCK_HEIGHT;
         this->terrain = new QuadTree(
-            Rectangle(worldWidth * 64, worldHeight * 64,
-                      Vector(worldWidth * 64 / 2, -worldHeight * 64 / 2)));
+            Rectangle(worldWidth * blockWidth, worldHeight * blockHeight,
+                      Vector(worldWidth * blockWidth / 2, -worldHeight * blockHeight / 2)));
     }
 
     void generate(SDL_Surface* charset, SDL_Surface* screen) {
@@ -114,9 +117,10 @@ class Terrain {
                         int t = rand() % 100;
                         if (t < 10) {
                             placeTree(x, y + 1);
-                        }
-                        int b = rand() % 100;
-                        if (b < 20) {
+                        } else if (x <= worldWidth / 2 + 10 && x >= worldWidth / 2 - 10) {
+                            spawnPoint =
+                                Vector(x * BLOCK_WIDTH + BLOCK_WIDTH / 2,
+                                       -y * BLOCK_HEIGHT - 3 * BLOCK_HEIGHT);
                         }
                     }
                 }

@@ -51,7 +51,7 @@ int main(int argc, char* args[]) {
     std::vector<std::vector<SDL_Surface*>> heroSurfaceListList =
         loadHeroSurfaces();
 
-        std::vector<SDL_Surface*> mobLeftSurfaceList;
+    std::vector<SDL_Surface*> mobLeftSurfaceList;
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-1.bmp"));
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-2.bmp"));
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-3.bmp"));
@@ -60,7 +60,7 @@ int main(int argc, char* args[]) {
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-6.bmp"));
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-7.bmp"));
     mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-8.bmp"));
-std::vector<SDL_Surface*> mobRightSurfaceList;
+    std::vector<SDL_Surface*> mobRightSurfaceList;
     mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-1.bmp"));
     mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-2.bmp"));
     mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-3.bmp"));
@@ -87,6 +87,16 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
     std::vector<SDL_Surface*> boxSurfaceList;
     boxSurfaceList.push_back(loadBMP("../bmp/box.bmp"));
 
+    // int worldWidth, int worldHeight, double noiseValue, double
+    // terrainFreq, double caveFreq, float heightMultiplier, float
+    // heightAddition, int dirtLayerHeight, unsigned int seed
+    const int worldWidth = 600, worldHeight = 100, blockSize = 64;
+    int worldSeed = 1;
+    Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
+                  worldSeed);
+    world.generate(charset, screen);
+    const int worldSize = worldWidth * worldHeight;
+
     int playerHitboxWidth = 42;
     int playerHitboxHeigth = 60;
     double playerWalkAcceleration = 20;
@@ -94,9 +104,10 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
     double playerJumpHeight = 45;
     double playerJumpCooldown = 0.5;
     int playerMaxHealth = 5;
-
     bool playerDrawScaledToHitbox = false;
-    Alive player(RigidBody(center.add(Vector(1600, -4000)), playerHitboxWidth,
+    Vector playerSpawnPoint = world.spawnPoint;
+
+    Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
                  heroSurfaceListList, playerWalkAcceleration, playerJumpHeight,
                  playerJumpCooldown, playerMaxHealth);
@@ -110,23 +121,14 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
     double wraithJumpCooldown = 1;
     int wraithMaxHealth = 5;
 
-    Alive wraith(RigidBody(center.add(Vector(1700, -4000)), wraithHitboxWidth,
-                           wraithHitboxHeigth, false, wraithMaxSpeed),
-                 mobSurfaceListList, wraithWalkAcceleration, wraithJumpHeight,
-                 wraithJumpCooldown, wraithMaxHealth);
+    Alive wraith(
+        RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
+                  wraithHitboxHeigth, false, wraithMaxSpeed),
+        mobSurfaceListList, wraithWalkAcceleration, wraithJumpHeight,
+        wraithJumpCooldown, wraithMaxHealth);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
-
-    // int worldWidth, int worldHeight, double noiseValue, double
-    // terrainFreq, double caveFreq, float heightMultiplier, float
-    // heightAddition, int dirtLayerHeight, unsigned int seed
-    const int worldWidth = 600, worldHeight = 100, blockSize = 64;
-    int worldSeed = 1;
-    Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
-                  worldSeed);
-    world.generate(charset, screen);
-    const int worldSize = worldWidth * worldHeight;
 
     theme = loadBMP("../bmp/forestTheme3.bmp");
 
@@ -147,7 +149,6 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
     Vector camera;
 
     Vector gravity(0, 10);
-
 
     while (!quit) {
         currentTime = SDL_GetTicks();
@@ -180,6 +181,25 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
         wraith.rb.move(gameDelta);
         player.rb.move(gameDelta);
 
+        if (player.getPosition().y > 0 || player.getPosition().x < 0 || player.getPosition().x > worldWidth * BLOCK_WIDTH) {
+            // std::vector<GameObject> blockStrip =
+            //     world.terrain->queryRange(Rectangle(
+            //         100, worldHeight * BLOCK_HEIGHT,
+            //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT / 2)));
+            // double highestY = 0;
+            // for (int i = 0; i < blockStrip.size(); i++) {
+            //     if (blockStrip[i].getPosition().y < highestY) {
+            //         highestY = blockStrip[i].getPosition().y;
+            //     }
+            // }
+            // player.rb.hitbox.position.y = highestY - 3 * BLOCK_HEIGHT;
+            player.rb.hitbox.position = playerSpawnPoint;
+        }
+
+        if(!Rectangle(2*SCREEN_WIDTH, 2*SCREEN_HEIGHT, player.getPosition()).contains(wraith.getPosition())){
+            wraith.rb.hitbox.position = player.getPosition().addY(-SCREEN_HEIGHT / 2);
+        }
+
         // output
         SDL_FillRect(screen, NULL, skyblue);
 
@@ -207,7 +227,7 @@ std::vector<SDL_Surface*> mobRightSurfaceList;
             fpsTimer -= 500;
         };
 
-        printf("Wolfs health = %d\n", wraith.health);
+        printf("Creature's health = %d\n", wraith.health);
 
         frames++;
     }
