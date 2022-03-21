@@ -60,41 +60,57 @@ void Alive::walk(char direction) {
     if (rb.bottomHitbox().translate(below).overlapsAny(othersHitboxes,
                                                        rb.collidersCount)) {
         if (direction == 'L') {
-            rb.acceleration = rb.acceleration.add(Vector(-walkAccel, 0));
+            rb.acceleration += Vector(-moveAccel, 0);
             return;
         }
         if (direction == 'R') {
-            rb.acceleration = rb.acceleration.add(Vector(walkAccel, 0));
+            rb.acceleration += Vector(moveAccel, 0);
             return;
         }
     }
     // airborne
     if (direction == 'L') {
-        rb.acceleration = rb.acceleration.add(Vector(-walkAccel * 0.3, 0));
+        rb.acceleration += Vector(-moveAccel * 0.3, 0);
         return;
     }
     if (direction == 'R') {
-        rb.acceleration = rb.acceleration.add(Vector(walkAccel * 0.3, 0));
+        rb.acceleration += Vector(moveAccel * 0.3, 0);
         return;
     }
     delete[] othersHitboxes;
 }
 
-void Alive::attack(Alive* creature, double realTime) {
+void Alive::attack(Alive* creature, char direction, double realTime) {
     if (attackTimer.isUp(realTime)) {
         attackTimer.start(realTime);
         const int weaponDamage = 1;
-        const int areaW = 30;
-        const int areaH = 10;
+        const int areaW = 64;
+        const int areaH = 64;
+        Vector weaponDir;
+        if(direction == 'L'){
+            weaponDir = rb.hitbox.position.addX(-areaW / 2);
+        }
+        if(direction == 'R'){
+            weaponDir = rb.hitbox.position.addX(areaW / 2);
+        }
         Rectangle weaponDamageArea(areaW, areaH,
-                                   rb.hitbox.position.addX(areaW / 2));
+                                   weaponDir);
         if (weaponDamageArea.overlaps(creature->rb.hitbox)) {
             creature->health -= weaponDamage;
         }
         if (creature->health <= 0) {
-            creature->jump(realTime);
+            creature->die();
         }
     }
+}
+
+void Alive::flyTo(Vector position, double realTime){
+    Vector direction((position  - rb.hitbox.position).addY(-32));
+    rb.acceleration += Vector::fromAngle(moveAccel, direction.getAngle());
+}
+
+void Alive::die(){
+    printf("A creature died");
 }
 
 void Alive::startAnimation(Animation* animation) { rndr.active = animation; }

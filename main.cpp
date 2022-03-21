@@ -22,18 +22,18 @@
 #include "src/settings.h"
 
 void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
-        if (rb->colliders != nullptr) {
-            delete[] rb->colliders;
-            rb->collidersCount = 0;
-        }
-        std::vector<GameObject> inRangeList = terrain->queryRange(Rectangle(
-            rb->hitbox.width + 100, rb->hitbox.height + 100, rb->hitbox.position));
-        rb->collidersCount = static_cast<int>(inRangeList.size());
-        rb->colliders = new RigidBody[rb->collidersCount];
-        for (int i = 0; i < rb->collidersCount; i++) {
-            rb->colliders[i] = inRangeList[i].rb;
-        }
+    if (rb->colliders != nullptr) {
+        delete[] rb->colliders;
+        rb->collidersCount = 0;
     }
+    std::vector<GameObject> inRangeList = terrain->queryRange(Rectangle(
+        rb->hitbox.width + 200, rb->hitbox.height + 200, rb->hitbox.position));
+    rb->collidersCount = static_cast<int>(inRangeList.size());
+    rb->colliders = new RigidBody[rb->collidersCount];
+    for (int i = 0; i < rb->collidersCount; i++) {
+        rb->colliders[i] = inRangeList[i].rb;
+    }
+}
 
 int main(int argc, char* args[]) {
     Display display(SCREEN_WIDTH, SCREEN_HEIGHT, "Bieszczady");
@@ -50,6 +50,31 @@ int main(int argc, char* args[]) {
 
     std::vector<std::vector<SDL_Surface*>> heroSurfaceListList =
         loadHeroSurfaces();
+
+        std::vector<SDL_Surface*> mobLeftSurfaceList;
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-1.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-2.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-3.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-4.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-5.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-6.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-7.bmp"));
+    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-8.bmp"));
+std::vector<SDL_Surface*> mobRightSurfaceList;
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-1.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-2.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-3.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-4.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-5.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-6.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-7.bmp"));
+    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-8.bmp"));
+
+    std::vector<std::vector<SDL_Surface*>> mobSurfaceListList;
+    for (int i = 0; i < 4; i++) {
+        mobSurfaceListList.push_back(mobLeftSurfaceList);
+        mobSurfaceListList.push_back(mobRightSurfaceList);
+    }
 
     std::vector<SDL_Surface*> redSurfaceList;
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
@@ -77,18 +102,18 @@ int main(int argc, char* args[]) {
                  playerJumpCooldown, playerMaxHealth);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
 
-    int wolfHitboxWidth = 64;
-    int wolfHitboxHeigth = 32;
-    double wolfWalkAcceleration = 15;
-    double wolfMaxSpeed = 25;
-    double wolfJumpHeight = 35;
-    double wolfJumpCooldown = 1;
-    int wolfMaxHealth = 5;
+    int wraithHitboxWidth = 64;
+    int wraithHitboxHeigth = 64;
+    double wraithWalkAcceleration = 10;
+    double wraithMaxSpeed = 25;
+    double wraithJumpHeight = 35;
+    double wraithJumpCooldown = 1;
+    int wraithMaxHealth = 5;
 
-    Alive wolf(RigidBody(center.add(Vector(1700, -4000)), wolfHitboxWidth,
-                         wolfHitboxHeigth, false, wolfMaxSpeed),
-               redSurfaceListList, wolfWalkAcceleration, wolfJumpHeight,
-               wolfJumpCooldown, wolfMaxHealth);
+    Alive wraith(RigidBody(center.add(Vector(1700, -4000)), wraithHitboxWidth,
+                           wraithHitboxHeigth, false, wraithMaxSpeed),
+                 mobSurfaceListList, wraithWalkAcceleration, wraithJumpHeight,
+                 wraithJumpCooldown, wraithMaxHealth);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -123,6 +148,7 @@ int main(int argc, char* args[]) {
 
     Vector gravity(0, 10);
 
+
     while (!quit) {
         currentTime = SDL_GetTicks();
         delta = currentTime - lastTime;
@@ -132,23 +158,26 @@ int main(int argc, char* args[]) {
         realTime += delta;
         gameTime += gameDelta;
 
-        wolf.rb.acceleration = gravity;
         player.rb.acceleration = gravity;
+        wraith.rb.acceleration = Vector::ZERO;
 
         // handle input
-        
 
-        quit = control(&player, realTime / 1000, &wolf, box,
-                       world.terrain);
-
+        quit = control(&player, realTime / 1000, &wraith, box, world.terrain);
         // change gamestate
-        calculateNearbyColliders(&wolf.rb , world.terrain);
+
+        wraith.flyTo(player.rb.hitbox.position, realTime / 1000);
+
+        animationControl(&player, realTime / 1000);
+        animationControl(&wraith, realTime / 1000);
+
+        calculateNearbyColliders(&wraith.rb, world.terrain);
         calculateNearbyColliders(&player.rb, world.terrain);
 
-        wolf.rb.collide(gameDelta);
+        wraith.rb.collide(gameDelta);
         player.rb.collide(gameDelta);
 
-        wolf.rb.move(gameDelta);
+        wraith.rb.move(gameDelta);
         player.rb.move(gameDelta);
 
         // output
@@ -165,23 +194,8 @@ int main(int argc, char* args[]) {
             visibleBlocks[i].rndr.draw(screen, camera,
                                        visibleBlocks[i].rb.hitbox);
         }
-        wolf.rndr.draw(screen, camera, wolf.rb.hitbox);
+        wraith.rndr.draw(screen, camera, wraith.rb.hitbox);
         player.rndr.draw(screen, camera, player.rb.hitbox);
-
-        // tekst informacyjny
-        // DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, silver, brown);
-
-        // sprintf_s(text, "Czas trwania = %.1lf s  %.0lf klatek / s",
-        //           realTime / 1000, fps);
-        // DrawString(screen,
-        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2),
-        //            10, text, charset);
-        // sprintf_s(text,
-        //           "Esc - wyjscie, W / \030 - skok, A / \032 oraz D / \033 - "
-        //           "sterowanie");
-        // DrawString(screen,
-        //            static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2),
-        //            26, text, charset);
 
         display.update(screen);
 
@@ -193,15 +207,7 @@ int main(int argc, char* args[]) {
             fpsTimer -= 500;
         };
 
-        printf("Wolfs health = %d\n", wolf.health);
-
-        // printf(
-        //     "Player's position: x = %.2f y = %.2f "
-        //     "velocity: x = %.8f y = %.8f "
-        //     "acceleration: x = %.4f y = %.4f\n",
-        //     player.rb.hitbox.position.x, player.rb.hitbox.position.y,
-        //     player.rb.velocity.x, player.rb.velocity.y,
-        //     player.rb.acceleration.x, player.rb.acceleration.y);
+        printf("Wolfs health = %d\n", wraith.health);
 
         frames++;
     }

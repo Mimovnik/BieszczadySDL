@@ -41,8 +41,8 @@ void RigidBody::move(double gameDelta) {
 }
 
 void RigidBody::collide(double gameDelta) {
-    Vector futureOffset = velocity * gameDelta +
-        acceleration * (gameDelta * gameDelta / 2);
+    Vector futureOffset =
+        velocity * gameDelta + acceleration * (gameDelta * gameDelta / 2);
 
     std::vector<Rectangle> collidableHitboxList;
     for (int i = 0; i < collidersCount; i++) {
@@ -63,8 +63,8 @@ void RigidBody::collide(double gameDelta) {
             .overlapsAny(collidableHitboxes, collidableCount)) {
         velocity.y = 0;
         acceleration.y = 0;
-        futureOffset = velocity* gameDelta+(
-            acceleration * (gameDelta * gameDelta / 2));
+        futureOffset =
+            velocity * gameDelta + (acceleration * (gameDelta * gameDelta / 2));
     }
     if (leftHitbox()
             .translate(futureOffset)
@@ -76,6 +76,10 @@ void RigidBody::collide(double gameDelta) {
         acceleration.x = 0;
     }
     delete[] collidableHitboxes;
+}
+
+Vector RigidBody::futureOffset(double gameDelta) {
+    return velocity * gameDelta + (acceleration * (gameDelta * gameDelta / 2));
 }
 
 Rectangle RigidBody::leftHitbox() {

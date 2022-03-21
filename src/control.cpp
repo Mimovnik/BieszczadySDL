@@ -5,7 +5,7 @@
 #include "RigidBody.h"
 #include "settings.h"
 
-bool control(Alive* entity, double realTime, Alive* creature, GameObject block, QuadTree* terrain) {
+void animationControl(Alive* entity, double realTime) {
     if (entity->rb.velocity.y > 10) {
         entity->startAnimation(&entity->falling);
     } else if (entity->rb.velocity.y < 0) {
@@ -23,25 +23,29 @@ bool control(Alive* entity, double realTime, Alive* creature, GameObject block, 
         entity->rndr.active->changeSide('L');
     }
 
+    entity->rndr.active->changeSurface(realTime);
+}
+
+bool control(Alive* entity, double realTime, Alive* creature, GameObject block,
+             QuadTree* terrain) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
 
-    if (KeyState[SDL_SCANCODE_W] ||
-        KeyState[SDL_SCANCODE_SPACE]) {
+    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
         entity->jump(realTime);
     }
-    if (KeyState[SDL_SCANCODE_D] ) {
+    if (KeyState[SDL_SCANCODE_D]) {
         entity->walk('R');
     }
     if (KeyState[SDL_SCANCODE_A]) {
         entity->walk('L');
     }
-    if(KeyState[SDL_SCANCODE_RIGHT]){
-        entity->attack(creature, realTime);
+    if (KeyState[SDL_SCANCODE_LEFT]) {
+        entity->attack(creature, 'L', realTime);
+    } else if (KeyState[SDL_SCANCODE_RIGHT]) {
+        entity->attack(creature, 'R', realTime);
     }
-
-    entity->rndr.active->changeSurface(realTime);
 
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;

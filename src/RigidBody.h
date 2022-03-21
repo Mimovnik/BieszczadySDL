@@ -43,6 +43,8 @@ class RigidBody {
 
     void collide(double gameDelta);
 
+    Vector futureOffset(double gameDelta);
+
     Rectangle leftHitbox();
     Rectangle rightHitbox();
     Rectangle topHitbox();

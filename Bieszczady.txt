@@ -1,3 +1,6 @@
-Survival typu Don't Starve
-Świat Wiedźmina
-Widok jak w Terrari
+Ror2-like (rogulelike with different characters having different abilities, spawned mobs give a player coins to open chests)
+Witcher's World (Old Slavic)
+Terraria's view
+Crafting like in Dont Starve
+Destructable enviroment (requires tools)
+Multiple level objectives leading to different run paths (player can choose a certain objective)
