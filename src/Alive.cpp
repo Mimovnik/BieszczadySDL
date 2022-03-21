@@ -115,10 +115,6 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
 
 void Alive::flyTo(Vector position, double realTime){
     Vector direction((position  - rb.hitbox.position).addY(-32));
-    rb.acceleration += Vector::fromAngle(moveAccel, direction.getAngle());
-}
-
-void Alive::die(){
     printf("A creature died");
     alive = false;
 }
