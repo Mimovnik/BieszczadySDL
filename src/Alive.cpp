@@ -119,6 +119,11 @@ void Alive::flyTo(Vector position, double realTime){
 
 void Alive::die(){
     printf("A creature died");
+    alive = false;
+}
+
+bool Alive::isAlive(){
+    return alive;
 }
 
 void Alive::startAnimation(Animation* animation) { rndr.active = animation; }

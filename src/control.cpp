@@ -26,63 +26,44 @@ void animationControl(Alive* entity, double realTime) {
     entity->rndr.active->changeSurface(realTime);
 }
 
-bool control(Alive* entity, double realTime, Alive* creature, GameObject block,
+bool control(Alive* player, double realTime, Alive* creature, GameObject block,
              QuadTree* terrain) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
 
+    if (!player->isAlive()) {
+        return false;
+    }
+    
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
-        entity->jump(realTime);
+        player->jump(realTime);
     }
     if (KeyState[SDL_SCANCODE_D]) {
-        entity->walk('R');
+        player->walk('R');
     }
     if (KeyState[SDL_SCANCODE_A]) {
-        entity->walk('L');
+        player->walk('L');
     }
     if (KeyState[SDL_SCANCODE_LEFT]) {
-        entity->attack(creature, 'L', realTime);
+        player->attack(creature, 'L', realTime);
     } else if (KeyState[SDL_SCANCODE_RIGHT]) {
-        entity->attack(creature, 'R', realTime);
+        player->attack(creature, 'R', realTime);
     }
 
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;
     buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);
-    Vector mousePos = entity->rb.hitbox.position.add(
+    Vector mousePos = player->rb.hitbox.position.add(
         Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
 
     if ((buttons & SDL_BUTTON_RMASK) != 0) {
-        entity->place(block, mousePos, terrain, realTime);
+        player->place(block, mousePos, terrain, realTime);
     }
     if ((buttons & SDL_BUTTON_LMASK) != 0) {
-        entity->dig(mousePos, terrain, realTime);
+        player->dig(mousePos, terrain, realTime);
     }
 
-    return false;
-}
-
-bool noclip(Alive* entity) {
-    SDL_PumpEvents();
-    const Uint8* KeyState = SDL_GetKeyboardState(NULL);
-    if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
-
-    double accel = 10;
-    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP]) {
-        entity->rb.acceleration =
-            entity->rb.acceleration.add(Vector(0, -accel));
-    }
-    if (KeyState[SDL_SCANCODE_S] || KeyState[SDL_SCANCODE_DOWN]) {
-        entity->rb.acceleration = entity->rb.acceleration.add(Vector(0, accel));
-    }
-    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
-        entity->rb.acceleration =
-            entity->rb.acceleration.add(Vector(-accel, 0));
-    }
-    if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
-        entity->rb.acceleration = entity->rb.acceleration.add(Vector(accel, 0));
-    }
     return false;
 }

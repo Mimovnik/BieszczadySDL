@@ -4,13 +4,26 @@ class Timer {
     double deadline;
 
     double coolDown;
+    bool waiting;
 
    public:
-    Timer() { this->deadline = 0; }
+    Timer() {
+        this->deadline = 0;
+        this->waiting = false;
+    }
 
-    void start(double realTime) { deadline = realTime + coolDown; }
+    void start(double realTime) {
+        if (!waiting) {
+            waiting = true;
+            deadline = realTime + coolDown;
+        }
+    }
 
-    bool isUp(double realTime) { return realTime > deadline; }
+    bool isUp(double realTime) { 
+        if(realTime > deadline){
+            waiting = false;
+        }
+        return realTime > deadline; }
 
     void setCooldown(double cooldown) { this->coolDown = cooldown; }
 };

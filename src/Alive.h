@@ -8,8 +8,8 @@
 #include "RigidBody.h"
 #include "Timer.h"
 class Alive : public GameObject {
-
    public:
+    bool alive;
     int health;
     const int maxHealth;
     Timer jumpTimer;
@@ -32,6 +32,7 @@ class Alive : public GameObject {
         this->moveAccel = moveAccel;
         this->jumpHeight = jumpHeight;
         this->jumpTimer.setCooldown(jumpCooldown);
+        this->alive = true;
 
         this->placeTimer.setCooldown(0);
         this->digTimer.setCooldown(0);
@@ -64,6 +65,8 @@ class Alive : public GameObject {
     void startAnimation(Animation* animation);
 
     void die();
+
+    bool isAlive();
 };
 
 #endif

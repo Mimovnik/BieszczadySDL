@@ -31,6 +31,17 @@ void DrawString(SDL_Surface* screen, double x, double y, const char* text,
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y)
 // (x, y) to punkt środka obrazka sprite na ekranie
+void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, double x, double y) {
+    SDL_Rect dest;
+    dest.x = static_cast<int>(x - sprite->w / 2);
+    dest.y = static_cast<int>(y - sprite->h / 2);
+    dest.w = sprite->w;
+    dest.h = sprite->h;
+    SDL_BlitSurface(sprite, NULL, screen, &dest);
+};
+
+// narysowanie na ekranie screen powierzchni sprite w punkcie (x, y)
+// (x, y) to punkt środka obrazka sprite na ekranie w odniesieniu do kamery offset
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, double x, double y,
                  Vector offset) {
     SDL_Rect dest;

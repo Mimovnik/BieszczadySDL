@@ -41,7 +41,7 @@ int main(int argc, char* args[]) {
     SDL_Surface* screen =
         SDL_CreateRGBSurface(0, display.getWidth(), display.getHeight(), 32,
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-    SDL_Surface *charset = nullptr, *theme = nullptr;
+    SDL_Surface *charset = nullptr, *youdied = nullptr;
 
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector center(CENTER_X, CENTER_Y);
@@ -130,7 +130,7 @@ int main(int argc, char* args[]) {
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
 
-    theme = loadBMP("../bmp/forestTheme3.bmp");
+    youdied = loadBMP("../bmp/youdied.bmp");
 
     // char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -147,8 +147,9 @@ int main(int argc, char* args[]) {
     bool quit = false;
     lastTime = SDL_GetTicks();
     Vector camera;
-
     Vector gravity(0, 10);
+    Timer spawnMob;
+    spawnMob.setCooldown(5);
 
     while (!quit) {
         currentTime = SDL_GetTicks();
@@ -167,11 +168,21 @@ int main(int argc, char* args[]) {
         quit = control(&player, realTime / 1000, &wraith, box, world.terrain);
         // change gamestate
 
-        wraith.flyTo(player.rb.hitbox.position, realTime / 1000);
+        if (wraith.isAlive()) {
+            wraith.flyTo(player.getPosition(), realTime / 1000);
 
-        if (Rectangle(64, 64, wraith.getPosition())
-                .contains(player.getPosition())) {
-            wraith.attack(&player, 'R', realTime / 1000);
+            if (Rectangle(64, 64, wraith.getPosition())
+                    .contains(player.getPosition())) {
+                wraith.attack(&player, 'R', realTime / 1000);
+            }
+        } else {
+            spawnMob.start(realTime / 1000);
+            if (spawnMob.isUp(realTime / 1000)) {
+                wraith.alive = true;
+                wraith.rb.hitbox.position =
+                    player.getPosition().addY(-SCREEN_HEIGHT / 2);
+                wraith.health = wraith.maxHealth;
+            }
         }
 
         animationControl(&player, realTime / 1000);
@@ -215,8 +226,6 @@ int main(int argc, char* args[]) {
 
         camera = player.rb.hitbox.position.difference(screenMiddle);
 
-        DrawSurface(screen, theme, center.x, center.y, camera);
-
         std::vector<GameObject> visibleBlocks = world.terrain->queryRange(
             Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
                       player.rb.hitbox.position));
@@ -226,6 +235,13 @@ int main(int argc, char* args[]) {
         }
         wraith.rndr.draw(screen, camera, wraith.rb.hitbox);
         player.rndr.draw(screen, camera, player.rb.hitbox);
+
+        
+
+        if (!player.isAlive()) {
+            DrawSurface(screen, youdied, screenMiddle.x,
+                        screenMiddle.y);
+        }
 
         display.update(screen);
 
