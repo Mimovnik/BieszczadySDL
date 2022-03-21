@@ -63,7 +63,7 @@ class Terrain {
                       Vector(worldWidth * blockWidth / 2, -worldHeight * blockHeight / 2)));
     }
 
-    void generate(SDL_Surface* charset, SDL_Surface* screen) {
+    void generate(SDL_Surface* screen) {
         this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp"));
 
         this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp"));

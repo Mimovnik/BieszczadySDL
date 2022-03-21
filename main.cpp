@@ -43,6 +43,8 @@ int main(int argc, char* args[]) {
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     SDL_Surface *charset = nullptr, *youdied = nullptr;
 
+    charset = loadBMP("../bmp/cs8x8.bmp");
+
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector center(CENTER_X, CENTER_Y);
 
@@ -76,6 +78,15 @@ int main(int argc, char* args[]) {
         mobSurfaceListList.push_back(mobRightSurfaceList);
     }
 
+    SDL_Surface* healthPointTemp = loadBMP("../bmp/red.bmp");
+    const int healthPointW = 10;
+    const int healthPointH = 20;
+    SDL_Surface* healthPoint =
+        SDL_CreateRGBSurface(0, healthPointW, healthPointH, 32, 0x00FF0000,
+                             0x0000FF00, 0x000000FF, 0xFF000000);
+    SDL_BlitScaled(healthPointTemp, NULL, healthPoint, NULL);
+    SDL_FreeSurface(healthPointTemp);
+
     std::vector<SDL_Surface*> redSurfaceList;
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
 
@@ -94,7 +105,7 @@ int main(int argc, char* args[]) {
     int worldSeed = 1;
     Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
                   worldSeed);
-    world.generate(charset, screen);
+    world.generate(screen);
     const int worldSize = worldWidth * worldHeight;
 
     int playerHitboxWidth = 42;
@@ -103,7 +114,7 @@ int main(int argc, char* args[]) {
     double playerMaxSpeed = 30;
     double playerJumpHeight = 45;
     double playerJumpCooldown = 0.5;
-    int playerMaxHealth = 5;
+    int playerMaxHealth = 10;
     bool playerDrawScaledToHitbox = false;
     Vector playerSpawnPoint = world.spawnPoint;
 
@@ -132,7 +143,7 @@ int main(int argc, char* args[]) {
 
     youdied = loadBMP("../bmp/youdied.bmp");
 
-    // char text[128];
+    char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
     int silver = SDL_MapRGB(screen->format, 192, 192, 192);
     int green = SDL_MapRGB(screen->format, 0, 153, 51);
@@ -236,11 +247,24 @@ int main(int argc, char* args[]) {
         wraith.rndr.draw(screen, camera, wraith.rb.hitbox);
         player.rndr.draw(screen, camera, player.rb.hitbox);
 
-        
+        DrawRectangle(screen, 40, 4, SCREEN_WIDTH - 80, 20, silver, brown);
+
+        sprintf_s(text, "Czas trwania: %.1lf s  %.0lf klatek / s",
+                  realTime / 1000, fps);
+        DrawString(screen,
+                   static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
+                   text, charset);
+
+        sprintf_s(text, "%d / %d",
+                  player.health, player.maxHealth);
+        DrawString(screen, 20, SCREEN_HEIGHT - 45, text, charset);
+        for (int i = 0; i < player.health; i++) {
+            DrawSurface(screen, healthPoint, 20 + (healthPoint->w + 5) * i,
+                        SCREEN_HEIGHT - 20);
+        }
 
         if (!player.isAlive()) {
-            DrawSurface(screen, youdied, screenMiddle.x,
-                        screenMiddle.y);
+            DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y);
         }
 
         display.update(screen);
