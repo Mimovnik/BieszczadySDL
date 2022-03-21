@@ -169,6 +169,11 @@ int main(int argc, char* args[]) {
 
         wraith.flyTo(player.rb.hitbox.position, realTime / 1000);
 
+        if (Rectangle(64, 64, wraith.getPosition())
+                .contains(player.getPosition())) {
+            wraith.attack(&player, 'R', realTime / 1000);
+        }
+
         animationControl(&player, realTime / 1000);
         animationControl(&wraith, realTime / 1000);
 
@@ -181,11 +186,13 @@ int main(int argc, char* args[]) {
         wraith.rb.move(gameDelta);
         player.rb.move(gameDelta);
 
-        if (player.getPosition().y > 0 || player.getPosition().x < 0 || player.getPosition().x > worldWidth * BLOCK_WIDTH) {
+        if (player.getPosition().y > 0 || player.getPosition().x < 0 ||
+            player.getPosition().x > worldWidth * BLOCK_WIDTH) {
             // std::vector<GameObject> blockStrip =
             //     world.terrain->queryRange(Rectangle(
             //         100, worldHeight * BLOCK_HEIGHT,
-            //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT / 2)));
+            //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT /
+            //         2)));
             // double highestY = 0;
             // for (int i = 0; i < blockStrip.size(); i++) {
             //     if (blockStrip[i].getPosition().y < highestY) {
@@ -196,8 +203,11 @@ int main(int argc, char* args[]) {
             player.rb.hitbox.position = playerSpawnPoint;
         }
 
-        if(!Rectangle(2*SCREEN_WIDTH, 2*SCREEN_HEIGHT, player.getPosition()).contains(wraith.getPosition())){
-            wraith.rb.hitbox.position = player.getPosition().addY(-SCREEN_HEIGHT / 2);
+        if (!Rectangle(2 * SCREEN_WIDTH, 2 * SCREEN_HEIGHT,
+                       player.getPosition())
+                 .contains(wraith.getPosition())) {
+            wraith.rb.hitbox.position =
+                player.getPosition().addY(-SCREEN_HEIGHT / 2);
         }
 
         // output
@@ -227,7 +237,7 @@ int main(int argc, char* args[]) {
             fpsTimer -= 500;
         };
 
-        printf("Creature's health = %d\n", wraith.health);
+        printf("Creature: %dHP, Player: %dHP\n", wraith.health, player.health);
 
         frames++;
     }

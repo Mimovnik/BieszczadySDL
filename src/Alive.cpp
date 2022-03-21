@@ -86,6 +86,7 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
         const int weaponDamage = 1;
         const int areaW = 64;
         const int areaH = 64;
+        const int knockbackStrength = 50;
         Vector weaponDir;
         if(direction == 'L'){
             weaponDir = rb.hitbox.position.addX(-areaW / 2);
@@ -97,6 +98,13 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
                                    weaponDir);
         if (weaponDamageArea.overlaps(creature->rb.hitbox)) {
             creature->health -= weaponDamage;
+            Vector knockback;
+            if(direction == 'L'){
+                knockback = Vector(-knockbackStrength, 0);
+            } else if(direction == 'R'){
+                knockback = Vector(knockbackStrength, 0);
+            }
+            creature->rb.velocity += knockback;
         }
         if (creature->health <= 0) {
             creature->die();
