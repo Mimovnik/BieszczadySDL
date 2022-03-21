@@ -68,25 +68,27 @@ int main(int argc, char* args[]) {
     double playerMaxSpeed = 30;
     double playerJumpHeight = 45;
     double playerJumpCooldown = 0.5;
+    int playerMaxHealth = 5;
+
     bool playerDrawScaledToHitbox = false;
     Alive player(RigidBody(center.add(Vector(1600, -4000)), playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
                  heroSurfaceListList, playerWalkAcceleration, playerJumpHeight,
-                 playerJumpCooldown);
+                 playerJumpCooldown, playerMaxHealth);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
 
-    int wolfHitboxWidth = 60;
-    int wolfHitboxHeigth = 42;
+    int wolfHitboxWidth = 64;
+    int wolfHitboxHeigth = 32;
     double wolfWalkAcceleration = 15;
     double wolfMaxSpeed = 25;
     double wolfJumpHeight = 35;
     double wolfJumpCooldown = 1;
-    bool wolfDrawScaledToHitbox = true;
+    int wolfMaxHealth = 5;
 
     Alive wolf(RigidBody(center.add(Vector(1700, -4000)), wolfHitboxWidth,
                          wolfHitboxHeigth, false, wolfMaxSpeed),
                redSurfaceListList, wolfWalkAcceleration, wolfJumpHeight,
-               wolfJumpCooldown);
+               wolfJumpCooldown, wolfMaxHealth);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -136,7 +138,7 @@ int main(int argc, char* args[]) {
         // handle input
         
 
-        quit = control(&player, realTime / 1000, box,
+        quit = control(&player, realTime / 1000, &wolf, box,
                        world.terrain);
 
         // change gamestate
@@ -191,13 +193,15 @@ int main(int argc, char* args[]) {
             fpsTimer -= 500;
         };
 
-        printf(
-            "Player's position: x = %.2f y = %.2f "
-            "velocity: x = %.8f y = %.8f "
-            "acceleration: x = %.4f y = %.4f\n",
-            player.rb.hitbox.position.x, player.rb.hitbox.position.y,
-            player.rb.velocity.x, player.rb.velocity.y,
-            player.rb.acceleration.x, player.rb.acceleration.y);
+        printf("Wolfs health = %d\n", wolf.health);
+
+        // printf(
+        //     "Player's position: x = %.2f y = %.2f "
+        //     "velocity: x = %.8f y = %.8f "
+        //     "acceleration: x = %.4f y = %.4f\n",
+        //     player.rb.hitbox.position.x, player.rb.hitbox.position.y,
+        //     player.rb.velocity.x, player.rb.velocity.y,
+        //     player.rb.acceleration.x, player.rb.acceleration.y);
 
         frames++;
     }

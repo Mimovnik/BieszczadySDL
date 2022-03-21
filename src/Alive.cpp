@@ -80,4 +80,21 @@ void Alive::walk(char direction) {
     delete[] othersHitboxes;
 }
 
+void Alive::attack(Alive* creature, double realTime) {
+    if (attackTimer.isUp(realTime)) {
+        attackTimer.start(realTime);
+        const int weaponDamage = 1;
+        const int areaW = 30;
+        const int areaH = 10;
+        Rectangle weaponDamageArea(areaW, areaH,
+                                   rb.hitbox.position.addX(areaW / 2));
+        if (weaponDamageArea.overlaps(creature->rb.hitbox)) {
+            creature->health -= weaponDamage;
+        }
+        if (creature->health <= 0) {
+            creature->jump(realTime);
+        }
+    }
+}
+
 void Alive::startAnimation(Animation* animation) { rndr.active = animation; }

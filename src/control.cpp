@@ -5,7 +5,7 @@
 #include "RigidBody.h"
 #include "settings.h"
 
-bool control(Alive* entity, double realTime, GameObject block, QuadTree* terrain) {
+bool control(Alive* entity, double realTime, Alive* creature, GameObject block, QuadTree* terrain) {
     if (entity->rb.velocity.y > 10) {
         entity->startAnimation(&entity->falling);
     } else if (entity->rb.velocity.y < 0) {
@@ -27,15 +27,18 @@ bool control(Alive* entity, double realTime, GameObject block, QuadTree* terrain
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
 
-    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_UP] ||
+    if (KeyState[SDL_SCANCODE_W] ||
         KeyState[SDL_SCANCODE_SPACE]) {
         entity->jump(realTime);
     }
-    if (KeyState[SDL_SCANCODE_D] || KeyState[SDL_SCANCODE_RIGHT]) {
+    if (KeyState[SDL_SCANCODE_D] ) {
         entity->walk('R');
     }
-    if (KeyState[SDL_SCANCODE_A] || KeyState[SDL_SCANCODE_LEFT]) {
+    if (KeyState[SDL_SCANCODE_A]) {
         entity->walk('L');
+    }
+    if(KeyState[SDL_SCANCODE_RIGHT]){
+        entity->attack(creature, realTime);
     }
 
     entity->rndr.active->changeSurface(realTime);

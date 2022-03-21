@@ -92,6 +92,10 @@ class Vector {
 
     Vector add(Vector other) { return Vector(x + other.x, y + other.y); }
 
+    Vector addX(int x_) { return Vector(x + x_, y); }
+
+    Vector addY(int y_) { return Vector(x, y + y_); }
+
     Vector setAngle(double angle) {
         return Vector(magnitude() * sin(angle * PI / 180),
                       magnitude() * cos(angle * PI / 180));

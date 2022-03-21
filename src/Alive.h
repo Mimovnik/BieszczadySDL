@@ -10,9 +10,12 @@
 class Alive : public GameObject {
 
    public:
+    int health;
+    const int maxHealth;
     Timer jumpTimer;
     Timer placeTimer;
     Timer digTimer;
+    Timer attackTimer;
     double walkAccel;
     double jumpHeight;
 
@@ -23,15 +26,16 @@ class Alive : public GameObject {
 
     Alive(RigidBody rb,
           std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, double walkAccel, double jumpHeight,
-          double jumpCooldown) {
+          double jumpCooldown, int maxHealth_): maxHealth(maxHealth_) {
         this->rb = rb;
-
+        this->health = maxHealth;
         this->walkAccel = walkAccel;
         this->jumpHeight = jumpHeight;
         this->jumpTimer.setCooldown(jumpCooldown);
 
         this->placeTimer.setCooldown(0);
         this->digTimer.setCooldown(0);
+        this->attackTimer.setCooldown(0.5);
 
         idle = Animation(heroSurfaceListList[0], heroSurfaceListList[1], "idle",
                          0.2);
@@ -53,7 +57,7 @@ class Alive : public GameObject {
 
     void walk(char direction);
 
-    
+    void attack(Alive* creature, double realTime);
 
     void startAnimation(Animation* animation);
 };
