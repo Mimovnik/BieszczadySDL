@@ -106,7 +106,8 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
             }
             creature->rb.velocity += knockback;
         }
-        if (creature->health <= 0) {
+        if (creature->health <= 0 && creature->isAlive()) {
+            killCount++;
             creature->die();
         }
     }

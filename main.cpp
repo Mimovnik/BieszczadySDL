@@ -249,8 +249,8 @@ int main(int argc, char* args[]) {
 
         DrawRectangle(screen, 40, 4, SCREEN_WIDTH - 80, 20, silver, brown);
 
-        sprintf_s(text, "Czas trwania: %.1lf s  %.0lf klatek / s",
-                  realTime / 1000, fps);
+        sprintf_s(text, "Czas trwania: %.1lf s    %.0lf klatek / s    Killcount: %d",
+                  realTime / 1000, fps, player.killCount);
         DrawString(screen,
                    static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
                    text, charset);

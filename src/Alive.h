@@ -18,6 +18,7 @@ class Alive : public GameObject {
     Timer attackTimer;
     double moveAccel;
     double jumpHeight;
+    int killCount = 0;
 
     Animation idle;
     Animation walking;
