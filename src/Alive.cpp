@@ -16,8 +16,8 @@ void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
     block.rb.hitbox.position = blockPos;
     if (!this->rb.hitbox.overlaps(block.rb.hitbox)) {
         if (terrain->queryRange(block.rb.hitbox).size() == 0) {
-            if (placeTimer.isUp(realTime)) {
-                placeTimer.start(realTime);
+            if (placeDelay.isUp(realTime)) {
+                placeDelay.start(realTime);
 
                 terrain->insert(block);
             }
@@ -26,8 +26,8 @@ void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
 }
 
 void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
-    if (digTimer.isUp(realTime)) {
-        digTimer.start(realTime);
+    if (digDelay.isUp(realTime)) {
+        digDelay.start(realTime);
 
         terrain->destroy(digPos);
     }
@@ -81,14 +81,22 @@ void Alive::walk(char direction) {
 }
 
 void Alive::attack(Alive* creature, char direction, double realTime) {
-    if (attackTimer.isUp(realTime)) {
-        attackTimer.start(realTime);
+    if (attackFreq.isUp(realTime)) {
+        attackFreq.start(realTime);
         Vector weaponDir = rb.hitbox.position;
+
+        if (!attacking1.rightSurfaceList.empty()) {
+            startAnimation(&attacking1);
+            attackEnd.start(realTime);
+        }
+
         if (direction == 'L') {
             weaponDir.x += -weapon.damageArea.width / 2;
+            attacking1.changeSide('L');
         }
         if (direction == 'R') {
             weaponDir.x += weapon.damageArea.width / 2;
+            attacking1.changeSide('R');
         }
         weapon.damageArea.position = weaponDir;
         if (weapon.damageArea.overlaps(creature->rb.hitbox)) {

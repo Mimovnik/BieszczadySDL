@@ -62,7 +62,7 @@ SDL_Surface* createFlipH(SDL_Surface* surface) {
 
 std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     std::string folder, const int idleCount, const int walkCount,
-    const int jumpCount, const int fallCount, bool idleIsFly) {
+    const int jumpCount, const int fallCount, const int attack1Count, bool idleIsFly) {
     std::vector<std::vector<SDL_Surface*>> surfaces;
 
     // IDLE OR FLY
@@ -123,15 +123,30 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
         fallLeft.push_back(createFlipH(fallRight[i]));
     }
 
+    // ATTACK
+
+    std::vector<SDL_Surface*> attack1Right;
+    for (int i = 0; i < attack1Count; i++) {
+        attack1Right.push_back(
+            loadBMP(folder + "/attack1/attack1-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> attack1Left;
+    for (int i = 0; i < attack1Right.size(); i++) {
+        attack1Left.push_back(createFlipH(attack1Right[i]));
+    }
+
     // ADD TO GENERAL LIST
-    surfaces.push_back(idleLeft);
-    surfaces.push_back(idleRight);
-    surfaces.push_back(walkLeft);
-    surfaces.push_back(walkRight);
-    surfaces.push_back(jumpLeft);
-    surfaces.push_back(jumpRight);
-    surfaces.push_back(fallLeft);
-    surfaces.push_back(fallRight);
+    surfaces.push_back(idleLeft);//0
+    surfaces.push_back(idleRight);//1
+    surfaces.push_back(walkLeft);//2
+    surfaces.push_back(walkRight);//3
+    surfaces.push_back(jumpLeft);//4
+    surfaces.push_back(jumpRight);//5
+    surfaces.push_back(fallLeft);//6
+    surfaces.push_back(fallRight);//7
+    surfaces.push_back(attack1Left);//8
+    surfaces.push_back(attack1Right);//9
 
     return surfaces;
 }

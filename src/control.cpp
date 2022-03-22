@@ -7,27 +7,29 @@
 #include "settings.h"
 
 void animationControl(Alive* entity, double realTime) {
-    if (entity->rb.velocity.y > 10) {
-        if (!entity->falling.rightSurfaceList.empty()) {
-            entity->startAnimation(&entity->falling);
+    if (entity->attackEnd.isUp(realTime)) {
+        if (entity->rb.velocity.y > 10) {
+            if (!entity->falling.rightSurfaceList.empty()) {
+                entity->startAnimation(&entity->falling);
+            }
+        } else if (entity->rb.velocity.y < 0) {
+            if (!entity->falling.rightSurfaceList.empty()) {
+                entity->startAnimation(&entity->jumping);
+            }
+        } else if (entity->rb.velocity.x > 10 || entity->rb.velocity.x < -10) {
+            if (!entity->falling.rightSurfaceList.empty()) {
+                entity->startAnimation(&entity->walking);
+            }
+        } else {
+            entity->startAnimation(&entity->idle);
         }
-    } else if (entity->rb.velocity.y < 0) {
-        if (!entity->falling.rightSurfaceList.empty()) {
-            entity->startAnimation(&entity->jumping);
-        }
-    } else if (entity->rb.velocity.x > 10 || entity->rb.velocity.x < -10) {
-        if (!entity->falling.rightSurfaceList.empty()) {
-            entity->startAnimation(&entity->walking);
-        }
-    } else {
-        entity->startAnimation(&entity->idle);
-    }
 
-    if (entity->rb.velocity.x > 0) {
-        entity->rndr.active->changeSide('R');
-    }
-    if (entity->rb.velocity.x < 0) {
-        entity->rndr.active->changeSide('L');
+        if (entity->rb.velocity.x > 0) {
+            entity->rndr.active->changeSide('R');
+        }
+        if (entity->rb.velocity.x < 0) {
+            entity->rndr.active->changeSide('L');
+        }
     }
 
     entity->rndr.active->changeSurface(realTime);
