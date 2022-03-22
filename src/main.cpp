@@ -56,10 +56,10 @@ int main(int argc, char* args[]) {
         loadSurfaces("../bmp/player", 4, 6, 4, 2, 5, false);
 
     std::vector<std::vector<SDL_Surface*>> mobSurfaceListList =
-        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, 0, true);
+        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, 7, true);
 
     SDL_Surface* healthPointTemp = loadBMP("../bmp/red.bmp");
-    const int healthPointW = 10;
+    const int healthPointW = 2;
     const int healthPointH = 20;
     SDL_Surface* healthPoint =
         SDL_CreateRGBSurface(0, healthPointW, healthPointH, 32, 0x00FF0000,
@@ -94,14 +94,14 @@ int main(int argc, char* args[]) {
     double playerMaxSpeed = 30;
     double playerJumpHeight = 45;
     double playerJumpCooldown = 0.5;
-    double playerAttackFreq = 0.5;
-    int playerMaxHealth = 10;
+    double playerAttackFreq = 0.7;
+    int playerMaxHealth = 100;
     bool playerDrawScaledToHitbox = false;
     Vector playerSpawnPoint = world.spawnPoint;
 
     Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
-                 Weapon(1, Rectangle(54, 64), 500), heroSurfaceListList,
+                 Weapon(10, Rectangle(54, 64), 500), heroSurfaceListList,
                  playerWalkAcceleration, playerJumpHeight, playerJumpCooldown,
                  playerAttackFreq, playerMaxHealth, 0.2, 0.05, 0.15, 0.15,
                  0.15);
@@ -114,14 +114,14 @@ int main(int argc, char* args[]) {
     double wraithJumpHeight = 35;
     double wraithJumpCooldown = 1;
     double wraithAttackFreq = 1;
-    int wraithMaxHealth = 5;
+    int wraithMaxHealth = 50;
 
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
                   wraithHitboxHeigth, false, wraithMaxSpeed),
-        Weapon(1, Rectangle(60, 60), 10), mobSurfaceListList,
+        Weapon(9, Rectangle(60, 60), 10), mobSurfaceListList,
         wraithWalkAcceleration, wraithJumpHeight, wraithJumpCooldown,
-        wraithAttackFreq, wraithMaxHealth, 0.02);
+        wraithAttackFreq, wraithMaxHealth, 0.02, 0.1);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -164,9 +164,9 @@ int main(int argc, char* args[]) {
 
         if (wraith.isAlive()) {
             wraith.flyTo(player.getPosition(), realTime / 1000);
-
-            if (Rectangle(64, 64, wraith.getPosition())
+            if (Rectangle(100, 100, wraith.getPosition())
                     .contains(player.getPosition())) {
+                // ATTACK
                 if (wraith.rb.velocity.x >= 0) {
                     wraith.attack(&player, 'R', realTime / 1000);
                 } else {
