@@ -99,7 +99,7 @@ int main(int argc, char* args[]) {
     Vector playerSpawnPoint = world.spawnPoint;
 
     Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
-                           playerHitboxHeigth, true, playerMaxSpeed),
+                           playerHitboxHeigth, true, playerMaxSpeed), Weapon(1, Rectangle(64, 64), 50),
                  heroSurfaceListList, playerWalkAcceleration, playerJumpHeight,
                  playerJumpCooldown, playerMaxHealth, 0.2, 0.15, 0.15, 0.15);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
@@ -114,7 +114,7 @@ int main(int argc, char* args[]) {
 
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
-                  wraithHitboxHeigth, false, wraithMaxSpeed),
+                  wraithHitboxHeigth, false, wraithMaxSpeed),Weapon(1, Rectangle(60, 60), 10),
         mobSurfaceListList, wraithWalkAcceleration, wraithJumpHeight,
         wraithJumpCooldown, wraithMaxHealth, 0.02);
 
@@ -162,7 +162,12 @@ int main(int argc, char* args[]) {
 
             if (Rectangle(64, 64, wraith.getPosition())
                     .contains(player.getPosition())) {
-                wraith.attack(&player, 'R', realTime / 1000);
+                if (wraith.rb.velocity.x >= 0) {
+                    wraith.attack(&player, 'R', realTime / 1000);
+                }
+                else {
+                    wraith.attack(&player, 'L', realTime / 1000);
+                }
             }
         } else {
             spawnMob.start(realTime / 1000);

@@ -8,6 +8,7 @@
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "Timer.h"
+#include "Weapon.h"
 class Alive : public GameObject {
    public:
     bool alive;
@@ -21,16 +22,19 @@ class Alive : public GameObject {
     double jumpHeight;
     int killCount = 0;
 
+    Weapon weapon;
+
     Animation idle;
     Animation walking;
     Animation jumping;
     Animation falling;
 
-    Alive(RigidBody rb, std::vector<std::vector<SDL_Surface*>> surfaces,
-          double moveAccel, double jumpHeight, double jumpCooldown,
-          int maxHealth_, double idleAnimSpeed = 0.2, double walkAnimSpeed = 0.2,
+    Alive(RigidBody rb, Weapon weapon_,
+          std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
+          double jumpHeight, double jumpCooldown, int maxHealth_,
+          double idleAnimSpeed = 0.2, double walkAnimSpeed = 0.2,
           double jumpAnimSpeed = 0.2, double fallAnimSpeed = 0.2)
-        : maxHealth(maxHealth_) {
+        : maxHealth(maxHealth_), weapon(weapon_) {
         this->rb = rb;
         this->health = maxHealth;
         this->moveAccel = moveAccel;
@@ -46,13 +50,16 @@ class Alive : public GameObject {
             idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
 
         if (!surfaces[2].empty() && !surfaces[3].empty())
-            walking = Animation(surfaces[2], surfaces[3], "walking", walkAnimSpeed);
+            walking =
+                Animation(surfaces[2], surfaces[3], "walking", walkAnimSpeed);
 
         if (!surfaces[4].empty() && !surfaces[5].empty())
-            jumping = Animation(surfaces[4], surfaces[5], "jumping", jumpAnimSpeed);
+            jumping =
+                Animation(surfaces[4], surfaces[5], "jumping", jumpAnimSpeed);
 
         if (!surfaces[6].empty() && !surfaces[7].empty())
-            falling = Animation(surfaces[6], surfaces[7], "falling", fallAnimSpeed);
+            falling =
+                Animation(surfaces[6], surfaces[7], "falling", fallAnimSpeed);
 
         rndr.active = &idle;
     }

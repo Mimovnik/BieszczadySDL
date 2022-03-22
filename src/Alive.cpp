@@ -83,25 +83,21 @@ void Alive::walk(char direction) {
 void Alive::attack(Alive* creature, char direction, double realTime) {
     if (attackTimer.isUp(realTime)) {
         attackTimer.start(realTime);
-        const int weaponDamage = 1;
-        const int areaW = 64;
-        const int areaH = 64;
-        const int knockbackStrength = 50;
-        Vector weaponDir;
+        Vector weaponDir = rb.hitbox.position;
         if (direction == 'L') {
-            weaponDir = rb.hitbox.position.addX(-areaW / 2);
+            weaponDir.x += -weapon.damageArea.width / 2;
         }
         if (direction == 'R') {
-            weaponDir = rb.hitbox.position.addX(areaW / 2);
+            weaponDir.x += weapon.damageArea.width / 2;
         }
-        Rectangle weaponDamageArea(areaW, areaH, weaponDir);
-        if (weaponDamageArea.overlaps(creature->rb.hitbox)) {
-            creature->health -= weaponDamage;
+        weapon.damageArea.position = weaponDir;
+        if (weapon.damageArea.overlaps(creature->rb.hitbox)) {
+            creature->health -= weapon.damage;
             Vector knockback;
             if (direction == 'L') {
-                knockback = Vector(-knockbackStrength, 0);
+                knockback = Vector(-weapon.knockback, 0);
             } else if (direction == 'R') {
-                knockback = Vector(knockbackStrength, 0);
+                knockback = Vector(weapon.knockback, 0);
             }
             creature->rb.velocity += knockback;
         }
