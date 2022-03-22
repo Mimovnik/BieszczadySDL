@@ -43,6 +43,9 @@ int main(int argc, char* args[]) {
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     SDL_Surface *charset = nullptr, *youdied = nullptr;
 
+    
+    youdied = loadBMP("../bmp/youdied.bmp");
+
     charset = loadBMP("../bmp/cs8x8.bmp");
 
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
@@ -141,7 +144,6 @@ int main(int argc, char* args[]) {
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
 
-    youdied = loadBMP("../bmp/youdied.bmp");
 
     char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -265,7 +267,7 @@ int main(int argc, char* args[]) {
 
         if (!player.isAlive()) {
             DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y);
-        }
+        }        
 
         display.update(screen);
 
