@@ -2,6 +2,7 @@
 #define ALIVE_H
 
 #include <vector>
+
 #include "Animation.h"
 #include "GameObject.h"
 #include "QuadTree.h"
@@ -25,9 +26,11 @@ class Alive : public GameObject {
     Animation jumping;
     Animation falling;
 
-    Alive(RigidBody rb,
-          std::vector<std::vector<SDL_Surface*>> heroSurfaceListList, double moveAccel, double jumpHeight,
-          double jumpCooldown, int maxHealth_): maxHealth(maxHealth_) {
+    Alive(RigidBody rb, std::vector<std::vector<SDL_Surface*>> surfaces,
+          double moveAccel, double jumpHeight, double jumpCooldown,
+          int maxHealth_, double idleAnimSpeed = 0.2, double walkAnimSpeed = 0.2,
+          double jumpAnimSpeed = 0.2, double fallAnimSpeed = 0.2)
+        : maxHealth(maxHealth_) {
         this->rb = rb;
         this->health = maxHealth;
         this->moveAccel = moveAccel;
@@ -39,14 +42,18 @@ class Alive : public GameObject {
         this->digTimer.setCooldown(0);
         this->attackTimer.setCooldown(0.5);
 
-        idle = Animation(heroSurfaceListList[0], heroSurfaceListList[1], "idle",
-                         0.2);
-        walking = Animation(heroSurfaceListList[2], heroSurfaceListList[3],
-                            "walking", 0.15);
-        jumping = Animation(heroSurfaceListList[4], heroSurfaceListList[5],
-                            "jumping", 0.15);
-        falling = Animation(heroSurfaceListList[6], heroSurfaceListList[7],
-                            "falling", 0.1);
+        if (!surfaces[0].empty() && !surfaces[1].empty())
+            idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
+
+        if (!surfaces[2].empty() && !surfaces[3].empty())
+            walking = Animation(surfaces[2], surfaces[3], "walking", walkAnimSpeed);
+
+        if (!surfaces[4].empty() && !surfaces[5].empty())
+            jumping = Animation(surfaces[4], surfaces[5], "jumping", jumpAnimSpeed);
+
+        if (!surfaces[6].empty() && !surfaces[7].empty())
+            falling = Animation(surfaces[6], surfaces[7], "falling", fallAnimSpeed);
+
         rndr.active = &idle;
     }
 

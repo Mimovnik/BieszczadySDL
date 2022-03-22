@@ -4,113 +4,136 @@
 #include <SDL.h>
 
 #include <iostream>
+#include <string>
 #include <vector>
 
+#include "Draw.cpp"
 #include "Framework.h"
 
-SDL_Surface* loadBMP(const char* fileName) {
-    SDL_Surface* surface = SDL_LoadBMP(fileName);
+SDL_Surface* loadBMP(std::string fileName) {
+    SDL_Surface* surface = SDL_LoadBMP(fileName.c_str());
     if (surface == NULL) {
-        printf("SDL_LoadBMP(%s) error: %s\n", fileName, SDL_GetError());
+        printf("SDL_LoadBMP(%s) error: %s\n", fileName.c_str(), SDL_GetError());
         throw 1;
     };
     SDL_SetColorKey(surface, true, SDL_MapRGB(surface->format, 255, 0, 255));
     return surface;
 }
 
-std::vector<std::vector<SDL_Surface*>> loadHeroSurfaces() {
-    std::vector<std::vector<SDL_Surface*>> heroSurfaceListList;
+SDL_Surface* createFlipV(SDL_Surface* surface) {
+    SDL_Surface* flipped =
+        SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
+    SDL_LockSurface(flipped);
 
-    std::vector<SDL_Surface*> heroIdleLeftSurfaceList;
-    heroIdleLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-left-00.bmp"));
-    heroIdleLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-left-01.bmp"));
-    heroIdleLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-left-02.bmp"));
-    heroIdleLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-left-03.bmp"));
+    int pitch = flipped->pitch;    // row size
+    char* temp = new char[pitch];  // intermediate buffer
+    char* pixels = (char*)flipped->pixels;
 
-    std::vector<SDL_Surface*> heroIdleRightSurfaceList;
-    heroIdleRightSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-right-00.bmp"));
-    heroIdleRightSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-right-01.bmp"));
-    heroIdleRightSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-right-02.bmp"));
-    heroIdleRightSurfaceList.push_back(
-        loadBMP("../bmp/player/idle/adventurer-idle-right-03.bmp"));
+    for (int i = 0; i < flipped->h / 2; ++i) {
+        // get pointers to the two rows to swap
+        char* row1 = pixels + i * pitch;
+        char* row2 = pixels + (flipped->h - i - 1) * pitch;
 
-    std::vector<SDL_Surface*> heroWalkLeftSurfaceList;
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-00.bmp"));
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-01.bmp"));
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-02.bmp"));
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-03.bmp"));
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-04.bmp"));
-    heroWalkLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-left-05.bmp"));
+        // swap rows
+        memcpy(temp, row1, pitch);
+        memcpy(row1, row2, pitch);
+        memcpy(row2, temp, pitch);
+    }
 
-    std::vector<SDL_Surface*> heroWalkRightSurfaceList;
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-00.bmp"));
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-01.bmp"));
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-02.bmp"));
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-03.bmp"));
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-04.bmp"));
-    heroWalkRightSurfaceList.push_back(
-        loadBMP("../bmp/player/walk/adventurer-run-right-05.bmp"));
+    delete[] temp;
 
-    std::vector<SDL_Surface*> heroJumpLeftSurfaceList;
-    heroJumpLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-left-00.bmp"));
-    heroJumpLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-left-01.bmp"));
-    heroJumpLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-left-02.bmp"));
-    heroJumpLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-left-03.bmp"));
+    SDL_UnlockSurface(flipped);
+    return flipped;
+}
 
-    std::vector<SDL_Surface*> heroJumpRightSurfaceList;
-    heroJumpRightSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-right-00.bmp"));
-    heroJumpRightSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-right-01.bmp"));
-    heroJumpRightSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-right-02.bmp"));
-    heroJumpRightSurfaceList.push_back(
-        loadBMP("../bmp/player/jump/adventurer-jump-right-03.bmp"));
+SDL_Surface* createFlipH(SDL_Surface* surface) {
+    SDL_Surface* flipped =
+        SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
+    SDL_LockSurface(flipped);
+    for (int y = 0; y < surface->h; y++) {
+        for (int x = 0; x < surface->w; x++) {
+            Uint32 pixel = getPixel(surface, surface->w - x - 1, y);
+            setPixel(flipped, x, y, pixel);
+        }
+    }
+    SDL_UnlockSurface(flipped);
+    return flipped;
+}
 
-    std::vector<SDL_Surface*> heroFallLeftSurfaceList;
-    heroFallLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/fall/adventurer-fall-left-00.bmp"));
-    heroFallLeftSurfaceList.push_back(
-        loadBMP("../bmp/player/fall/adventurer-fall-left-01.bmp"));
+std::vector<std::vector<SDL_Surface*>> loadSurfaces(
+    std::string folder, const int idleCount, const int walkCount,
+    const int jumpCount, const int fallCount, bool idleIsFly) {
+    std::vector<std::vector<SDL_Surface*>> surfaces;
 
-    std::vector<SDL_Surface*> heroFallRightSurfaceList;
-    heroFallRightSurfaceList.push_back(
-        loadBMP("../bmp/player/fall/adventurer-fall-right-00.bmp"));
-    heroFallRightSurfaceList.push_back(
-        loadBMP("../bmp/player/fall/adventurer-fall-right-01.bmp"));
+    // IDLE OR FLY
+    std::vector<SDL_Surface*> idleRight;
+    if (idleIsFly) {
+        // FLY
 
-    heroSurfaceListList.push_back(heroIdleLeftSurfaceList);
-    heroSurfaceListList.push_back(heroIdleRightSurfaceList);
-    heroSurfaceListList.push_back(heroWalkLeftSurfaceList);
-    heroSurfaceListList.push_back(heroWalkRightSurfaceList);
-    heroSurfaceListList.push_back(heroJumpLeftSurfaceList);
-    heroSurfaceListList.push_back(heroJumpRightSurfaceList);
-    heroSurfaceListList.push_back(heroFallLeftSurfaceList);
-    heroSurfaceListList.push_back(heroFallRightSurfaceList);
+        for (int i = 0; i < idleCount; i++) {
+            idleRight.push_back(
+                loadBMP(folder + "/fly/fly-" + std::to_string(i) + ".bmp"));
+        }
 
-    return heroSurfaceListList;
+    } else {
+        // IDLE
+        for (int i = 0; i < idleCount; i++) {
+            idleRight.push_back(
+                loadBMP(folder + "/idle/idle-" + std::to_string(i) + ".bmp"));
+        }
+    }
+    std::vector<SDL_Surface*> idleLeft;
+    for (int i = 0; i < idleRight.size(); i++) {
+        idleLeft.push_back(createFlipH(idleRight[i]));
+    }
+
+    // WALK
+    std::vector<SDL_Surface*> walkRight;
+    for (int i = 0; i < walkCount; i++) {
+        walkRight.push_back(
+            loadBMP(folder + "/run/run-" + std::to_string(i) + ".bmp"));
+    }
+    std::vector<SDL_Surface*> walkLeft;
+    for (int i = 0; i < walkRight.size(); i++) {
+        walkLeft.push_back(createFlipH(walkRight[i]));
+    }
+
+    // JUMP
+    std::vector<SDL_Surface*> jumpRight;
+    for (int i = 0; i < jumpCount; i++) {
+        jumpRight.push_back(
+            loadBMP(folder + "/jump/jump-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> jumpLeft;
+    for (int i = 0; i < jumpRight.size(); i++) {
+        jumpLeft.push_back(createFlipH(jumpRight[i]));
+    }
+
+    // FALL
+
+    std::vector<SDL_Surface*> fallRight;
+    for (int i = 0; i < fallCount; i++) {
+        fallRight.push_back(
+            loadBMP(folder + "/fall/fall-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> fallLeft;
+    for (int i = 0; i < fallRight.size(); i++) {
+        fallLeft.push_back(createFlipH(fallRight[i]));
+    }
+
+    // ADD TO GENERAL LIST
+    surfaces.push_back(idleLeft);
+    surfaces.push_back(idleRight);
+    surfaces.push_back(walkLeft);
+    surfaces.push_back(walkRight);
+    surfaces.push_back(jumpLeft);
+    surfaces.push_back(jumpRight);
+    surfaces.push_back(fallLeft);
+    surfaces.push_back(fallRight);
+
+    return surfaces;
 }
 
 #endif

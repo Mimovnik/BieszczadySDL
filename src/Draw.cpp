@@ -101,45 +101,6 @@ void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
     SDL_UnlockSurface(surface);
 };
 
-
-SDL_Surface* createFlipV(SDL_Surface* surface) {
-    SDL_Surface* flipped = SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
-    SDL_LockSurface(flipped);
-    
-    int pitch = flipped->pitch;    // row size
-    char* temp = new char[pitch];  // intermediate buffer
-    char* pixels = (char*)flipped->pixels;
-
-    for (int i = 0; i < flipped->h / 2; ++i) {
-        // get pointers to the two rows to swap
-        char* row1 = pixels + i * pitch;
-        char* row2 = pixels + (flipped->h - i - 1) * pitch;
-
-        // swap rows
-        memcpy(temp, row1, pitch);
-        memcpy(row1, row2, pitch);
-        memcpy(row2, temp, pitch);
-    }
-
-    delete[] temp;
-
-    SDL_UnlockSurface(flipped);
-    return flipped;
-}
-
-SDL_Surface* createFlipH(SDL_Surface* surface) {
-    SDL_Surface* flipped = SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
-    SDL_LockSurface(flipped);
-    for (int y = 0; y < surface->h; y++) {
-        for (int x = 0; x < surface->w; x++) {
-            Uint32 pixel = getPixel(surface, surface->w - x - 1, y);
-            setPixel(flipped, x, y, pixel);
-        }
-    }
-    SDL_UnlockSurface(flipped);
-    return flipped;
-}
-
 // rysowanie linii o długości l w pionie (gdy dx = 0, dy = 1)
 // bądź poziomie (gdy dx = 1, dy = 0)
 void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy,

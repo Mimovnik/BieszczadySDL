@@ -1,18 +1,24 @@
 #include <SDL.h>
 
 #include "Alive.h"
+#include "GameObject.h"
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "settings.h"
-#include "GameObject.h"
 
 void animationControl(Alive* entity, double realTime) {
     if (entity->rb.velocity.y > 10) {
-        entity->startAnimation(&entity->falling);
+        if (!entity->falling.rightSurfaceList.empty()) {
+            entity->startAnimation(&entity->falling);
+        }
     } else if (entity->rb.velocity.y < 0) {
-        entity->startAnimation(&entity->jumping);
+        if (!entity->falling.rightSurfaceList.empty()) {
+            entity->startAnimation(&entity->jumping);
+        }
     } else if (entity->rb.velocity.x > 10 || entity->rb.velocity.x < -10) {
-        entity->startAnimation(&entity->walking);
+        if (!entity->falling.rightSurfaceList.empty()) {
+            entity->startAnimation(&entity->walking);
+        }
     } else {
         entity->startAnimation(&entity->idle);
     }
@@ -25,7 +31,6 @@ void animationControl(Alive* entity, double realTime) {
     }
 
     entity->rndr.active->changeSurface(realTime);
-
 }
 
 bool control(Alive* player, double realTime, Alive* creature, GameObject block,
@@ -37,7 +42,7 @@ bool control(Alive* player, double realTime, Alive* creature, GameObject block,
     if (!player->isAlive()) {
         return false;
     }
-    
+
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
         player->jump(realTime);
     }

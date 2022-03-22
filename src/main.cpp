@@ -43,7 +43,6 @@ int main(int argc, char* args[]) {
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
     SDL_Surface *charset = nullptr, *youdied = nullptr;
 
-    
     youdied = loadBMP("../bmp/youdied.bmp");
 
     charset = loadBMP("../bmp/cs8x8.bmp");
@@ -54,32 +53,10 @@ int main(int argc, char* args[]) {
     printf("Log:\n");
 
     std::vector<std::vector<SDL_Surface*>> heroSurfaceListList =
-        loadHeroSurfaces();
+        loadSurfaces("../bmp/player", 4, 6, 4, 2, false);
 
-    std::vector<SDL_Surface*> mobLeftSurfaceList;
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-1.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-2.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-3.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-4.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-5.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-6.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-7.bmp"));
-    mobLeftSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-left-8.bmp"));
-    std::vector<SDL_Surface*> mobRightSurfaceList;
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-1.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-2.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-3.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-4.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-5.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-6.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-7.bmp"));
-    mobRightSurfaceList.push_back(loadBMP("../bmp/flyingEye/fly-right-8.bmp"));
-
-    std::vector<std::vector<SDL_Surface*>> mobSurfaceListList;
-    for (int i = 0; i < 4; i++) {
-        mobSurfaceListList.push_back(mobLeftSurfaceList);
-        mobSurfaceListList.push_back(mobRightSurfaceList);
-    }
+    std::vector<std::vector<SDL_Surface*>> mobSurfaceListList =
+        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, true);
 
     SDL_Surface* healthPointTemp = loadBMP("../bmp/red.bmp");
     const int healthPointW = 10;
@@ -124,7 +101,7 @@ int main(int argc, char* args[]) {
     Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
                  heroSurfaceListList, playerWalkAcceleration, playerJumpHeight,
-                 playerJumpCooldown, playerMaxHealth);
+                 playerJumpCooldown, playerMaxHealth, 0.2, 0.15, 0.15, 0.15);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
 
     int wraithHitboxWidth = 64;
@@ -139,11 +116,10 @@ int main(int argc, char* args[]) {
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
                   wraithHitboxHeigth, false, wraithMaxSpeed),
         mobSurfaceListList, wraithWalkAcceleration, wraithJumpHeight,
-        wraithJumpCooldown, wraithMaxHealth);
+        wraithJumpCooldown, wraithMaxHealth, 0.02);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
-
 
     char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -251,23 +227,23 @@ int main(int argc, char* args[]) {
 
         DrawRectangle(screen, 40, 4, SCREEN_WIDTH - 80, 20, silver, brown);
 
-        sprintf_s(text, "Czas trwania: %.1lf s    %.0lf klatek / s    Killcount: %d",
+        sprintf_s(text,
+                  "Czas trwania: %.1lf s    %.0lf klatek / s    Killcount: %d",
                   realTime / 1000, fps, player.killCount);
         DrawString(screen,
                    static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
                    text, charset);
 
-        sprintf_s(text, "%d / %d",
-                  player.health, player.maxHealth);
+        sprintf_s(text, "%d / %d", player.health, player.maxHealth);
         DrawString(screen, 20, SCREEN_HEIGHT - 45, text, charset);
         for (int i = 0; i < player.health; i++) {
-            DrawSurface(screen, healthPoint, 20 + (healthPoint->w + 5) * i,
+            DrawSurface(screen, healthPoint, 20 + (healthPoint->w) * i,
                         SCREEN_HEIGHT - 20);
         }
 
         if (!player.isAlive()) {
             DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y);
-        }        
+        }
 
         display.update(screen);
 
