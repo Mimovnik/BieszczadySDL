@@ -8,6 +8,8 @@
 #include "Timer.h"
 
 class Animation {
+    bool running = false;
+
    public:
     std::string name;
     std::vector<SDL_Surface*> rightSurfaceList;
@@ -38,6 +40,9 @@ class Animation {
             nextSprite.start(realTime);
 
             currentSurfaceIndex++;
+            if (currentSurfaceIndex >= rightSurfaceList.size()) {
+                running = false;
+            }
             if (side == 'L') {
                 currentSurfaceIndex =
                     currentSurfaceIndex % leftSurfaceList.size();
@@ -50,5 +55,18 @@ class Animation {
             }
         }
     }
+    void restart() {
+        running = true;
+        currentSurfaceIndex = 0;
+        this->currentSurface = rightSurfaceList[0];
+    }
+
+    void stop() {
+        running = false;
+        currentSurfaceIndex = 0;
+        this->currentSurface = rightSurfaceList[0];
+    }
+
+    bool isRunning() { return running; }
 };
 #endif

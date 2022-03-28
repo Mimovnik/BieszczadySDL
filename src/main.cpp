@@ -52,11 +52,11 @@ int main(int argc, char* args[]) {
 
     printf("Log:\n");
 
-    std::vector<std::vector<SDL_Surface*>> heroSurfaceListList =
-        loadSurfaces("../bmp/player", 4, 6, 4, 2, 5, false);
+    std::vector<std::vector<SDL_Surface*>> playerAnimations =
+        loadSurfaces("../bmp/player", 4, 6, 4, 2, 5, 3, 7, false);
 
-    std::vector<std::vector<SDL_Surface*>> mobSurfaceListList =
-        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, 7, true);
+    std::vector<std::vector<SDL_Surface*>> mobAnimations =
+        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, 7, 4, 2, true);
 
     SDL_Surface* healthPointTemp = loadBMP("../bmp/red.bmp");
     const int healthPointW = 2;
@@ -68,6 +68,8 @@ int main(int argc, char* args[]) {
     SDL_FreeSurface(healthPointTemp);
 
     std::vector<SDL_Surface*> redSurfaceList;
+    redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
+    redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
     redSurfaceList.push_back(loadBMP("../bmp/red.bmp"));
 
     std::vector<std::vector<SDL_Surface*>> redSurfaceListList;
@@ -82,7 +84,7 @@ int main(int argc, char* args[]) {
     // terrainFreq, double caveFreq, float heightMultiplier, float
     // heightAddition, int dirtLayerHeight, unsigned int seed
     const int worldWidth = 600, worldHeight = 100, blockSize = 64;
-    int worldSeed = 1;
+    int worldSeed = 2137;
     Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
                   worldSeed);
     world.generate(screen);
@@ -101,10 +103,10 @@ int main(int argc, char* args[]) {
 
     Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
-                 Weapon(10, Rectangle(54, 64), 500), heroSurfaceListList,
+                 Weapon(10, Rectangle(54, 64), 500), playerAnimations,
                  playerWalkAcceleration, playerJumpHeight, playerJumpCooldown,
-                 playerAttackFreq, playerMaxHealth, 0.2, 0.05, 0.15, 0.15,
-                 0.15);
+                 playerAttackFreq, playerMaxHealth, 0.2, 0.08, 0.2, 0.3, 0.15,
+                 0.15, 0.15);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
 
     int wraithHitboxWidth = 64;
@@ -119,9 +121,9 @@ int main(int argc, char* args[]) {
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
                   wraithHitboxHeigth, false, wraithMaxSpeed),
-        Weapon(9, Rectangle(60, 60), 10), mobSurfaceListList,
-        wraithWalkAcceleration, wraithJumpHeight, wraithJumpCooldown,
-        wraithAttackFreq, wraithMaxHealth, 0.02, 0.1);
+        Weapon(9, Rectangle(60, 60), 10), mobAnimations, wraithWalkAcceleration,
+        wraithJumpHeight, wraithJumpCooldown, wraithAttackFreq, wraithMaxHealth,
+        0.02, 0.05, 0.1, 0.4);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -145,6 +147,7 @@ int main(int argc, char* args[]) {
     Timer spawnMob;
     spawnMob.setCooldown(5);
 
+    // GAMELOOP
     while (!quit) {
         currentTime = SDL_GetTicks();
         delta = currentTime - lastTime;
@@ -251,7 +254,7 @@ int main(int argc, char* args[]) {
         }
 
         if (!player.isAlive()) {
-            DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y);
+            DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y / 4);
         }
 
         display.update(screen);
@@ -263,8 +266,6 @@ int main(int argc, char* args[]) {
             frames = 0;
             fpsTimer -= 500;
         };
-
-        printf("Creature: %dHP, Player: %dHP\n", wraith.health, player.health);
 
         frames++;
     }

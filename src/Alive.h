@@ -29,12 +29,15 @@ class Alive : public GameObject {
     Animation jumping;
     Animation falling;
     Animation attacking1;
-    Timer attackEnd;
+    Animation hurting;
+    Animation dying;
+    Animation died;
 
     Alive(RigidBody rb, Weapon weapon_,
           std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
-          double jumpHeight, double jumpCooldown, double attackFrequency, int maxHealth_,
-          double idleAnimSpeed = 0.2, double attack1AnimSpeed = 0.1,
+          double jumpHeight, double jumpCooldown, double attackFrequency,
+          int maxHealth_, double idleAnimSpeed, double attack1AnimSpeed,
+          double hurtingAnimSpeed, double dyingAnimSpeed,
           double walkAnimSpeed = 0.2, double jumpAnimSpeed = 0.2,
           double fallAnimSpeed = 0.2)
         : maxHealth(maxHealth_), weapon(weapon_) {
@@ -44,7 +47,6 @@ class Alive : public GameObject {
         this->jumpHeight = jumpHeight;
         this->jumpTimer.setCooldown(jumpCooldown);
         this->alive = true;
-
 
         if (!surfaces[0].empty() && !surfaces[1].empty())
             idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
@@ -63,15 +65,25 @@ class Alive : public GameObject {
 
         if (!surfaces[8].empty() && !surfaces[9].empty())
             attacking1 = Animation(surfaces[8], surfaces[9], "attack1",
-                                attack1AnimSpeed);
+                                   attack1AnimSpeed);
+
+        if (!surfaces[10].empty() && !surfaces[11].empty())
+            hurting = Animation(surfaces[10], surfaces[11], "hurting",
+                                hurtingAnimSpeed);
+
+        if (!surfaces[12].empty() && !surfaces[13].empty())
+            dying =
+                Animation(surfaces[12], surfaces[13], "dying", dyingAnimSpeed);
+
+        if (!surfaces[14].empty())
+            died =
+                Animation(surfaces[14], surfaces[14], "died", 100);
 
         rndr.active = &idle;
 
-        
         this->placeDelay.setCooldown(0);
         this->digDelay.setCooldown(0);
         this->attackFreq.setCooldown(attackFrequency);
-        this->attackEnd.setCooldown(attack1AnimSpeed * attacking1.rightSurfaceList.size());
     }
 
     void place(GameObject block, Vector mousePos, QuadTree* terrain,

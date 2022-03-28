@@ -62,7 +62,8 @@ SDL_Surface* createFlipH(SDL_Surface* surface) {
 
 std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     std::string folder, const int idleCount, const int walkCount,
-    const int jumpCount, const int fallCount, const int attack1Count, bool idleIsFly) {
+    const int jumpCount, const int fallCount, const int attack1Count,
+    const int hurtCount, const int dieCount, bool idleIsFly) {
     std::vector<std::vector<SDL_Surface*>> surfaces;
 
     // IDLE OR FLY
@@ -136,17 +137,55 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
         attack1Left.push_back(createFlipH(attack1Right[i]));
     }
 
+    // HURT
+
+    std::vector<SDL_Surface*> hurtRight;
+    for (int i = 0; i < hurtCount; i++) {
+        hurtRight.push_back(
+            loadBMP(folder + "/hurt/hurt-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> hurtLeft;
+    for (int i = 0; i < hurtRight.size(); i++) {
+        hurtLeft.push_back(createFlipH(hurtRight[i]));
+    }
+
+    // DIE
+
+    std::vector<SDL_Surface*> dieRight;
+    for (int i = 0; i < dieCount; i++) {
+        dieRight.push_back(
+            loadBMP(folder + "/die/die-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> dieLeft;
+    for (int i = 0; i < dieRight.size(); i++) {
+        dieLeft.push_back(createFlipH(dieRight[i]));
+    }
+
+    // DIED
+
+    std::vector<SDL_Surface*> died;
+        died.push_back(
+            loadBMP(folder + "/died/died.bmp"));
+    
+
     // ADD TO GENERAL LIST
-    surfaces.push_back(idleLeft);//0
-    surfaces.push_back(idleRight);//1
-    surfaces.push_back(walkLeft);//2
-    surfaces.push_back(walkRight);//3
-    surfaces.push_back(jumpLeft);//4
-    surfaces.push_back(jumpRight);//5
-    surfaces.push_back(fallLeft);//6
-    surfaces.push_back(fallRight);//7
-    surfaces.push_back(attack1Left);//8
-    surfaces.push_back(attack1Right);//9
+    surfaces.push_back(idleLeft);      // 0
+    surfaces.push_back(idleRight);     // 1
+    surfaces.push_back(walkLeft);      // 2
+    surfaces.push_back(walkRight);     // 3
+    surfaces.push_back(jumpLeft);      // 4
+    surfaces.push_back(jumpRight);     // 5
+    surfaces.push_back(fallLeft);      // 6
+    surfaces.push_back(fallRight);     // 7
+    surfaces.push_back(attack1Left);   // 8
+    surfaces.push_back(attack1Right);  // 9
+    surfaces.push_back(hurtLeft);      // 10
+    surfaces.push_back(hurtRight);     // 11
+    surfaces.push_back(dieLeft);       // 12
+    surfaces.push_back(dieRight);      // 13
+    surfaces.push_back(died);      // 14
 
     return surfaces;
 }

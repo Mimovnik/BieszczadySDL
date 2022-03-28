@@ -81,13 +81,14 @@ void Alive::walk(char direction) {
 }
 
 void Alive::attack(Alive* creature, char direction, double realTime) {
-    if (attackFreq.isUp(realTime)) {
+    if (attackFreq.isUp(realTime) && !hurting.isRunning()) {
         attackFreq.start(realTime);
+        printf("Attack incoming at %.1lf\n", realTime);
+
         Vector weaponDir = rb.hitbox.position;
 
         if (!attacking1.rightSurfaceList.empty()) {
             startAnimation(&attacking1);
-            attackEnd.start(realTime);
         }
 
         if (direction == 'L') {
@@ -100,12 +101,17 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
         }
         weapon.damageArea.position = weaponDir;
         if (weapon.damageArea.overlaps(creature->rb.hitbox)) {
+            if (creature->isAlive())
+                creature->startAnimation(&creature->hurting);
             creature->health -= weapon.damage;
+
             Vector knockback;
             if (direction == 'L') {
                 knockback = Vector(-weapon.knockback, 0);
+                creature->hurting.changeSide('L');
             } else if (direction == 'R') {
                 knockback = Vector(weapon.knockback, 0);
+                creature->hurting.changeSide('R');
             }
             creature->rb.velocity += knockback;
         }
@@ -124,8 +130,15 @@ void Alive::flyTo(Vector position, double realTime) {
 void Alive::die() {
     printf("A creature died");
     alive = false;
+    startAnimation(&dying);
 }
 
 bool Alive::isAlive() { return alive; }
 
-void Alive::startAnimation(Animation* animation) { rndr.active = animation; }
+void Alive::startAnimation(Animation* animation) {
+    if (rndr.active != animation) {
+        rndr.active->stop();
+        animation->restart();
+    }
+    rndr.active = animation;
+}

@@ -6,30 +6,39 @@
 #include "RigidBody.h"
 #include "settings.h"
 
-void animationControl(Alive* entity, double realTime) {
-    if (entity->attackEnd.isUp(realTime)) {
-        if (entity->rb.velocity.y > 10) {
-            if (!entity->falling.rightSurfaceList.empty()) {
-                entity->startAnimation(&entity->falling);
-            }
-        } else if (entity->rb.velocity.y < 0) {
-            if (!entity->falling.rightSurfaceList.empty()) {
-                entity->startAnimation(&entity->jumping);
-            }
-        } else if (entity->rb.velocity.x > 10 || entity->rb.velocity.x < -10) {
-            if (!entity->falling.rightSurfaceList.empty()) {
-                entity->startAnimation(&entity->walking);
-            }
-        } else {
-            entity->startAnimation(&entity->idle);
+Animation* whichAnimation(Alive* entity) {
+    if ((entity->rb.velocity.y > 10)) {
+        if (!entity->falling.rightSurfaceList.empty()) {
+            return &entity->falling;
         }
+    }
+    if ((entity->rb.velocity.y < 0)) {
+        if (!entity->jumping.rightSurfaceList.empty()) {
+            return &entity->jumping;
+        }
+    }
+    if ((entity->rb.velocity.x > 10 || entity->rb.velocity.x < -10)) {
+        if (!entity->walking.rightSurfaceList.empty()) {
+            return &entity->walking;
+        }
+    }
+    return &entity->idle;
+}
 
-        if (entity->rb.velocity.x > 0) {
-            entity->rndr.active->changeSide('R');
+void animationControl(Alive* entity, double realTime) {
+    if (entity->isAlive()) {
+        if (!entity->attacking1.isRunning() && !entity->hurting.isRunning()) {
+            entity->startAnimation(whichAnimation(entity));
+
+            if (entity->rb.velocity.x > 0) {
+                entity->rndr.active->changeSide('R');
+            }
+            if (entity->rb.velocity.x < 0) {
+                entity->rndr.active->changeSide('L');
+            }
         }
-        if (entity->rb.velocity.x < 0) {
-            entity->rndr.active->changeSide('L');
-        }
+    } else if (!entity->dying.isRunning()) {
+        entity->startAnimation(&entity->died);
     }
 
     entity->rndr.active->changeSurface(realTime);
@@ -54,9 +63,9 @@ bool control(Alive* player, double realTime, Alive* creature, GameObject block,
     if (KeyState[SDL_SCANCODE_A]) {
         player->walk('L');
     }
-    if (KeyState[SDL_SCANCODE_LEFT]) {
+    if (KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J]) {
         player->attack(creature, 'L', realTime);
-    } else if (KeyState[SDL_SCANCODE_RIGHT]) {
+    } else if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
         player->attack(creature, 'R', realTime);
     }
 
