@@ -6,55 +6,62 @@ set(SDL2_LIB_DIR lib/SDL2/x64)
 
 add_library(
     SOURCE_FILES
+    
+    src/classes/Alive.cpp
+    src/classes/Alive.h
 
-    src/settings.h
-    src/displaySetup.cpp
-    src/loadBMP.cpp
-    src/draw.cpp
-    src/control.cpp
+    src/classes/Animation.h
+    src/classes/Animation.cpp
 
-    src/Framework.h
-    src/Framework.cpp
+    src/classes/Framework.h
+    src/classes/Framework.cpp
 
-    src/GameObject.h
+    src/classes/GameObject.h
 
-    src/Renderer.h
-    src/Renderer.cpp
+    src/classes/Renderer.h
+    src/classes/Renderer.cpp
 
-    src/Rectangle.h
-    src/Rectangle.cpp
+    src/classes/Rectangle.h
+    src/classes/Rectangle.cpp
 
-    src/RigidBody.h
-    src/RigidBody.cpp
+    src/classes/RigidBody.h
+    src/classes/RigidBody.cpp
 
-    src/Alive.h
-    src/Alive.cpp
+    src/classes/Weapon.h
 
-    src/Renderer.h
-    src/Renderer.cpp
+    src/classes/Renderer.h
+    src/classes/Renderer.cpp
 
-    src/RigidBody.h
-    src/RigidBody.cpp
+    src/classes/RigidBody.h
+    src/classes/RigidBody.cpp
 
-    src/Vector.h
-    src/Vector.cpp
+    src/classes/Vector.h
+    src/classes/Vector.cpp
 
-    src/Rectangle.h
-    src/Rectangle.cpp
+    src/classes/Rectangle.h
+    src/classes/Rectangle.cpp
 
-    src/Timer.h
+    src/classes/Timer.h
 
-    src/Animation.h
-    src/Animation.cpp
+    src/classes/Terrain.h
+    src/classes/Terrain.cpp
 
-    src/Terrain.h
-    src/Terrain.cpp
+    src/classes/QuadTree.h
+    src/classes/QuadTree.cpp
 
-    src/QuadTree.h
-    src/QuadTree.cpp
+    src/classes/PerlinNoise.h
+    src/classes/PerlinNoise.cpp
 
-    src/PerlinNoise.h
-    src/PerlinNoise.cpp
+    src/functions/controller.h
+    src/functions/controller.cpp
+
+    src/functions/draw.h
+    src/functions/draw.cpp
+    
+    src/functions/settings.h
+
+    src/functions/loadBMP.h
+    src/functions/loadBMP.cpp
 )
 
 include_directories(${SDL2_INCLUDE_DIR})

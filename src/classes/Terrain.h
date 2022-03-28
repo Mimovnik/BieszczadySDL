@@ -3,17 +3,13 @@
 #define TERRAIN_H
 #include <SDL.h>
 
-#include <iostream>
-#include <random>
 #include <vector>
 
-#include "Framework.h"
-#include "PerlinNoise.h"
-#include "QuadTree.h"
-#include "RigidBody.h"
+#include <iostream>
 #include "Vector.h"
-#include "loadBMP.cpp"
-#include "settings.h"
+#include "QuadTree.h"
+
+
 class Terrain {
    public:
     int worldWidth;

@@ -1,5 +1,12 @@
 #include "Terrain.h"
 
+#include <random>
+#include "Framework.h"
+#include "PerlinNoise.h"
+#include "RigidBody.h"
+#include "../functions/loadBMP.h"
+#include "../functions/settings.h"
+
 Terrain::Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
                  double terrainFreq, double caveFreq, float heightMultiplier,
                  float heightAddition, int dirtLayerHeight, unsigned int seed) {

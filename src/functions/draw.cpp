@@ -1,15 +1,5 @@
-#ifndef DRAW_CPP
-#define DRAW_CPP
+#include "draw.h"
 
-#include <SDL.h>
-
-#include <cstring>
-
-#include "Vector.h"
-
-
-// narysowanie napisu txt na powierzchni screen, zaczynając od punktu (x, y)
-// charset to bitmapa 128x128 zawierająca znaki
 void DrawString(SDL_Surface* screen, double x, double y, const char* text,
                 SDL_Surface* charset) {
     int px, py, c;
@@ -124,5 +114,3 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
     for (i = y + 1; i < y + k - 1; i++)
         DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
-
-#endif

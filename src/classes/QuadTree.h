@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "GameObject.h"
-#include "settings.h"
+#include "../functions/settings.h"
 
 #define NODE_CAPACITY 4
 class QuadTree {

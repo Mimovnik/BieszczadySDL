@@ -4,7 +4,7 @@
 
 #include "RigidBody.h"
 #include "Vector.h"
-#include "settings.h"
+#include "../functions/settings.h"
 
 Alive::Alive(RigidBody rb, Weapon weapon_,
           std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,

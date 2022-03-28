@@ -1,14 +1,7 @@
+#include "loadBMP.h"
 
-#ifndef LOADBMP_CPP
-#define LOADBMP_CPP
-#include <SDL.h>
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "Draw.cpp"
-#include "Framework.h"
+#include "../classes/Framework.h"
+#include "draw.h"
 
 SDL_Surface* loadBMP(std::string fileName) {
     SDL_Surface* surface = SDL_LoadBMP(fileName.c_str());
@@ -166,9 +159,7 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     // DIED
 
     std::vector<SDL_Surface*> died;
-        died.push_back(
-            loadBMP(folder + "/died/died.bmp"));
-    
+    died.push_back(loadBMP(folder + "/died/died.bmp"));
 
     // ADD TO GENERAL LIST
     surfaces.push_back(idleLeft);      // 0
@@ -185,9 +176,7 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     surfaces.push_back(hurtRight);     // 11
     surfaces.push_back(dieLeft);       // 12
     surfaces.push_back(dieRight);      // 13
-    surfaces.push_back(died);      // 14
+    surfaces.push_back(died);          // 14
 
     return surfaces;
 }
-
-#endif

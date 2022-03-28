@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "settings.h"
+#include "../functions/settings.h"
 
 void RigidBody::move(double gameDelta) {
     Vector friction = Vector::ZERO;

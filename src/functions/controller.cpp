@@ -1,9 +1,6 @@
-#include <SDL.h>
+#include "controller.h"
 
-#include "Alive.h"
-#include "GameObject.h"
-#include "QuadTree.h"
-#include "RigidBody.h"
+#include "../classes/RigidBody.h"
 #include "settings.h"
 
 Animation* whichAnimation(Alive* entity) {
