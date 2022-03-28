@@ -1,11 +1,12 @@
+#ifndef DRAW_CPP
+#define DRAW_CPP
+
 #include <SDL.h>
 
 #include <cstring>
 
 #include "Vector.h"
 
-#ifndef DRAW_CPP
-#define DRAW_CPP
 
 // narysowanie napisu txt na powierzchni screen, zaczynając od punktu (x, y)
 // charset to bitmapa 128x128 zawierająca znaki

@@ -6,6 +6,59 @@
 #include "Vector.h"
 #include "settings.h"
 
+Alive::Alive(RigidBody rb, Weapon weapon_,
+          std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
+          double jumpHeight, double jumpCooldown, double attackFrequency,
+          int maxHealth_, double idleAnimSpeed, double attack1AnimSpeed,
+          double hurtingAnimSpeed, double dyingAnimSpeed,
+          double walkAnimSpeed, double jumpAnimSpeed,
+          double fallAnimSpeed)
+        : maxHealth(maxHealth_), weapon(weapon_) {
+        this->rb = rb;
+        this->health = maxHealth;
+        this->moveAccel = moveAccel;
+        this->jumpHeight = jumpHeight;
+        this->jumpTimer.setCooldown(jumpCooldown);
+        this->alive = true;
+
+        if (!surfaces[0].empty() && !surfaces[1].empty())
+            idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
+
+        if (!surfaces[2].empty() && !surfaces[3].empty())
+            walking =
+                Animation(surfaces[2], surfaces[3], "walking", walkAnimSpeed);
+
+        if (!surfaces[4].empty() && !surfaces[5].empty())
+            jumping =
+                Animation(surfaces[4], surfaces[5], "jumping", jumpAnimSpeed);
+
+        if (!surfaces[6].empty() && !surfaces[7].empty())
+            falling =
+                Animation(surfaces[6], surfaces[7], "falling", fallAnimSpeed);
+
+        if (!surfaces[8].empty() && !surfaces[9].empty())
+            attacking1 = Animation(surfaces[8], surfaces[9], "attack1",
+                                   attack1AnimSpeed);
+
+        if (!surfaces[10].empty() && !surfaces[11].empty())
+            hurting = Animation(surfaces[10], surfaces[11], "hurting",
+                                hurtingAnimSpeed);
+
+        if (!surfaces[12].empty() && !surfaces[13].empty())
+            dying =
+                Animation(surfaces[12], surfaces[13], "dying", dyingAnimSpeed);
+
+        if (!surfaces[14].empty())
+            died =
+                Animation(surfaces[14], surfaces[14], "died", 100);
+
+        rndr.active = &idle;
+
+        this->placeDelay.setCooldown(0);
+        this->digDelay.setCooldown(0);
+        this->attackFreq.setCooldown(attackFrequency);
+    }
+
 void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
                   double realTime) {
     Vector blockPos;

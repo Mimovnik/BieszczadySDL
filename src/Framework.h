@@ -56,28 +56,11 @@ class Sound {
     int status;
 
    public:
-    Sound(const char* fileName) {
-        if (SDL_LoadWAV(fileName, &wavSpec, &wavBuffer, &wavLength) ==
-            nullptr) {
-            std::cerr << "Audio load error:\n" << SDL_GetError() << std::endl;
-        }
-        deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr, 0);
-        if (deviceId == 0) {
-            std::cerr << "Open audio device error:\n"
-                      << SDL_GetError() << std::endl;
-        }
-    }
-    ~Sound() {
-        SDL_CloseAudioDevice(deviceId);
-        SDL_FreeWAV(wavBuffer);
-    }
-    void play() {
-        status = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-        if (status != 0) {
-            std::cerr << "Queue audio error:\n" << SDL_GetError() << std::endl;
-        }
-        SDL_PauseAudioDevice(deviceId, 0);
-    }
+    Sound(const char* fileName);
+
+    ~Sound();
+    
+    void play();
 
     void loop() {
         if (SDL_GetQueuedAudioSize(deviceId) <= wavLength) {
