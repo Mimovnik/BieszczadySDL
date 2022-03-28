@@ -92,11 +92,11 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
         }
 
         if (direction == 'L') {
-            weaponDir.x += -weapon.damageArea.width / 2;
+            weaponDir.x += -weapon.damageArea.width / 4;
             attacking1.changeSide('L');
         }
         if (direction == 'R') {
-            weaponDir.x += weapon.damageArea.width / 2;
+            weaponDir.x += weapon.damageArea.width / 4;
             attacking1.changeSide('R');
         }
         weapon.damageArea.position = weaponDir;
@@ -125,6 +125,7 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
 void Alive::flyTo(Vector position, double realTime) {
     Vector direction((position - rb.hitbox.position).addY(-32));
     rb.acceleration += Vector::fromAngle(moveAccel, direction.getAngle());
+    rb.acceleration.y -= 10;
 }
 
 void Alive::die() {

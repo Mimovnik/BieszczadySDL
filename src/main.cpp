@@ -123,7 +123,7 @@ int main(int argc, char* args[]) {
                   wraithHitboxHeigth, false, wraithMaxSpeed),
         Weapon(9, Rectangle(60, 60), 10), mobAnimations, wraithWalkAcceleration,
         wraithJumpHeight, wraithJumpCooldown, wraithAttackFreq, wraithMaxHealth,
-        0.02, 0.05, 0.1, 0.4);
+        0.02, 0.08, 0.1, 0.4);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -158,7 +158,7 @@ int main(int argc, char* args[]) {
         gameTime += gameDelta;
 
         player.rb.acceleration = gravity;
-        wraith.rb.acceleration = Vector::ZERO;
+        wraith.rb.acceleration = gravity;
 
         // handle input
 
