@@ -161,10 +161,10 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
             Vector knockback;
             if (direction == 'L') {
                 knockback = Vector(-weapon.knockback, 0);
-                creature->hurting.changeSide('L');
+                creature->hurting.changeSide('R');
             } else if (direction == 'R') {
                 knockback = Vector(weapon.knockback, 0);
-                creature->hurting.changeSide('R');
+                creature->hurting.changeSide('L');
             }
             creature->rb.velocity += knockback;
         }

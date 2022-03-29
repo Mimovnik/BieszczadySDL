@@ -10,7 +10,7 @@ Animation* whichAnimation(Alive* entity);
 
 void animationControl(Alive* entity, double realTime);
 
-bool control(Alive* player, double realTime, Alive* creature, GameObject block,
+bool playerControl(Alive* player, double realTime, Alive* creature, GameObject block,
              QuadTree* terrain);
 
 #endif

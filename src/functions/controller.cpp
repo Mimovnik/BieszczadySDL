@@ -41,14 +41,14 @@ void animationControl(Alive* entity, double realTime) {
     entity->rndr.active->changeSurface(realTime);
 }
 
-bool control(Alive* player, double realTime, Alive* creature, GameObject block,
+bool playerControl(Alive* player, double realTime, Alive* creature, GameObject block,
              QuadTree* terrain) {
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
-    if (KeyState[SDL_SCANCODE_ESCAPE]) return true;
+    if (KeyState[SDL_SCANCODE_ESCAPE]) return false;
 
     if (!player->isAlive()) {
-        return false;
+        return true;
     }
 
     if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
@@ -80,5 +80,5 @@ bool control(Alive* player, double realTime, Alive* creature, GameObject block,
         player->dig(mousePos, terrain, realTime);
     }
 
-    return false;
+    return true;
 }

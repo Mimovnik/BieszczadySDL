@@ -1,9 +1,7 @@
-﻿#define _USE_MATH_DEFINES
-#include <cmath>
-#define _CRT_SECURE_NO_WARNINGS
-
+﻿
 #include <SDL.h>
 
+#include <cmath>
 #include <iostream>
 #include <vector>
 
@@ -120,7 +118,7 @@ int main(int argc, char* args[]) {
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), wraithHitboxWidth,
                   wraithHitboxHeigth, false, wraithMaxSpeed),
-        Weapon(9, Rectangle(60, 60), 10), mobAnimations, wraithWalkAcceleration,
+        Weapon(9, Rectangle(60, 60), 20), mobAnimations, wraithWalkAcceleration,
         wraithJumpHeight, wraithJumpCooldown, wraithAttackFreq, wraithMaxHealth,
         0.02, 0.05, 0.1, 0.4);
 
@@ -138,13 +136,18 @@ int main(int argc, char* args[]) {
     int lastTime = 0, frames = 0;
     int currentTime, delta;
     double fpsTimer = 0, fps = 0, realTime = 0, gameTime = 0, timeFactor = 0.01;
+    double runTime = 0;
     double gameDelta;
+    bool inRun = true;
     bool quit = false;
     lastTime = SDL_GetTicks();
     Vector camera;
     Vector gravity(0, 10);
     Timer spawnMob;
     spawnMob.setCooldown(5);
+    Timer onDeath;
+    onDeath.setCooldown(5);
+    bool wantQuit = false;
 
     // GAMELOOP
     while (!quit) {
@@ -153,76 +156,81 @@ int main(int argc, char* args[]) {
         lastTime = currentTime;
         gameDelta = delta * timeFactor;
         if (delta < (1000 / MAX_FPS)) SDL_Delay(1000 / MAX_FPS - delta);
-        realTime += delta;
-        gameTime += gameDelta;
+        SDL_FillRect(screen, NULL, skyblue);
 
-        player.rb.acceleration = gravity;
-        wraith.rb.acceleration = gravity;
+        if (inRun) {
+            realTime += delta;
+            gameTime += gameDelta;
+            runTime = realTime / 1000;
 
-        // handle input
+            player.rb.acceleration = gravity;
+            wraith.rb.acceleration = gravity;
 
-        quit = control(&player, realTime / 1000, &wraith, box, world.terrain);
-        // change gamestate
+            // handle input
 
-        if (wraith.isAlive()) {
-            wraith.flyTo(player.getPosition(), realTime / 1000);
-            if (Rectangle(100, 100, wraith.getPosition())
-                    .contains(player.getPosition())) {
-                // ATTACK
-                if (wraith.rb.velocity.x >= 0) {
-                    wraith.attack(&player, 'R', realTime / 1000);
-                } else {
-                    wraith.attack(&player, 'L', realTime / 1000);
+            inRun = playerControl(&player, realTime / 1000, &wraith, box,
+                                  world.terrain);
+            // change gamestate
+
+            if (wraith.isAlive()) {
+                wraith.flyTo(player.getPosition(), realTime / 1000);
+                if (Rectangle(100, 100, wraith.getPosition())
+                        .contains(player.getPosition())) {
+                    // ATTACK
+                    if (wraith.rb.velocity.x >= 0) {
+                        wraith.attack(&player, 'R', realTime / 1000);
+                    } else {
+                        wraith.attack(&player, 'L', realTime / 1000);
+                    }
+                }
+            } else {
+                spawnMob.start(realTime / 1000);
+                if (spawnMob.isUp(realTime / 1000)) {
+                    wraith.alive = true;
+                    wraith.rb.hitbox.position =
+                        player.getPosition().addY(-SCREEN_HEIGHT / 2);
+                    wraith.health = wraith.maxHealth;
                 }
             }
-        } else {
-            spawnMob.start(realTime / 1000);
-            if (spawnMob.isUp(realTime / 1000)) {
-                wraith.alive = true;
+
+            animationControl(&player, realTime / 1000);
+            animationControl(&wraith, realTime / 1000);
+
+            calculateNearbyColliders(&wraith.rb, world.terrain);
+            calculateNearbyColliders(&player.rb, world.terrain);
+
+            wraith.rb.collide(gameDelta);
+            player.rb.collide(gameDelta);
+
+            wraith.rb.move(gameDelta);
+            player.rb.move(gameDelta);
+
+            if (player.getPosition().y > 0 || player.getPosition().x < 0 ||
+                player.getPosition().x > worldWidth * BLOCK_WIDTH) {
+                // std::vector<GameObject> blockStrip =
+                //     world.terrain->queryRange(Rectangle(
+                //         100, worldHeight * BLOCK_HEIGHT,
+                //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT
+                //         / 2)));
+                // double highestY = 0;
+                // for (int i = 0; i < blockStrip.size(); i++) {
+                //     if (blockStrip[i].getPosition().y < highestY) {
+                //         highestY = blockStrip[i].getPosition().y;
+                //     }
+                // }
+                // player.rb.hitbox.position.y = highestY - 3 * BLOCK_HEIGHT;
+                player.rb.hitbox.position = playerSpawnPoint;
+            }
+
+            if (!Rectangle(2 * SCREEN_WIDTH, 2 * SCREEN_HEIGHT,
+                           player.getPosition())
+                     .contains(wraith.getPosition())) {
                 wraith.rb.hitbox.position =
                     player.getPosition().addY(-SCREEN_HEIGHT / 2);
-                wraith.health = wraith.maxHealth;
             }
-        }
-
-        animationControl(&player, realTime / 1000);
-        animationControl(&wraith, realTime / 1000);
-
-        calculateNearbyColliders(&wraith.rb, world.terrain);
-        calculateNearbyColliders(&player.rb, world.terrain);
-
-        wraith.rb.collide(gameDelta);
-        player.rb.collide(gameDelta);
-
-        wraith.rb.move(gameDelta);
-        player.rb.move(gameDelta);
-
-        if (player.getPosition().y > 0 || player.getPosition().x < 0 ||
-            player.getPosition().x > worldWidth * BLOCK_WIDTH) {
-            // std::vector<GameObject> blockStrip =
-            //     world.terrain->queryRange(Rectangle(
-            //         100, worldHeight * BLOCK_HEIGHT,
-            //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT /
-            //         2)));
-            // double highestY = 0;
-            // for (int i = 0; i < blockStrip.size(); i++) {
-            //     if (blockStrip[i].getPosition().y < highestY) {
-            //         highestY = blockStrip[i].getPosition().y;
-            //     }
-            // }
-            // player.rb.hitbox.position.y = highestY - 3 * BLOCK_HEIGHT;
-            player.rb.hitbox.position = playerSpawnPoint;
-        }
-
-        if (!Rectangle(2 * SCREEN_WIDTH, 2 * SCREEN_HEIGHT,
-                       player.getPosition())
-                 .contains(wraith.getPosition())) {
-            wraith.rb.hitbox.position =
-                player.getPosition().addY(-SCREEN_HEIGHT / 2);
         }
 
         // output
-        SDL_FillRect(screen, NULL, skyblue);
 
         camera = player.rb.hitbox.position.difference(screenMiddle);
 
@@ -254,6 +262,65 @@ int main(int argc, char* args[]) {
 
         if (!player.isAlive()) {
             DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y / 4);
+
+            onDeath.start(realTime / 1000);
+            if (onDeath.isUp(realTime / 1000)) {
+                inRun = false;
+            }
+        }
+
+        // MENU
+        if (!inRun) {
+            // SCORE
+            DrawRectangle(screen, static_cast<int>(screenMiddle.x - 200),
+                          static_cast<int>(screenMiddle.y - 105), 400, 20,
+                          silver, brown);
+
+            sprintf_s(text, "You survived: %.1lf s and killed: %d mobs.",
+                      runTime, player.killCount);
+            DrawString(screen,
+                       static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
+                       screenMiddle.y - 100, text, charset);
+
+            SDL_Event event;
+
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    wantQuit = true;
+                }
+                if (event.type == SDL_KEYDOWN) {
+                    SDL_Keycode Keysym = event.key.keysym.sym;
+                    if (Keysym == SDLK_ESCAPE) {
+                        wantQuit = true;
+                    }
+                    if (Keysym == SDLK_r) {
+                        inRun = true;
+                    }
+                    if (wantQuit) {
+                        if (Keysym == SDLK_y) {
+                            quit = true;
+                        }
+                        if (Keysym == SDLK_n) {
+                            wantQuit = false;
+                            if (player.isAlive()) {
+                                inRun = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (wantQuit) {
+                DrawRectangle(screen, static_cast<int>(screenMiddle.x - 200),
+                              static_cast<int>(screenMiddle.y - 5), 400, 20,
+                              silver, brown);
+
+                sprintf_s(text, "Are you sure you want to quit? [y/n]");
+                DrawString(
+                    screen,
+                    static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
+                    screenMiddle.y, text, charset);
+            }
         }
 
         display.update(screen);
