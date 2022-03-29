@@ -12,6 +12,11 @@ class Timer {
         this->waiting = false;
     }
 
+    void reset(){
+        deadline = 0;
+        waiting = false;
+    }
+
     void start(double realTime) {
         if (!waiting) {
             waiting = true;

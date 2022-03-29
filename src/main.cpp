@@ -31,6 +31,48 @@ void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
         rb->colliders[i] = inRangeList[i].rb;
     }
 }
+//&realTime, &gameTime, &inRun, &player, &wraith
+void restartRun(double* realTime, double* gameTime, Timer* spawnMob, Timer* onDeath, bool* inRun, Alive* player,
+                Alive* mob) {
+    *realTime = 0;
+    *gameTime = 0;
+    *inRun = true;
+    player->alive = true;
+    player->health = player->maxHealth;
+    player->rb.acceleration = Vector::ZERO;
+    player->rb.velocity = Vector::ZERO;
+    player->rb.hitbox.position = Vector(200, -1600);
+    //RESET TIMERS
+    spawnMob->reset();
+    onDeath->reset();
+
+    player->jumpTimer.reset();
+    player->digDelay.reset();
+    player->placeDelay.reset();
+    player->attackFreq.reset();
+    player->idle.nextSprite.reset();
+    player->walking.nextSprite.reset();
+    player->jumping.nextSprite.reset();
+    player->falling.nextSprite.reset();
+    player->attacking1.nextSprite.reset();
+    player->hurting.nextSprite.reset();
+    player->dying.nextSprite.reset();
+    player->died.nextSprite.reset();
+
+
+    player->killCount = 0;
+    mob->health = mob->maxHealth;
+
+    mob->attackFreq.reset();
+    mob->idle.nextSprite.reset();
+    mob->walking.nextSprite.reset();
+    mob->jumping.nextSprite.reset();
+    mob->falling.nextSprite.reset();
+    mob->attacking1.nextSprite.reset();
+    mob->hurting.nextSprite.reset();
+    mob->dying.nextSprite.reset();
+    mob->died.nextSprite.reset();
+}
 
 int main(int argc, char* args[]) {
     Display display(SCREEN_WIDTH, SCREEN_HEIGHT, "Bieszczady");
@@ -282,6 +324,7 @@ int main(int argc, char* args[]) {
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
                        screenMiddle.y - 100, text, charset);
 
+            SDL_FlushEvent(SDL_KEYDOWN);
             SDL_Event event;
 
             while (SDL_PollEvent(&event)) {
@@ -294,7 +337,8 @@ int main(int argc, char* args[]) {
                         wantQuit = true;
                     }
                     if (Keysym == SDLK_r) {
-                        inRun = true;
+                        restartRun(&realTime, &gameTime, &spawnMob, &onDeath, &inRun, &player,
+                                   &wraith);
                     }
                     if (wantQuit) {
                         if (Keysym == SDLK_y) {
