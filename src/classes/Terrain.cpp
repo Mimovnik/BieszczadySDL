@@ -27,6 +27,23 @@ Terrain::Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
         Vector(worldWidth * blockWidth / 2, -worldHeight * blockHeight / 2)));
 }
 
+Terrain::~Terrain(){
+    delete noiseTexture;
+    delete terrain;
+    for(int i = 0; i < stoneSurfaceList.size(); i++){
+        SDL_FreeSurface(stoneSurfaceList[i]);
+    }
+    for(int i = 0; i < dirtSurfaceList.size(); i++){
+        SDL_FreeSurface(dirtSurfaceList[i]);
+    }
+    for(int i = 0; i < grassDirtSurfaceList.size(); i++){
+        SDL_FreeSurface(grassDirtSurfaceList[i]);
+    }
+    for(int i = 0; i < treeSurfaceList.size(); i++){
+        SDL_FreeSurface(treeSurfaceList[i]);
+    }
+}
+
 void Terrain::generate(SDL_Surface* screen) {
     this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp"));
 

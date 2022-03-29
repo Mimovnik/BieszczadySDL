@@ -3,12 +3,11 @@
 #define TERRAIN_H
 #include <SDL.h>
 
+#include <iostream>
 #include <vector>
 
-#include <iostream>
-#include "Vector.h"
 #include "QuadTree.h"
-
+#include "Vector.h"
 
 class Terrain {
    public:
@@ -42,6 +41,8 @@ class Terrain {
     Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
             double terrainFreq, double caveFreq, float heightMultiplier,
             float heightAddition, int dirtLayerHeight, unsigned int seed);
+
+    ~Terrain();
 
     void generate(SDL_Surface* screen);
 

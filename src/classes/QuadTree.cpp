@@ -1,5 +1,15 @@
 #include "QuadTree.h"
 
+QuadTree::~QuadTree() {
+    if(topLeft != nullptr){
+        delete topLeft;
+        delete topRight;
+        delete botLeft;
+        delete botRight;
+    }
+
+}
+
 bool QuadTree::insert(GameObject block) {
     if (!boundary.contains(block.rb.hitbox.position)) {
         return false;
@@ -31,9 +41,9 @@ bool QuadTree::destroy(Vector point) {
         botRight->destroy(point);
     }
 
-for (int i = 0; i < blocksAdded; i++) {
+    for (int i = 0; i < blocksAdded; i++) {
         if (blocks[i].rb.hitbox.contains(point)) {
-           blocks[i] = GameObject();
+            blocks[i] = GameObject();
         }
     }
 

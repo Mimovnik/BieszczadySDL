@@ -18,12 +18,13 @@ class QuadTree {
     QuadTree* botLeft = nullptr;
     QuadTree* botRight = nullptr;
 
-    QuadTree(){};
 
     QuadTree(Rectangle boundary) {
         this->boundary = boundary;
         this->blocksAdded = 0;
     }
+
+    ~QuadTree();
 
     bool insert(GameObject block);
 

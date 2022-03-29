@@ -19,6 +19,9 @@
 #include "functions/settings.h"
 
 void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
+    if (terrain == nullptr) {
+        return;
+    }
     if (rb->colliders != nullptr) {
         delete[] rb->colliders;
         rb->collidersCount = 0;
@@ -32,17 +35,17 @@ void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
     }
 }
 //&realTime, &gameTime, &inRun, &player, &wraith
-void restartRun(double* realTime, double* gameTime, Timer* spawnMob, Timer* onDeath, bool* inRun, Alive* player,
-                Alive* mob) {
+void restartRun(double* realTime, double* gameTime, Timer* spawnMob,
+                Timer* onDeath, bool* inRun, Alive* player, Alive* mob) {
     *realTime = 0;
     *gameTime = 0;
     *inRun = true;
+
     player->alive = true;
     player->health = player->maxHealth;
     player->rb.acceleration = Vector::ZERO;
     player->rb.velocity = Vector::ZERO;
-    player->rb.hitbox.position = Vector(200, -1600);
-    //RESET TIMERS
+    // RESET TIMERS
     spawnMob->reset();
     onDeath->reset();
 
@@ -58,7 +61,6 @@ void restartRun(double* realTime, double* gameTime, Timer* spawnMob, Timer* onDe
     player->hurting.nextSprite.reset();
     player->dying.nextSprite.reset();
     player->died.nextSprite.reset();
-
 
     player->killCount = 0;
     mob->health = mob->maxHealth;
@@ -124,9 +126,9 @@ int main(int argc, char* args[]) {
     // heightAddition, int dirtLayerHeight, unsigned int seed
     const int worldWidth = 600, worldHeight = 100, blockSize = 64;
     int worldSeed = 2137;
-    Terrain world(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25, 25, 5,
-                  worldSeed);
-    world.generate(screen);
+    Terrain* world = new Terrain(worldWidth, worldHeight, 0.4, 0.05, 0.08, 25,
+                                 25, 5, worldSeed);
+    world->generate(screen);
     const int worldSize = worldWidth * worldHeight;
 
     int playerHitboxWidth = 42;
@@ -138,7 +140,7 @@ int main(int argc, char* args[]) {
     double playerAttackFreq = 0.7;
     int playerMaxHealth = 100;
     bool playerDrawScaledToHitbox = false;
-    Vector playerSpawnPoint = world.spawnPoint;
+    Vector playerSpawnPoint = world->spawnPoint;
 
     Alive player(RigidBody(playerSpawnPoint, playerHitboxWidth,
                            playerHitboxHeigth, true, playerMaxSpeed),
@@ -211,7 +213,7 @@ int main(int argc, char* args[]) {
             // handle input
 
             inRun = playerControl(&player, realTime / 1000, &wraith, box,
-                                  world.terrain);
+                                  world->terrain);
             // change gamestate
 
             if (wraith.isAlive()) {
@@ -238,8 +240,8 @@ int main(int argc, char* args[]) {
             animationControl(&player, realTime / 1000);
             animationControl(&wraith, realTime / 1000);
 
-            calculateNearbyColliders(&wraith.rb, world.terrain);
-            calculateNearbyColliders(&player.rb, world.terrain);
+            calculateNearbyColliders(&wraith.rb, world->terrain);
+            calculateNearbyColliders(&player.rb, world->terrain);
 
             wraith.rb.collide(gameDelta);
             player.rb.collide(gameDelta);
@@ -276,7 +278,7 @@ int main(int argc, char* args[]) {
 
         camera = player.rb.hitbox.position.difference(screenMiddle);
 
-        std::vector<GameObject> visibleBlocks = world.terrain->queryRange(
+        std::vector<GameObject> visibleBlocks = world->terrain->queryRange(
             Rectangle(SCREEN_WIDTH + 300, SCREEN_HEIGHT + 300,
                       player.rb.hitbox.position));
         for (int i = 0; i < visibleBlocks.size(); i++) {
@@ -324,6 +326,16 @@ int main(int argc, char* args[]) {
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
                        screenMiddle.y - 100, text, charset);
 
+            // info
+            DrawRectangle(screen, static_cast<int>(screenMiddle.x - 200),
+                          static_cast<int>(screenMiddle.y - 55), 400, 20,
+                          silver, brown);
+
+            sprintf_s(text, "Press escape to exit, press R to start another run");
+            DrawString(screen,
+                       static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
+                       screenMiddle.y - 50, text, charset);
+
             SDL_FlushEvent(SDL_KEYDOWN);
             SDL_Event event;
 
@@ -337,8 +349,19 @@ int main(int argc, char* args[]) {
                         wantQuit = true;
                     }
                     if (Keysym == SDLK_r) {
-                        restartRun(&realTime, &gameTime, &spawnMob, &onDeath, &inRun, &player,
-                                   &wraith);
+                        restartRun(&realTime, &gameTime, &spawnMob, &onDeath,
+                                   &inRun, &player, &wraith);
+                        delete world;
+                        const int worldWidth = 600, worldHeight = 100,
+                                  blockSize = 64;
+                        int worldSeed = rand() % 10000;
+                        world = new Terrain(worldWidth, worldHeight, 0.4, 0.05,
+                                            0.08, 25, 25, 5, worldSeed);
+                        world->generate(screen);
+                        playerSpawnPoint = world->spawnPoint;
+                        player.rb.hitbox.position = playerSpawnPoint;
+                        wraith.rb.hitbox.position =
+                            player.getPosition().addY(-500);
                     }
                     if (wantQuit) {
                         if (Keysym == SDLK_y) {
