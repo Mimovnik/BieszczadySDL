@@ -158,9 +158,14 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
 
     // DIED
 
-    std::vector<SDL_Surface*> died;
-    died.push_back(loadBMP(folder + "/died/died.bmp"));
+    std::vector<SDL_Surface*> diedRight;
+    diedRight.push_back(loadBMP(folder + "/died/died.bmp"));
 
+    std::vector<SDL_Surface*> diedLeft;
+    for (int i = 0; i < diedRight.size(); i++) {
+        diedLeft.push_back(createFlipH(diedRight[i]));
+    }
+        
     // ADD TO GENERAL LIST
     surfaces.push_back(idleLeft);      // 0
     surfaces.push_back(idleRight);     // 1
@@ -176,7 +181,8 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     surfaces.push_back(hurtRight);     // 11
     surfaces.push_back(dieLeft);       // 12
     surfaces.push_back(dieRight);      // 13
-    surfaces.push_back(died);          // 14
+    surfaces.push_back(diedLeft);      // 14
+    surfaces.push_back(diedRight);    // 15
 
     return surfaces;
 }

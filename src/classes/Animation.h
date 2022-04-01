@@ -25,6 +25,8 @@ class Animation {
               std::vector<SDL_Surface*> rightSurfaceList, char* name,
               double animationSpeed);
 
+    void freeSurfaces();
+
     void changeSide(char side) { this->side = side; }
 
     void changeSurface(double realTime);

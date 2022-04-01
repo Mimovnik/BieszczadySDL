@@ -19,13 +19,14 @@
 #include "functions/settings.h"
 
 void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
-    if (terrain == nullptr) {
-        return;
-    }
     if (rb->colliders != nullptr) {
         delete[] rb->colliders;
         rb->collidersCount = 0;
     }
+    if (terrain == nullptr) {
+        return;
+    }
+
     std::vector<GameObject> inRangeList = terrain->queryRange(Rectangle(
         rb->hitbox.width + 200, rb->hitbox.height + 200, rb->hitbox.position));
     rb->collidersCount = static_cast<int>(inRangeList.size());
@@ -33,6 +34,8 @@ void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
     for (int i = 0; i < rb->collidersCount; i++) {
         rb->colliders[i] = inRangeList[i].rb;
     }
+    inRangeList.clear();
+    inRangeList.shrink_to_fit();
 }
 //&realTime, &gameTime, &inRun, &player, &wraith
 void restartRun(double* realTime, double* gameTime, Timer* spawnMob,
@@ -285,6 +288,8 @@ int main(int argc, char* args[]) {
             visibleBlocks[i].rndr.draw(screen, camera,
                                        visibleBlocks[i].rb.hitbox);
         }
+        visibleBlocks.clear();
+        visibleBlocks.shrink_to_fit();
         wraith.rndr.draw(screen, camera, wraith.rb.hitbox);
         player.rndr.draw(screen, camera, player.rb.hitbox);
 
@@ -331,7 +336,8 @@ int main(int argc, char* args[]) {
                           static_cast<int>(screenMiddle.y - 55), 400, 20,
                           silver, brown);
 
-            sprintf_s(text, "Press escape to exit, press R to start another run");
+            sprintf_s(text,
+                      "Press escape to exit, press R to start another run");
             DrawString(screen,
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
                        screenMiddle.y - 50, text, charset);

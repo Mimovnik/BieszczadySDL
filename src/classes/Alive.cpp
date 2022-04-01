@@ -50,7 +50,7 @@ Alive::Alive(RigidBody rb, Weapon weapon_,
 
         if (!surfaces[14].empty())
             died =
-                Animation(surfaces[14], surfaces[14], "died", 100);
+                Animation(surfaces[14], surfaces[15], "died", 100);
 
         rndr.active = &idle;
 
@@ -191,7 +191,7 @@ bool Alive::isAlive() { return alive; }
 
 void Alive::startAnimation(Animation* animation) {
     if (rndr.active != animation) {
-        rndr.active->stop();
+        if (rndr.active != nullptr) rndr.active->stop();
         animation->restart();
     }
     rndr.active = animation;
