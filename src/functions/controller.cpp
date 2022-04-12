@@ -41,12 +41,22 @@ void animationControl(Alive* entity, double realTime) {
     entity->rndr.active->changeSurface(realTime);
 }
 
-bool playerControl(Alive* player, double realTime, Alive* creature, GameObject block,
-             QuadTree* terrain) {
+bool playerControl(Alive* player, double realTime, Alive* creature,
+                   GameObject block, QuadTree* terrain) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            return false;
+        }
+        if (event.type == SDL_KEYDOWN) {
+            SDL_Keycode Keysym = event.key.keysym.sym;
+            if (Keysym == SDLK_ESCAPE) {
+                return false;
+            }
+        }
+    }
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
-    if (KeyState[SDL_SCANCODE_ESCAPE]) return false;
-
     if (!player->isAlive()) {
         return true;
     }
