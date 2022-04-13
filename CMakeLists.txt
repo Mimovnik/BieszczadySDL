@@ -28,6 +28,8 @@ add_library(
     src/classes/RigidBody.cpp
 
     src/classes/Weapon.h
+    
+    src/classes/Tool.h
 
     src/classes/Renderer.h
     src/classes/Renderer.cpp

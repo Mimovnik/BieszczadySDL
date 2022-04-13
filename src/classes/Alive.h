@@ -8,12 +8,11 @@
 #include "QuadTree.h"
 #include "RigidBody.h"
 #include "Timer.h"
+#include "Tool.h"
 #include "Weapon.h"
 class Alive : public GameObject {
    public:
     bool alive;
-    int health;
-    const int maxHealth;
     Timer jumpTimer;
     Timer placeDelay;
     Timer digDelay;
@@ -22,7 +21,11 @@ class Alive : public GameObject {
     double jumpHeight;
     int killCount = 0;
 
-    Weapon weapon;
+    Weapon* weapon;
+    
+    Tool* tool;
+    
+    GameObject* buildingBlock;
 
     Animation idle;
     Animation walking;
@@ -33,10 +36,10 @@ class Alive : public GameObject {
     Animation dying;
     Animation died;
 
-    Alive(RigidBody rb, Weapon weapon_,
+    Alive(RigidBody rb, Weapon weapon, Tool tool,
           std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
           double jumpHeight, double jumpCooldown, double attackFrequency,
-          int maxHealth_, double idleAnimSpeed, double attack1AnimSpeed,
+          int maxHealth, double idleAnimSpeed, double attack1AnimSpeed,
           double hurtingAnimSpeed, double dyingAnimSpeed,
           double walkAnimSpeed = 0.2, double jumpAnimSpeed = 0.2,
           double fallAnimSpeed = 0.2);

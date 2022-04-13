@@ -52,7 +52,7 @@ class Terrain {
 
     void placeTree(int x, int y);
 
-    void placeTile(int x, int y, SDL_Surface* tileSurface,
+    void placeTile(int x, int y, SDL_Surface* tileSurface, int blockHealth,
                    bool collidable = true, bool drawScaledToHitbox = true);
 };
 

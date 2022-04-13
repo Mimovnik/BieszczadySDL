@@ -28,10 +28,10 @@ class QuadTree {
 
     bool insert(GameObject block);
 
-    bool destroy(Vector point);
+    bool dig(Vector point, int efficiency);
 
     std::vector<GameObject> queryRange(Rectangle range);
-    std::vector<GameObject> queryRange(Vector containingPoint);
+    
 
     void subdivide(GameObject* blocks);
 };

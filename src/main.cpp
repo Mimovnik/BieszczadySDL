@@ -127,7 +127,8 @@ int main(int argc, char* args[]) {
 
     Alive player(RigidBody(playerSpawnPoint, PLAYER_HITBOX_WIDTH,
                            PLAYER_HITBOX_HEIGHT, true, PLAYER_MAX_SPEED),
-                 Weapon(10, Rectangle(54, 64), 500), playerAnimations,
+                 Weapon(10, Rectangle(54, 64), 500),
+                 Tool(5, 1, Rectangle(10, 10), 5), playerAnimations,
                  PLAYER_WALK_ACCEL_RATE, PLAYER_JUMP_HEIGHT,
                  PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN,
                  PLAYER_MAX_HEALTH, 0.2, 0.08, 0.2, 0.3, 0.15, 0.15, 0.15);
@@ -136,12 +137,13 @@ int main(int argc, char* args[]) {
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), WRAITH_HITBOX_WIDTH,
                   WRAITH_HITBOX_HEIGHT, false, WRAITH_MAX_SPEED),
-        Weapon(9, Rectangle(60, 60), 20), mobAnimations, WRAITH_WALK_ACCEL_RATE,
+        Weapon(9, Rectangle(60, 60), 20), Tool(), mobAnimations, WRAITH_WALK_ACCEL_RATE,
         WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN, WRAITH_ATTACK_COOLDOWN,
         WRAITH_MAX_HEALTH, 0.02, 0.05, 0.1, 0.4);
 
     GameObject box(Renderer(boxSurfaceList),
-                   RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT));
+                   RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT), BOX_HEALTH);
+
 
     char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);

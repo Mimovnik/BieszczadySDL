@@ -1,11 +1,12 @@
 #include "Terrain.h"
 
 #include <random>
+
+#include "../functions/loadBMP.h"
+#include "../functions/settings.h"
 #include "Framework.h"
 #include "PerlinNoise.h"
 #include "RigidBody.h"
-#include "../functions/loadBMP.h"
-#include "../functions/settings.h"
 
 Terrain::Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
                  double terrainFreq, double caveFreq, float heightMultiplier,
@@ -27,22 +28,22 @@ Terrain::Terrain(int worldWidth, int worldHeight, double noiseCaveValue,
         Vector(worldWidth * blockWidth / 2, -worldHeight * blockHeight / 2)));
 }
 
-Terrain::~Terrain(){
+Terrain::~Terrain() {
     delete[] noiseTexture;
     delete terrain;
-    for(int i = 0; i < stoneSurfaceList.size(); i++){
+    for (int i = 0; i < stoneSurfaceList.size(); i++) {
         SDL_FreeSurface(stoneSurfaceList[i]);
     }
     stoneSurfaceList.shrink_to_fit();
-    for(int i = 0; i < dirtSurfaceList.size(); i++){
+    for (int i = 0; i < dirtSurfaceList.size(); i++) {
         SDL_FreeSurface(dirtSurfaceList[i]);
     }
     dirtSurfaceList.shrink_to_fit();
-    for(int i = 0; i < grassDirtSurfaceList.size(); i++){
+    for (int i = 0; i < grassDirtSurfaceList.size(); i++) {
         SDL_FreeSurface(grassDirtSurfaceList[i]);
     }
     grassDirtSurfaceList.shrink_to_fit();
-    for(int i = 0; i < treeSurfaceList.size(); i++){
+    for (int i = 0; i < treeSurfaceList.size(); i++) {
         SDL_FreeSurface(treeSurfaceList[i]);
     }
     treeSurfaceList.shrink_to_fit();
@@ -84,17 +85,21 @@ void Terrain::generateTerrain() {
         }
 
         SDL_Surface* tileSurface;
+        int blockHealth;
         for (int y = 0; y < height; y++) {
             if (y < height - dirtLayerHeight) {
                 int tileVariant = rand() % stoneSurfaceList.size();
                 tileSurface = stoneSurfaceList[tileVariant];
+                blockHealth = STONE_HEALTH;
             } else if (y < height - 1) {
                 int tileVariant = rand() % dirtSurfaceList.size();
                 tileSurface = dirtSurfaceList[tileVariant];
+                blockHealth = DIRT_HEALTH;
             } else {
                 // generate grass
                 int t = rand() % grassDirtSurfaceList.size();
                 tileSurface = grassDirtSurfaceList[t];
+                blockHealth = DIRT_HEALTH;
                 // generate Tree
 
                 if (noiseTexture[(y + 1) * worldWidth + x] > noiseCaveValue) {
@@ -111,7 +116,7 @@ void Terrain::generateTerrain() {
             }
 
             if (noiseTexture[y * worldWidth + x] > noiseCaveValue) {
-                placeTile(x, y, tileSurface);
+                placeTile(x, y, tileSurface, blockHealth);
             }
         }
     }
@@ -133,16 +138,15 @@ void Terrain::generateNoiseTexture() {
 void Terrain::placeTree(int x, int y) {
     int h = rand() % 4 + 2;
 
-    placeTile(x, y, treeSurfaceList[0], false);
+    placeTile(x, y, treeSurfaceList[0], TRUNK_HEALTH, false);
     for (int i = 1; i < h; i++) {
-        placeTile(x, y + i, treeSurfaceList[1], false);
+        placeTile(x, y + i, treeSurfaceList[1], TRUNK_HEALTH, false);
     }
-    placeTile(x, y + h + 2, treeSurfaceList[2], false, false);
+    placeTile(x, y + h + 2, treeSurfaceList[2], TRUNK_HEALTH, false, false);
 }
 
-void Terrain::placeTile(int x, int y, SDL_Surface* tileSurface,
-                        bool collidable,
-                        bool drawScaledToHitbox) {
+void Terrain::placeTile(int x, int y, SDL_Surface* tileSurface, int blockHealth,
+                        bool collidable, bool drawScaledToHitbox) {
     blockCount++;
     Vector blockPosition = Vector(x * blockWidth + blockWidth / 2,
                                   -y * blockHeight - blockHeight / 2);
@@ -151,5 +155,6 @@ void Terrain::placeTile(int x, int y, SDL_Surface* tileSurface,
 
     terrain->insert(GameObject(
         Renderer(tileSurfaceList, drawScaledToHitbox),
-        RigidBody(blockPosition, blockWidth, blockHeight, collidable)));
+        RigidBody(blockPosition, blockWidth, blockHeight, collidable),
+        blockHealth));
 }

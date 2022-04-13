@@ -1,13 +1,12 @@
 #include "QuadTree.h"
 
 QuadTree::~QuadTree() {
-    if(topLeft != nullptr){
+    if (topLeft != nullptr) {
         delete topLeft;
         delete topRight;
         delete botLeft;
         delete botRight;
     }
-
 }
 
 bool QuadTree::insert(GameObject block) {
@@ -30,20 +29,23 @@ bool QuadTree::insert(GameObject block) {
     return false;
 }
 
-bool QuadTree::destroy(Vector point) {
+bool QuadTree::dig(Vector point, int efficiency) {
     if (!boundary.overlaps(Rectangle(BLOCK_WIDTH, BLOCK_HEIGHT, point))) {
         return false;
     }
     if (topLeft != nullptr) {
-        topLeft->destroy(point);
-        topRight->destroy(point);
-        botLeft->destroy(point);
-        botRight->destroy(point);
+        topLeft->dig(point, efficiency);
+        topRight->dig(point, efficiency);
+        botLeft->dig(point, efficiency);
+        botRight->dig(point, efficiency);
     }
 
     for (int i = 0; i < blocksAdded; i++) {
         if (blocks[i].rb.hitbox.contains(point)) {
-            blocks[i] = GameObject();
+            blocks[i].health -= efficiency;
+            if (blocks[i].health <= 0) {
+                blocks[i] = GameObject();
+            }
         }
     }
 
@@ -81,47 +83,6 @@ std::vector<GameObject> QuadTree::queryRange(Rectangle range) {
     }
 
     return blocksInRange;
-}
-
-std::vector<GameObject> QuadTree::queryRange(Vector containingPoint) {
-    std::vector<GameObject> blocksContainingPoint;
-    if (!boundary.contains(containingPoint)) {
-        return blocksContainingPoint;
-    }
-
-    if (topLeft != nullptr) {
-        std::vector<GameObject> topLeftInRange =
-            topLeft->queryRange(containingPoint);
-        blocksContainingPoint.insert(blocksContainingPoint.end(),
-                                     topLeftInRange.begin(),
-                                     topLeftInRange.end());
-
-        std::vector<GameObject> topRightInRange =
-            topRight->queryRange(containingPoint);
-        blocksContainingPoint.insert(blocksContainingPoint.end(),
-                                     topRightInRange.begin(),
-                                     topRightInRange.end());
-
-        std::vector<GameObject> botLeftInRange =
-            botLeft->queryRange(containingPoint);
-        blocksContainingPoint.insert(blocksContainingPoint.end(),
-                                     botLeftInRange.begin(),
-                                     botLeftInRange.end());
-
-        std::vector<GameObject> botRightInRange =
-            botRight->queryRange(containingPoint);
-        blocksContainingPoint.insert(blocksContainingPoint.end(),
-                                     botRightInRange.begin(),
-                                     botRightInRange.end());
-    }
-
-    for (int i = 0; i < blocksAdded; i++) {
-        if (blocks[i].rb.hitbox.contains(containingPoint)) {
-            blocksContainingPoint.push_back(blocks[i]);
-        }
-    }
-
-    return blocksContainingPoint;
 }
 
 void QuadTree::subdivide(GameObject* blocks) {

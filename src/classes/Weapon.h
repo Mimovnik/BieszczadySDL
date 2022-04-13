@@ -9,6 +9,8 @@ class Weapon {
     int damage;
     Rectangle damageArea;
     int knockback;
+    
+    Weapon(){}
 
    Weapon(const Weapon& other) {
         this->damage = other.damage;

@@ -8,17 +8,19 @@ class GameObject {
    public:
     Renderer rndr;
     RigidBody rb;
+    int health;
+    int maxHealth;
 
-    GameObject() {}
+    GameObject(){}
 
-    GameObject(Renderer rndr, RigidBody rb) {
+    GameObject(Renderer rndr, RigidBody rb, int maxHealth){
         this->rndr = rndr;
         this->rb = rb;
+        this->maxHealth = maxHealth;
+        this->health = maxHealth;
     }
 
-    Vector getPosition() const{
-        return rb.hitbox.position;
-    }
+    Vector getPosition() const { return rb.hitbox.position; }
 };
 
 #endif
