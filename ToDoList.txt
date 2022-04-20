@@ -1,10 +1,8 @@
 -input kopania i stawiania blokow z klawiatury
--wytrzymalosc bloku
 -wypadanie bloków
 -lepsze tekstury
 -ekwipunek
 Błędy:
--bedac w pewnych miejscach(tam gdzie visibleRange obejmuje pewne bloki) wyskakuje error ze Surface jest nullptr
 -kiedy jest za duze przyspieszenie lub za maly hitbox przekazywany zeby sprawdzic blocksInRange gracz wpada w hitbox bloku
 -kiedy jest fullscreenMode to pozycja kursora jest zle liczona i gracz zapada sie w hitbox bloku
 -ruszając okno gry mozna teleportowac gracza

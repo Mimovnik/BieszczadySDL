@@ -21,6 +21,9 @@ class Alive : public GameObject {
     double jumpHeight;
     int killCount = 0;
 
+    enum Mode { fightMode, digMode, buildMode };
+    enum Mode mode = fightMode;
+
     Weapon* weapon;
     
     Tool* tool;

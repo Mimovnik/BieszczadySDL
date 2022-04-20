@@ -53,6 +53,15 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
             if (Keysym == SDLK_ESCAPE) {
                 return false;
             }
+            if (Keysym == SDLK_1) {
+                player->mode = player->fightMode;
+            }
+            if (Keysym == SDLK_2) {
+                player->mode = player->digMode;
+            }
+            if (Keysym == SDLK_3) {
+                player->mode = player->buildMode;
+            }
         }
     }
     SDL_PumpEvents();
@@ -70,12 +79,35 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
     if (KeyState[SDL_SCANCODE_A]) {
         player->walk('L');
     }
+
+    char direction;
+    Vector blockPos(player->getPosition());
     if (KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J]) {
-        player->attack(creature, 'L', realTime);
+        direction = 'L';
+        blockPos = blockPos.addX(
+            -static_cast<int>(BLOCK_WIDTH + player->rb.hitbox.width / 2) - 1);
     } else if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
-        player->attack(creature, 'R', realTime);
+        direction = 'R';
+        blockPos = blockPos.addX(
+            static_cast<int>(BLOCK_WIDTH + player->rb.hitbox.width / 2) - 1);
     }
 
+    bool directionKeysPressed =
+        KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J] ||
+        KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L];
+    if (directionKeysPressed) {
+        switch (player->mode) {
+            case player->fightMode:
+                player->attack(creature, direction, realTime);
+                break;
+            case player->digMode:
+                player->dig(blockPos, terrain, realTime);
+                break;
+            case player->buildMode:
+                player->place(block, blockPos, terrain, realTime);
+                break;
+        }
+    }
     int mouseXRelToScreen, mouseYRelToScreen;
     Uint32 buttons;
     buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);

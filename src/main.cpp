@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "classes/Alive.h"
@@ -137,13 +138,13 @@ int main(int argc, char* args[]) {
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), WRAITH_HITBOX_WIDTH,
                   WRAITH_HITBOX_HEIGHT, false, WRAITH_MAX_SPEED),
-        Weapon(9, Rectangle(60, 60), 20), Tool(), mobAnimations, WRAITH_WALK_ACCEL_RATE,
-        WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN, WRAITH_ATTACK_COOLDOWN,
-        WRAITH_MAX_HEALTH, 0.02, 0.05, 0.1, 0.4);
+        Weapon(9, Rectangle(60, 60), 20), Tool(), mobAnimations,
+        WRAITH_WALK_ACCEL_RATE, WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN,
+        WRAITH_ATTACK_COOLDOWN, WRAITH_MAX_HEALTH, 0.02, 0.05, 0.1, 0.4);
 
     GameObject box(Renderer(boxSurfaceList),
-                   RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT), BOX_HEALTH);
-
+                   RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT),
+                   BOX_HEALTH);
 
     char text[128];
     int black = SDL_MapRGB(screen->format, 0, 0, 0);
@@ -267,10 +268,22 @@ int main(int argc, char* args[]) {
         player.rndr.draw(screen, camera, player.rb.hitbox);
 
         DrawRectangle(screen, 40, 4, SCREEN_WIDTH - 80, 20, silver, brown);
-
+        std::string modeName;
+        switch (player.mode) {
+            case player.fightMode:
+                modeName = "fight";
+                break;
+            case player.digMode:
+                modeName = "dig";
+                break;
+            case player.buildMode:
+                modeName = "build";
+                break;
+        }
         sprintf_s(text,
-                  "Czas trwania: %.1lf s    %.0lf klatek / s    Killcount: %d",
-                  realTime / 1000, fps, player.killCount);
+                  "Tryb: %s    Czas trwania: %.1lf s    %.0lf klatek / s    "
+                  "Killcount: %d",
+                  modeName.c_str(), realTime / 1000, fps, player.killCount);
         DrawString(screen,
                    static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
                    text, charset);
