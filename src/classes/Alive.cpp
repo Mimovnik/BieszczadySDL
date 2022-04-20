@@ -77,7 +77,7 @@ void Alive::place(GameObject block, Vector mousePos, QuadTree* terrain,
 void Alive::dig(Vector digPos, QuadTree* terrain, double realTime) {
     if (digDelay.isUp(realTime)) {
         digDelay.start(realTime);
-        
+
         terrain->dig(digPos, tool->efficiency);
     }
 }
@@ -148,6 +148,12 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
             weaponDir.x += weapon->damageArea.width / 4;
             attacking1.changeSide('R');
         }
+        if (direction == 'D') {
+            weaponDir.y += weapon->damageArea.height / 4;
+        }
+        if (direction == 'U') {
+            weaponDir.y += -weapon->damageArea.height / 4;
+        }
         weapon->damageArea.position = weaponDir;
         if (weapon->damageArea.overlaps(creature->rb.hitbox)) {
             if (creature->isAlive())
@@ -161,6 +167,10 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
             } else if (direction == 'R') {
                 knockback = Vector(weapon->knockback, 0);
                 creature->hurting.changeSide('L');
+            } else if (direction == 'D') {
+                knockback = Vector(0, weapon->knockback);
+            } else if (direction == 'U') {
+                knockback = Vector(0, -weapon->knockback);
             }
             creature->rb.velocity += knockback;
         }

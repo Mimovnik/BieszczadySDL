@@ -86,15 +86,28 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
         direction = 'L';
         blockPos = blockPos.addX(
             -static_cast<int>(BLOCK_WIDTH + player->rb.hitbox.width / 2) - 1);
-    } else if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
+    }
+    if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
         direction = 'R';
         blockPos = blockPos.addX(
             static_cast<int>(BLOCK_WIDTH + player->rb.hitbox.width / 2) - 1);
     }
+    if (KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K]) {
+        direction = 'D';
+        blockPos = blockPos.addY(
+            static_cast<int>(BLOCK_HEIGHT + player->rb.hitbox.height / 2) - 1);
+    }
+    if (KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I]) {
+        direction = 'U';
+        blockPos = blockPos.addY(
+            -static_cast<int>(BLOCK_HEIGHT + player->rb.hitbox.height / 2) - 1);
+    }
 
     bool directionKeysPressed =
         KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J] ||
-        KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L];
+        KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L] ||
+        KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K] ||
+        KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I];
     if (directionKeysPressed) {
         switch (player->mode) {
             case player->fightMode:

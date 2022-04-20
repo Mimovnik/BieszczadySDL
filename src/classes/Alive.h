@@ -25,9 +25,7 @@ class Alive : public GameObject {
     enum Mode mode = fightMode;
 
     Weapon* weapon;
-    
     Tool* tool;
-    
     GameObject* buildingBlock;
 
     Animation idle;
