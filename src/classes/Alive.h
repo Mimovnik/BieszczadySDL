@@ -10,6 +10,7 @@
 #include "Timer.h"
 #include "Tool.h"
 #include "Weapon.h"
+
 class Alive : public GameObject {
    public:
     bool alive;
@@ -20,6 +21,8 @@ class Alive : public GameObject {
     double moveAccel;
     double jumpHeight;
     int killCount = 0;
+
+    Vector actionCursor;
 
     enum Mode { fightMode, digMode, buildMode };
     enum Mode mode = fightMode;

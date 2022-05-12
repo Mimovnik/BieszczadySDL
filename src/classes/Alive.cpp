@@ -11,7 +11,7 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
              double jumpHeight, double jumpCooldown, double attackFrequency,
              int maxHealth, double idleAnimSpeed, double attack1AnimSpeed,
              double hurtingAnimSpeed, double dyingAnimSpeed,
-             double walkAnimSpeed, double jumpAnimSpeed, double fallAnimSpeed) {
+             double walkAnimSpeed, double jumpAnimSpeed, double fallAnimSpeed){
     this->maxHealth = maxHealth;
     this->weapon = new Weapon(weapon);
     this->tool = new Tool(tool);
@@ -21,6 +21,7 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
     this->jumpHeight = jumpHeight;
     this->jumpTimer.setCooldown(jumpCooldown);
     this->alive = true;
+    this->actionCursor = Vector::ZERO;
 
     if (!surfaces[0].empty() && !surfaces[1].empty())
         idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
@@ -132,7 +133,6 @@ void Alive::walk(char direction) {
 void Alive::attack(Alive* creature, char direction, double realTime) {
     if (attackFreq.isUp(realTime) && !hurting.isRunning()) {
         attackFreq.start(realTime);
-        printf("Attack incoming at %.1lf\n", realTime);
 
         Vector weaponDir = rb.hitbox.position;
 
@@ -141,21 +141,21 @@ void Alive::attack(Alive* creature, char direction, double realTime) {
         }
 
         if (direction == 'L') {
-            weaponDir.x += -weapon->damageArea.width / 4;
+            weaponDir.x += -weapon->hitArea.width / 4;
             attacking1.changeSide('L');
         }
         if (direction == 'R') {
-            weaponDir.x += weapon->damageArea.width / 4;
+            weaponDir.x += weapon->hitArea.width / 4;
             attacking1.changeSide('R');
         }
         if (direction == 'D') {
-            weaponDir.y += weapon->damageArea.height / 4;
+            weaponDir.y += weapon->hitArea.height / 4;
         }
         if (direction == 'U') {
-            weaponDir.y += -weapon->damageArea.height / 4;
+            weaponDir.y += -weapon->hitArea.height / 4;
         }
-        weapon->damageArea.position = weaponDir;
-        if (weapon->damageArea.overlaps(creature->rb.hitbox)) {
+        weapon->hitArea.position = weaponDir;
+        if (weapon->hitArea.overlaps(creature->rb.hitbox)) {
             if (creature->isAlive())
                 creature->startAnimation(&creature->hurting);
             creature->health -= weapon->damage;
@@ -188,7 +188,6 @@ void Alive::flyTo(Vector position, double realTime) {
 }
 
 void Alive::die() {
-    printf("A creature died");
     alive = false;
     startAnimation(&dying);
 }

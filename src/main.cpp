@@ -113,6 +113,8 @@ int main(int argc, char* args[]) {
     SDL_BlitScaled(redSquare, NULL, healthPoint, NULL);
     SDL_FreeSurface(redSquare);
 
+    SDL_Surface* cursor = loadBMP("bmp/cursor.bmp");
+
     std::vector<SDL_Surface*> boxSurfaceList;
     boxSurfaceList.push_back(loadBMP("bmp/box.bmp"));
 
@@ -133,7 +135,7 @@ int main(int argc, char* args[]) {
     Alive player(RigidBody(playerSpawnPoint, PLAYER_HITBOX_WIDTH,
                            PLAYER_HITBOX_HEIGHT, true, PLAYER_MAX_SPEED),
                  Weapon(10, Rectangle(54, 64), 500),
-                 Tool(5, 1, Rectangle(10, 10), 5), playerAnimations,
+                 Tool(5, 1, Rectangle(200, 200), 5), playerAnimations,
                  PLAYER_WALK_ACCEL_RATE, PLAYER_JUMP_HEIGHT,
                  PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN,
                  PLAYER_MAX_HEALTH, 0.2, 0.08, 0.2, 0.3, 0.15, 0.15, 0.15);
@@ -384,7 +386,12 @@ int main(int argc, char* args[]) {
                     screenMiddle.y, text, charset);
             }
         }
-
+        if (player.mode != player.Mode::fightMode) {
+            DrawSurface(screen, cursor,
+                        player.getPosition().x + player.actionCursor.x,
+                        player.getPosition().y + player.actionCursor.y, camera);
+        }
+        // draw everything
         display.update(screen);
 
         // fps counter

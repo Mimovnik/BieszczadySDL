@@ -10,8 +10,8 @@ class Tool : public Weapon {
 
     Tool(const Tool& other) {
         this->damage = other.damage;
-        this->damageArea.width = other.damageArea.width;
-        this->damageArea.height = other.damageArea.height;
+        this->hitArea.width = other.hitArea.width;
+        this->hitArea.height = other.hitArea.height;
         this->knockback = other.knockback;
         this->efficiency = other.efficiency;
     }
@@ -19,7 +19,7 @@ class Tool : public Weapon {
     Tool(int efficiency, int damage, Rectangle damageArea, int knockbackStrength) {
         this->efficiency = efficiency;
         this->damage = damage;
-        this->damageArea = damageArea;
+        this->hitArea = damageArea;
         this->knockback = knockbackStrength;
     }
 
@@ -27,8 +27,8 @@ class Tool : public Weapon {
         Tool tmp = right;
         std::swap(efficiency, tmp.efficiency);
         std::swap(damage, tmp.damage);
-        std::swap(damageArea.width, tmp.damageArea.width);
-        std::swap(damageArea.height, tmp.damageArea.height);
+        std::swap(hitArea.width, tmp.hitArea.width);
+        std::swap(hitArea.height, tmp.hitArea.height);
         std::swap(knockback, tmp.knockback);
         return *this;
     }
@@ -36,8 +36,8 @@ class Tool : public Weapon {
     Tool& operator=(Tool&& right) {
         std::swap(efficiency, right.efficiency);
         std::swap(damage, right.damage);
-        std::swap(damageArea.width, right.damageArea.width);
-        std::swap(damageArea.height, right.damageArea.height);
+        std::swap(hitArea.width, right.hitArea.width);
+        std::swap(hitArea.height, right.hitArea.height);
         std::swap(knockback, right.knockback);
         return *this;
     }
