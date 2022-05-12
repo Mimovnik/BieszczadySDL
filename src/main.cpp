@@ -1,5 +1,9 @@
 ﻿
+#ifdef _WIN32
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 
 #include <cmath>
 #include <iostream>
@@ -90,17 +94,17 @@ int main(int argc, char* args[]) {
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector center(CENTER_X, CENTER_Y);
 
-    SDL_Surface* youdied = loadBMP("../bmp/youdied.bmp");
+    SDL_Surface* youdied = loadBMP("bmp/youdied.bmp");
 
-    SDL_Surface* charset = loadBMP("../bmp/cs8x8.bmp");
+    SDL_Surface* charset = loadBMP("bmp/cs8x8.bmp");
 
     std::vector<std::vector<SDL_Surface*>> playerAnimations =
-        loadSurfaces("../bmp/player", 4, 6, 4, 2, 5, 3, 7, false);
+        loadSurfaces("bmp/player", 4, 6, 4, 2, 5, 3, 7, false);
 
     std::vector<std::vector<SDL_Surface*>> mobAnimations =
-        loadSurfaces("../bmp/flyingEye", 8, 0, 0, 0, 7, 4, 2, true);
+        loadSurfaces("bmp/flyingEye", 8, 0, 0, 0, 7, 4, 2, true);
 
-    SDL_Surface* redSquare = loadBMP("../bmp/red.bmp");
+    SDL_Surface* redSquare = loadBMP("bmp/red.bmp");
     const int healthPointW = 2;
     const int healthPointH = 20;
     SDL_Surface* healthPoint =
@@ -110,7 +114,7 @@ int main(int argc, char* args[]) {
     SDL_FreeSurface(redSquare);
 
     std::vector<SDL_Surface*> boxSurfaceList;
-    boxSurfaceList.push_back(loadBMP("../bmp/box.bmp"));
+    boxSurfaceList.push_back(loadBMP("bmp/box.bmp"));
 
     // int worldWidth, int worldHeight, double noiseValue, double
     // terrainFreq, double caveFreq, float heightMultiplier, float
@@ -280,15 +284,15 @@ int main(int argc, char* args[]) {
                 modeName = "build";
                 break;
         }
-        sprintf_s(text,
-                  "Tryb: %s    Czas trwania: %.1lf s    %.0lf klatek / s    "
-                  "Killcount: %d",
-                  modeName.c_str(), realTime / 1000, fps, player.killCount);
+        sprintf(text,
+                "Tryb: %s    Czas trwania: %.1lf s    %.0lf klatek / s    "
+                "Killcount: %d",
+                modeName.c_str(), realTime / 1000, fps, player.killCount);
         DrawString(screen,
                    static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
                    text, charset);
 
-        sprintf_s(text, "%d / %d", player.health, player.maxHealth);
+        sprintf(text, "%d / %d", player.health, player.maxHealth);
         DrawString(screen, 20, SCREEN_HEIGHT - 45, text, charset);
         for (int i = 0; i < player.health; i++) {
             DrawSurface(screen, healthPoint, 20 + (healthPoint->w) * i,
@@ -311,8 +315,8 @@ int main(int argc, char* args[]) {
                           static_cast<int>(screenMiddle.y - 105), 400, 20,
                           silver, brown);
 
-            sprintf_s(text, "You survived: %.1lf s and killed: %d mobs.",
-                      runTime, player.killCount);
+            sprintf(text, "You survived: %.1lf s and killed: %d mobs.", runTime,
+                    player.killCount);
             DrawString(screen,
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
                        screenMiddle.y - 100, text, charset);
@@ -322,8 +326,7 @@ int main(int argc, char* args[]) {
                           static_cast<int>(screenMiddle.y - 55), 400, 20,
                           silver, brown);
 
-            sprintf_s(text,
-                      "Press escape to exit, press R to start another run");
+            sprintf(text, "Press escape to exit, press R to start another run");
             DrawString(screen,
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
                        screenMiddle.y - 50, text, charset);
@@ -374,7 +377,7 @@ int main(int argc, char* args[]) {
                               static_cast<int>(screenMiddle.y - 5), 400, 20,
                               silver, brown);
 
-                sprintf_s(text, "Are you sure you want to quit? [y/n]");
+                sprintf(text, "Are you sure you want to quit? [y/n]");
                 DrawString(
                     screen,
                     static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),

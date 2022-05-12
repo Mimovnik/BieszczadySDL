@@ -50,16 +50,16 @@ Terrain::~Terrain() {
 }
 
 void Terrain::generate(SDL_Surface* screen) {
-    this->stoneSurfaceList.push_back(loadBMP("../bmp/stone.bmp"));
+    this->stoneSurfaceList.push_back(loadBMP("bmp/stone.bmp"));
 
-    this->dirtSurfaceList.push_back(loadBMP("../bmp/dirt.bmp"));
-    this->dirtSurfaceList.push_back(loadBMP("../bmp/gravel_dirt.bmp"));
+    this->dirtSurfaceList.push_back(loadBMP("bmp/dirt.bmp"));
+    this->dirtSurfaceList.push_back(loadBMP("bmp/gravel_dirt.bmp"));
 
-    this->grassDirtSurfaceList.push_back(loadBMP("../bmp/dirt_grass.bmp"));
+    this->grassDirtSurfaceList.push_back(loadBMP("bmp/dirt_grass.bmp"));
 
-    this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_bottom.bmp"));
-    this->treeSurfaceList.push_back(loadBMP("../bmp/trunk_mid.bmp"));
-    SDL_Surface* treeCrown = loadBMP("../bmp/treeCrown.bmp");
+    this->treeSurfaceList.push_back(loadBMP("bmp/trunk_bottom.bmp"));
+    this->treeSurfaceList.push_back(loadBMP("bmp/trunk_mid.bmp"));
+    SDL_Surface* treeCrown = loadBMP("bmp/treeCrown.bmp");
     double resizeFactorW = 64 / BLOCK_WIDTH;
     double resizeFactorH = 64 / BLOCK_HEIGHT;
     SDL_Surface* treeCrownScaled =
