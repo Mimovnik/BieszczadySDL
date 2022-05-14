@@ -18,6 +18,7 @@
 #include "classes/GameObject.h"
 #include "classes/Rectangle.h"
 #include "classes/RigidBody.h"
+#include "classes/Surfaces.h"
 #include "classes/Terrain.h"
 #include "classes/Vector.h"
 #include "functions/controller.h"
@@ -93,37 +94,11 @@ int main(int argc, char* args[]) {
         SDL_CreateRGBSurface(0, display.getWidth(), display.getHeight(), 32,
                              0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 
+    Surfaces surfaces;
+    surfaces.load();
+
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector center(CENTER_X, CENTER_Y);
-
-    // load textures
-    SDL_Surface* youdied = loadBMP("bmp/youdied.bmp");
-
-    SDL_Surface* charset = loadBMP("bmp/cs8x8.bmp");
-
-    std::vector<std::vector<SDL_Surface*>> playerAnimations =
-        loadSurfaces("bmp/player", PLAYER_IDLE_ANIM_FRAMES,
-                     PLAYER_WALK_ANIM_FRAMES, PLAYER_JUMP_ANIM_FRAMES,
-                     PLAYER_FALL_ANIM_FRAMES, PLAYER_ATTACK1_ANIM_FRAMES,
-                     PLAYER_HURT_ANIM_FRAMES, PLAYER_DIE_ANIM_FRAMES, false);
-
-    std::vector<std::vector<SDL_Surface*>> mobAnimations =
-        loadSurfaces("bmp/flyingEye", WRAITH_IDLE_ANIM_FRAMES,
-                     WRAITH_WALK_ANIM_FRAMES, WRAITH_JUMP_ANIM_FRAMES,
-                     WRAITH_FALL_ANIM_FRAMES, WRAITH_ATTACK1_ANIM_FRAMES,
-                     WRAITH_HURT_ANIM_FRAMES, WRAITH_DIE_ANIM_FRAMES, true);
-
-    SDL_Surface* redSquare = loadBMP("bmp/red.bmp");
-    SDL_Surface* healthPoint =
-        SDL_CreateRGBSurface(0, HP_WIDTH, HP_HEIGHT, 32, 0x00FF0000, 0x0000FF00,
-                             0x000000FF, 0xFF000000);
-    SDL_BlitScaled(redSquare, NULL, healthPoint, NULL);
-    SDL_FreeSurface(redSquare);
-
-    SDL_Surface* cursor = loadBMP("bmp/cursor.bmp");
-
-    std::vector<SDL_Surface*> boxSurfaceList;
-    boxSurfaceList.push_back(loadBMP("bmp/box.bmp"));
 
     // World initialization
     srand(time(NULL));
@@ -136,29 +111,28 @@ int main(int argc, char* args[]) {
     world->generate(screen);
     const int worldSize = WORLD_WIDTH * WORLD_HEIGHT;
 
-    bool playerDrawScaledToHitbox = false;
     Vector playerSpawnPoint = world->spawnPoint;
 
     Alive player(
         RigidBody(playerSpawnPoint, PLAYER_HITBOX_WIDTH, PLAYER_HITBOX_HEIGHT,
                   true, PLAYER_MAX_SPEED),
         Weapon(10, Rectangle(54, 64), 500), Tool(5, 1, Rectangle(200, 200), 5),
-        playerAnimations, PLAYER_WALK_ACCEL_RATE, PLAYER_JUMP_HEIGHT,
-        PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN, PLAYER_MAX_HEALTH,
-        PLAYER_IDLE_ANIM_FREQ, PLAYER_ATTACK1_ANIM_FREQ, PLAYER_HURT_ANIM_FREQ,
-        PLAYER_DIE_ANIM_FREQ, PLAYER_WALK_ANIM_FREQ, PLAYER_JUMP_ANIM_FREQ,
-        PLAYER_FALL_ANIM_FREQ);
-    player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
+        surfaces.getPlayerAnimations(), PLAYER_WALK_ACCEL_RATE,
+        PLAYER_JUMP_HEIGHT, PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN,
+        PLAYER_MAX_HEALTH, PLAYER_IDLE_ANIM_FREQ, PLAYER_ATTACK1_ANIM_FREQ,
+        PLAYER_HURT_ANIM_FREQ, PLAYER_DIE_ANIM_FREQ, PLAYER_WALK_ANIM_FREQ,
+        PLAYER_JUMP_ANIM_FREQ, PLAYER_FALL_ANIM_FREQ);
+    player.rndr.setDrawScaledToHitbox(false);
 
     Alive wraith(
         RigidBody(playerSpawnPoint.add(Vector(0, -300)), WRAITH_HITBOX_WIDTH,
                   WRAITH_HITBOX_HEIGHT, false, WRAITH_MAX_SPEED),
-        Weapon(9, Rectangle(60, 60), 20), Tool(), mobAnimations,
+        Weapon(9, Rectangle(60, 60), 20), Tool(), surfaces.getMobAnimations(),
         WRAITH_WALK_ACCEL_RATE, WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN,
         WRAITH_ATTACK_COOLDOWN, WRAITH_MAX_HEALTH, WRAITH_IDLE_ANIM_FREQ,
         WRAITH_ATTACK1_ANIM_FREQ, WRAITH_HURT_ANIM_FREQ, WRAITH_DIE_ANIM_FREQ);
 
-    GameObject box(Renderer(boxSurfaceList),
+    GameObject box(Renderer(surfaces.getBoxSurfaces()),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT),
                    BOX_HEALTH);
 
@@ -292,17 +266,19 @@ int main(int argc, char* args[]) {
                 modeName.c_str(), realTime / 1000, fps, player.killCount);
         DrawString(screen,
                    static_cast<int>(screen->w / 2 - strlen(text) * 8 / 2), 10,
-                   text, charset);
+                   text, surfaces.getCharset());
 
         sprintf(text, "%d / %d", player.health, player.maxHealth);
-        DrawString(screen, 20, SCREEN_HEIGHT - 45, text, charset);
+        DrawString(screen, 20, SCREEN_HEIGHT - 45, text, surfaces.getCharset());
         for (int i = 0; i < player.health; i++) {
-            DrawSurface(screen, healthPoint, 20 + (healthPoint->w) * i,
+            DrawSurface(screen, surfaces.getHealthPoint(),
+                        20 + (surfaces.getHealthPoint()->w) * i,
                         SCREEN_HEIGHT - 20);
         }
 
         if (!player.isAlive()) {
-            DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y / 4);
+            DrawSurface(screen, surfaces.getYoudied(), screenMiddle.x,
+                        screenMiddle.y / 4);
 
             postDeath.start(realTime / 1000);
             if (postDeath.isUp(realTime / 1000)) {
@@ -321,7 +297,7 @@ int main(int argc, char* args[]) {
                     player.killCount);
             DrawString(screen,
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
-                       screenMiddle.y - 100, text, charset);
+                       screenMiddle.y - 100, text, surfaces.getCharset());
 
             // info
             DrawRectangle(screen, static_cast<int>(screenMiddle.x - 200),
@@ -331,7 +307,7 @@ int main(int argc, char* args[]) {
             sprintf(text, "Press escape to exit, press R to start another run");
             DrawString(screen,
                        static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
-                       screenMiddle.y - 50, text, charset);
+                       screenMiddle.y - 50, text, surfaces.getCharset());
 
             SDL_FlushEvent(SDL_KEYDOWN);
             SDL_Event event;
@@ -384,11 +360,11 @@ int main(int argc, char* args[]) {
                 DrawString(
                     screen,
                     static_cast<int>(screenMiddle.x - strlen(text) * 8 / 2),
-                    screenMiddle.y, text, charset);
+                    screenMiddle.y, text, surfaces.getCharset());
             }
         }
         if (player.mode != player.Mode::fightMode) {
-            DrawSurface(screen, cursor,
+            DrawSurface(screen, surfaces.getCursor(),
                         player.getPosition().x + player.actionCursor.x,
                         player.getPosition().y + player.actionCursor.y, camera);
         }
@@ -406,9 +382,7 @@ int main(int argc, char* args[]) {
         frames++;
     }
 
-    SDL_FreeSurface(charset);
-    SDL_FreeSurface(screen);
+    // surfaces.~Surfaces();
     SDL_Quit();
-
     return 0;
 }

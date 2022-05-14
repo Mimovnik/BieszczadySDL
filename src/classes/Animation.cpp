@@ -12,17 +12,6 @@ Animation::Animation(std::vector<SDL_Surface*> leftSurfaceList,
     changeSide('R');
 }
 
-void Animation::freeSurfaces() {
-    for (int i = 0; i < leftSurfaceList.size(); i++) {
-        SDL_FreeSurface(leftSurfaceList[i]);
-    }
-    leftSurfaceList.shrink_to_fit();
-    for (int i = 0; i < rightSurfaceList.size(); i++) {
-        SDL_FreeSurface(rightSurfaceList[i]);
-    }
-    rightSurfaceList.shrink_to_fit();
-}
-
 void Animation::changeSurface(double realTime) {
     if (nextSprite.isUp(realTime)) {
         nextSprite.start(realTime);

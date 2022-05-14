@@ -16,6 +16,9 @@ add_library(
     src/classes/Framework.h
     src/classes/Framework.cpp
 
+    src/classes/Surfaces.h
+    src/classes/Surfaces.cpp
+
     src/classes/GameObject.h
 
     src/classes/Renderer.h
