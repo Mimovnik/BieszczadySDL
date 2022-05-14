@@ -56,6 +56,10 @@ class Rectangle {
 
     Rectangle translate(Vector offset);
 
+    double area();
+    
+    double diagonal();
+
     double rightSide() { return position.x + width / 2; }
 
     double leftSide() { return position.x - width / 2; }

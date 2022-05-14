@@ -141,17 +141,12 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
         Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
 
-    Vector lastCursorPos = player->actionCursor;
-
+    // Limit range of placing and building
     player->actionCursor = mousePos.difference(player->getPosition());
 
-    Vector absoluteCursorPos = player->getPosition().add(player->actionCursor);
-
-    player->tool->hitArea.position = player->getPosition();
-    if (!player->tool->hitArea.contains(absoluteCursorPos)) {
-        player->actionCursor = lastCursorPos;
+    if(player->actionCursor.magnitude() > player->tool->hitArea.diagonal() / 2){
+        player->actionCursor = player->actionCursor.rescale(Vector::fromAngle(player->tool->hitArea.diagonal() / 2, 0));
     }
-    // Limit range of placing and building
 
     // If right button is pressed
     if ((buttons & SDL_BUTTON_RMASK) != 0) {

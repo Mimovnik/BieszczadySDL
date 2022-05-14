@@ -21,6 +21,10 @@ Rectangle Rectangle::translate(Vector offset) {
     return translated;
 }
 
+double Rectangle::area() { return width * height; }
+
+double Rectangle::diagonal() { return sqrt(width * width + height * height) ; }
+
 bool Rectangle::overlaps(Rectangle another) {
     double thisLeftSide = position.x - width / 2;
     double thisRightSide = position.x + width / 2;
