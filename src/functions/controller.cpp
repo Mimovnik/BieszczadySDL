@@ -43,6 +43,7 @@ void animationControl(Alive* entity, double realTime) {
 
 bool playerControl(Alive* player, double realTime, Alive* creature,
                    GameObject block, QuadTree* terrain) {
+    // Mode
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
@@ -64,6 +65,7 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
             }
         }
     }
+    // Movement
     SDL_PumpEvents();
     const Uint8* KeyState = SDL_GetKeyboardState(NULL);
     if (!player->isAlive()) {
@@ -80,67 +82,101 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
         player->walk('L');
     }
 
-    char direction;
-    player->actionCursor;
-    int cursorSpeed = 2;
+    // Action
 
-    bool directionKeysPressed =
-        KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J] ||
-        KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L] ||
-        KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K] ||
-        KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I];
+    // char direction;
+    // player->actionCursor;
+    // int cursorSpeed = 2;
 
-    player->tool->hitArea.position = player->getPosition();
+    // bool directionKeysPressed =
+    //     KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J] ||
+    //     KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L] ||
+    //     KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K] ||
+    //     KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I];
 
-    Vector lastCursorPos = player->actionCursor;
-    if (KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J]) {
-        direction = 'L';
-        player->actionCursor = player->actionCursor.addX(-cursorSpeed);
-    }
-    if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
-        direction = 'R';
-        player->actionCursor = player->actionCursor.addX(cursorSpeed);
-    }
-    if (KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K]) {
-        direction = 'D';
-        player->actionCursor = player->actionCursor.addY(cursorSpeed);
-    }
-    if (KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I]) {
-        direction = 'U';
-        player->actionCursor = player->actionCursor.addY(-cursorSpeed);
-    }
-    Vector absoluteCursorPos = player->getPosition().add(player->actionCursor);
-    if (!player->tool->hitArea.contains(absoluteCursorPos)) {
-        player->actionCursor = lastCursorPos;
-    }
+    // player->tool->hitArea.position = player->getPosition();
 
-    Vector blockPos(player->getPosition().add(player->actionCursor));
+    // Vector lastCursorPos = player->actionCursor;
+    // if (KeyState[SDL_SCANCODE_LEFT] || KeyState[SDL_SCANCODE_J]) {
+    //     direction = 'L';
+    //     player->actionCursor = player->actionCursor.addX(-cursorSpeed);
+    // }
+    // if (KeyState[SDL_SCANCODE_RIGHT] || KeyState[SDL_SCANCODE_L]) {
+    //     direction = 'R';
+    //     player->actionCursor = player->actionCursor.addX(cursorSpeed);
+    // }
+    // if (KeyState[SDL_SCANCODE_DOWN] || KeyState[SDL_SCANCODE_K]) {
+    //     direction = 'D';
+    //     player->actionCursor = player->actionCursor.addY(cursorSpeed);
+    // }
+    // if (KeyState[SDL_SCANCODE_UP] || KeyState[SDL_SCANCODE_I]) {
+    //     direction = 'U';
+    //     player->actionCursor = player->actionCursor.addY(-cursorSpeed);
+    // }
+    // Vector absoluteCursorPos =
+    // player->getPosition().add(player->actionCursor); if
+    // (!player->tool->hitArea.contains(absoluteCursorPos)) {
+    //     player->actionCursor = lastCursorPos;
+    // }
 
-    if (directionKeysPressed) {
-        switch (player->mode) {
-            case player->fightMode:
-                player->attack(creature, direction, realTime);
-                break;
-            case player->digMode:
-                player->dig(blockPos, terrain, realTime);
-                break;
-            case player->buildMode:
-                player->place(block, blockPos, terrain, realTime);
-                break;
-        }
-    }
+    // Vector blockPos(player->getPosition().add(player->actionCursor));
+
+    // if (directionKeysPressed) {
+    //     switch (player->mode) {
+    //         case player->fightMode:
+    //             player->attack(creature, direction, realTime);
+    //             break;
+    //         case player->digMode:
+    //             player->dig(blockPos, terrain, realTime);
+    //             break;
+    //         case player->buildMode:
+    //             player->place(block, blockPos, terrain, realTime);
+    //             break;
+    //     }
+    // }
+
     int mouseXRelToScreen, mouseYRelToScreen;
-    Uint32 buttons;
-    buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);
+    Uint32 buttons = SDL_GetMouseState(&mouseXRelToScreen, &mouseYRelToScreen);
     Vector mousePos = player->rb.hitbox.position.add(
         Vector(mouseXRelToScreen, mouseYRelToScreen)
             .difference(Vector(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)));
 
-    if ((buttons & SDL_BUTTON_RMASK) != 0) {
-        player->place(block, mousePos, terrain, realTime);
+    Vector lastCursorPos = player->actionCursor;
+
+    player->actionCursor = mousePos.difference(player->getPosition());
+
+    Vector absoluteCursorPos = player->getPosition().add(player->actionCursor);
+
+    player->tool->hitArea.position = player->getPosition();
+    if (!player->tool->hitArea.contains(absoluteCursorPos)) {
+        player->actionCursor = lastCursorPos;
     }
+    // Limit range of placing and building
+
+    // If right button is pressed
+    if ((buttons & SDL_BUTTON_RMASK) != 0) {
+        switch (player->mode) {
+            case player->fightMode:
+                player->attack(creature, 'R', realTime);
+                break;
+            case player->buildMode:
+            case player->digMode:
+                player->place(block, player->actionCursor.add(player->getPosition()), terrain, realTime);
+                break;
+        }
+    }
+
+    // If left button is pressed
     if ((buttons & SDL_BUTTON_LMASK) != 0) {
-        player->dig(mousePos, terrain, realTime);
+        switch (player->mode) {
+            case player->fightMode:
+                player->attack(creature, 'L', realTime);
+                break;
+            case player->buildMode:
+            case player->digMode:
+                player->dig(player->actionCursor.add(player->getPosition()), terrain, realTime);
+                break;
+        }
     }
 
     return true;

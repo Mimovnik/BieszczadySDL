@@ -2,6 +2,7 @@ Refactor of ALL CODE (it's garbage):
 -main is tooooooooo looooooooooong
 -screen should be member of Display class
 -almost every class have only public members and functions- need to privatize and protect some of them
+-using pointer where references are enough
 -physics are not right- mixing acceleration with force, reseting all forces every frame and reapplying them again
 -using realTime instead of gameTime in various places- need to consider changing it to gameTime
 Features:

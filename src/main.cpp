@@ -45,7 +45,7 @@ void calculateNearbyColliders(RigidBody* rb, QuadTree* terrain) {
     inRangeList.clear();
     inRangeList.shrink_to_fit();
 }
-//&realTime, &gameTime, &inRun, &player, &wraith
+
 void restartRun(double* realTime, double* gameTime, Timer* spawnMob,
                 Timer* onDeath, bool* inRun, Alive* player, Alive* mob) {
     *realTime = 0;
@@ -98,7 +98,6 @@ int main(int argc, char* args[]) {
     surfaces.load();
 
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    Vector center(CENTER_X, CENTER_Y);
 
     // World initialization
     srand(time(NULL));

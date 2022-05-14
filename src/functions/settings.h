@@ -6,8 +6,6 @@
 #define SCREEN_WIDTH 850
 #define SCREEN_HEIGHT 480
 
-#define CENTER_X 0
-#define CENTER_Y 0
 
 // ---WORLD GENERATION---
 
