@@ -1,8 +1,10 @@
--input kopania i stawiania blokow z klawiatury
--wypadanie bloków
--lepsze tekstury
--ekwipunek
-Błędy:
--kiedy jest za duze przyspieszenie lub za maly hitbox przekazywany zeby sprawdzic blocksInRange gracz wpada w hitbox bloku
--kiedy jest fullscreenMode to pozycja kursora jest zle liczona i gracz zapada sie w hitbox bloku
--ruszając okno gry mozna teleportowac gracza
+Refactor of ALL CODE (it's garbage):
+ -screen should be member of Display class
+Features:
+-Block item drops when destroyed
+-Equipment inventory
+Bugs:
+-physics are not right- mixing acceleration with force, reseting all forces every frame and reapplying them again
+-when acceleration is to big player sinks into terrain then blocks itself in it
+-when fullscreenMode is on the cursor is misplaced and player sinks into terrain
+-when moving a game window player sometimes teleports (only on Windows)

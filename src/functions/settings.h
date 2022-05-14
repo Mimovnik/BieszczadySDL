@@ -46,7 +46,14 @@
 #define PLAYER_JUMP_COOLDOWN 0.5
 #define PLAYER_ATTACK_COOLDOWN 0.7
 #define PLAYER_MAX_HEALTH 100
-
+// animations:
+#define PLAYER_IDLE_ANIM 4
+#define PLAYER_WALK_ANIM 6 
+#define PLAYER_JUMP_ANIM 4
+#define PLAYER_FALL_ANIM 2 
+#define PLAYER_ATTACK1_ANIM 5
+#define PLAYER_HURT_ANIM 3
+#define PLAYER_DIE_ANIM 7
 
 // ---WRAITH---
 #define WRAITH_HITBOX_WIDTH 64
@@ -57,8 +64,21 @@
 #define WRAITH_JUMP_COOLDOWN 1
 #define WRAITH_ATTACK_COOLDOWN 1
 #define WRAITH_MAX_HEALTH 50
+// animations:
+#define WRAITH_IDLE_ANIM 8
+#define WRAITH_WALK_ANIM 0 
+#define WRAITH_JUMP_ANIM 0
+#define WRAITH_FALL_ANIM 0 
+#define WRAITH_ATTACK1_ANIM 7
+#define WRAITH_HURT_ANIM 4
+#define WRAITH_DIE_ANIM 2
 
+// ---PHYSICS---
 #define FRICTION_FACTOR 7
 #define MIN_SPEED 0.3
+
+// GUI
+#define HP_WIDTH 2
+#define HP_HEIGHT 20
 
 #endif

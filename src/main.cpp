@@ -5,6 +5,8 @@
 #include <SDL2/SDL.h>
 #endif
 
+#include <time.h>
+
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -94,21 +96,24 @@ int main(int argc, char* args[]) {
     Vector screenMiddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Vector center(CENTER_X, CENTER_Y);
 
+    // load textures
     SDL_Surface* youdied = loadBMP("bmp/youdied.bmp");
 
     SDL_Surface* charset = loadBMP("bmp/cs8x8.bmp");
 
     std::vector<std::vector<SDL_Surface*>> playerAnimations =
-        loadSurfaces("bmp/player", 4, 6, 4, 2, 5, 3, 7, false);
+        loadSurfaces("bmp/player", PLAYER_IDLE_ANIM, PLAYER_WALK_ANIM,
+                     PLAYER_JUMP_ANIM, PLAYER_FALL_ANIM, PLAYER_ATTACK1_ANIM,
+                     PLAYER_HURT_ANIM, PLAYER_DIE_ANIM, false);
 
     std::vector<std::vector<SDL_Surface*>> mobAnimations =
-        loadSurfaces("bmp/flyingEye", 8, 0, 0, 0, 7, 4, 2, true);
+        loadSurfaces("bmp/flyingEye", WRAITH_IDLE_ANIM, WRAITH_WALK_ANIM,
+                     WRAITH_JUMP_ANIM, WRAITH_FALL_ANIM, WRAITH_ATTACK1_ANIM,
+                     WRAITH_HURT_ANIM, WRAITH_DIE_ANIM, true);
 
     SDL_Surface* redSquare = loadBMP("bmp/red.bmp");
-    const int healthPointW = 2;
-    const int healthPointH = 20;
     SDL_Surface* healthPoint =
-        SDL_CreateRGBSurface(0, healthPointW, healthPointH, 32, 0x00FF0000,
+        SDL_CreateRGBSurface(0, HP_WIDTH, HP_HEIGHT, 32, 0x00FF0000,
                              0x0000FF00, 0x000000FF, 0xFF000000);
     SDL_BlitScaled(redSquare, NULL, healthPoint, NULL);
     SDL_FreeSurface(redSquare);
@@ -118,10 +123,10 @@ int main(int argc, char* args[]) {
     std::vector<SDL_Surface*> boxSurfaceList;
     boxSurfaceList.push_back(loadBMP("bmp/box.bmp"));
 
-    // int worldWidth, int worldHeight, double noiseValue, double
-    // terrainFreq, double caveFreq, float heightMultiplier, float
-    // heightAddition, int dirtLayerHeight, unsigned int seed
-    int worldSeed = 2137;
+    // World initialization
+    srand(time(NULL));
+    int worldSeed = rand() % 10000;
+
     Terrain* world =
         new Terrain(WORLD_WIDTH, WORLD_HEIGHT, CAVE_HOLLOWNESS,
                     TERRAIN_RUGGEDNESS, CAVE_DENSITY, TERRAIN_STEEPNESS,
@@ -351,7 +356,8 @@ int main(int argc, char* args[]) {
                         delete world;
                         const int worldWidth = 600, worldHeight = 100,
                                   blockSize = 64;
-                        int worldSeed = rand() % 10000;
+                        srand(time(NULL));
+                        worldSeed = rand() % 10000;
                         world = new Terrain(worldWidth, worldHeight, 0.4, 0.05,
                                             0.08, 25, 25, 5, worldSeed);
                         world->generate(screen);

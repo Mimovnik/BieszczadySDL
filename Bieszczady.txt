@@ -1,6 +1,6 @@
-Ror2-like (rogulelike with different characters having different abilities, spawned mobs give a player coins to open chests)
+rogue-like (rogulelike with different characters having different abilities, spawned mobs give a player coins to open chests and xp to level him up)
 Witcher's World (Old Slavic)
 Terraria's view
 Crafting like in Dont Starve
 Destructable enviroment (requires tools)
-Multiple level objectives leading to different run paths (player can choose a certain objective)
+Multiple level objectives leading to different run paths (player can choose a certain objective/path)
