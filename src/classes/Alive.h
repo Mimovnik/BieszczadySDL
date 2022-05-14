@@ -43,10 +43,10 @@ class Alive : public GameObject {
     Alive(RigidBody rb, Weapon weapon, Tool tool,
           std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
           double jumpHeight, double jumpCooldown, double attackFrequency,
-          int maxHealth, double idleAnimSpeed, double attack1AnimSpeed,
-          double hurtingAnimSpeed, double dyingAnimSpeed,
-          double walkAnimSpeed = 0.2, double jumpAnimSpeed = 0.2,
-          double fallAnimSpeed = 0.2);
+          int maxHealth, double idleAnimFreq, double attack1AnimFreq,
+          double hurtingAnimFreq, double dyingAnimFreq,
+          double walkAnimFreq = 0.2, double jumpAnimFreq = 0.2,
+          double fallAnimFreq = 0.2);
 
     void place(GameObject block, Vector mousePos, QuadTree* terrain,
                double realTime);

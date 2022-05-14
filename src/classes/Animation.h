@@ -23,7 +23,7 @@ class Animation {
 
     Animation(std::vector<SDL_Surface*> leftSurfaceList,
               std::vector<SDL_Surface*> rightSurfaceList, char* name,
-              double animationSpeed);
+              double animationFrequency);
 
     void freeSurfaces();
 

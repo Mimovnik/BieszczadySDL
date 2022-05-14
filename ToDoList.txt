@@ -1,10 +1,11 @@
 Refactor of ALL CODE (it's garbage):
- -screen should be member of Display class
+-screen should be member of Display class
+-physics are not right- mixing acceleration with force, reseting all forces every frame and reapplying them again
+-using realTime instead of gameTime in various places- need to consider changing it to gameTime
 Features:
 -Block item drops when destroyed
 -Equipment inventory
 Bugs:
--physics are not right- mixing acceleration with force, reseting all forces every frame and reapplying them again
 -when acceleration is to big player sinks into terrain then blocks itself in it
 -when fullscreenMode is on the cursor is misplaced and player sinks into terrain
 -when moving a game window player sometimes teleports (only on Windows)

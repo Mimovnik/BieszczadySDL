@@ -102,19 +102,21 @@ int main(int argc, char* args[]) {
     SDL_Surface* charset = loadBMP("bmp/cs8x8.bmp");
 
     std::vector<std::vector<SDL_Surface*>> playerAnimations =
-        loadSurfaces("bmp/player", PLAYER_IDLE_ANIM, PLAYER_WALK_ANIM,
-                     PLAYER_JUMP_ANIM, PLAYER_FALL_ANIM, PLAYER_ATTACK1_ANIM,
-                     PLAYER_HURT_ANIM, PLAYER_DIE_ANIM, false);
+        loadSurfaces("bmp/player", PLAYER_IDLE_ANIM_FRAMES,
+                     PLAYER_WALK_ANIM_FRAMES, PLAYER_JUMP_ANIM_FRAMES,
+                     PLAYER_FALL_ANIM_FRAMES, PLAYER_ATTACK1_ANIM_FRAMES,
+                     PLAYER_HURT_ANIM_FRAMES, PLAYER_DIE_ANIM_FRAMES, false);
 
     std::vector<std::vector<SDL_Surface*>> mobAnimations =
-        loadSurfaces("bmp/flyingEye", WRAITH_IDLE_ANIM, WRAITH_WALK_ANIM,
-                     WRAITH_JUMP_ANIM, WRAITH_FALL_ANIM, WRAITH_ATTACK1_ANIM,
-                     WRAITH_HURT_ANIM, WRAITH_DIE_ANIM, true);
+        loadSurfaces("bmp/flyingEye", WRAITH_IDLE_ANIM_FRAMES,
+                     WRAITH_WALK_ANIM_FRAMES, WRAITH_JUMP_ANIM_FRAMES,
+                     WRAITH_FALL_ANIM_FRAMES, WRAITH_ATTACK1_ANIM_FRAMES,
+                     WRAITH_HURT_ANIM_FRAMES, WRAITH_DIE_ANIM_FRAMES, true);
 
     SDL_Surface* redSquare = loadBMP("bmp/red.bmp");
     SDL_Surface* healthPoint =
-        SDL_CreateRGBSurface(0, HP_WIDTH, HP_HEIGHT, 32, 0x00FF0000,
-                             0x0000FF00, 0x000000FF, 0xFF000000);
+        SDL_CreateRGBSurface(0, HP_WIDTH, HP_HEIGHT, 32, 0x00FF0000, 0x0000FF00,
+                             0x000000FF, 0xFF000000);
     SDL_BlitScaled(redSquare, NULL, healthPoint, NULL);
     SDL_FreeSurface(redSquare);
 
@@ -137,13 +139,15 @@ int main(int argc, char* args[]) {
     bool playerDrawScaledToHitbox = false;
     Vector playerSpawnPoint = world->spawnPoint;
 
-    Alive player(RigidBody(playerSpawnPoint, PLAYER_HITBOX_WIDTH,
-                           PLAYER_HITBOX_HEIGHT, true, PLAYER_MAX_SPEED),
-                 Weapon(10, Rectangle(54, 64), 500),
-                 Tool(5, 1, Rectangle(200, 200), 5), playerAnimations,
-                 PLAYER_WALK_ACCEL_RATE, PLAYER_JUMP_HEIGHT,
-                 PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN,
-                 PLAYER_MAX_HEALTH, 0.2, 0.08, 0.2, 0.3, 0.15, 0.15, 0.15);
+    Alive player(
+        RigidBody(playerSpawnPoint, PLAYER_HITBOX_WIDTH, PLAYER_HITBOX_HEIGHT,
+                  true, PLAYER_MAX_SPEED),
+        Weapon(10, Rectangle(54, 64), 500), Tool(5, 1, Rectangle(200, 200), 5),
+        playerAnimations, PLAYER_WALK_ACCEL_RATE, PLAYER_JUMP_HEIGHT,
+        PLAYER_JUMP_COOLDOWN, PLAYER_ATTACK_COOLDOWN, PLAYER_MAX_HEALTH,
+        PLAYER_IDLE_ANIM_FREQ, PLAYER_ATTACK1_ANIM_FREQ, PLAYER_HURT_ANIM_FREQ,
+        PLAYER_DIE_ANIM_FREQ, PLAYER_WALK_ANIM_FREQ, PLAYER_JUMP_ANIM_FREQ,
+        PLAYER_FALL_ANIM_FREQ);
     player.rndr.setDrawScaledToHitbox(playerDrawScaledToHitbox);
 
     Alive wraith(
@@ -151,7 +155,8 @@ int main(int argc, char* args[]) {
                   WRAITH_HITBOX_HEIGHT, false, WRAITH_MAX_SPEED),
         Weapon(9, Rectangle(60, 60), 20), Tool(), mobAnimations,
         WRAITH_WALK_ACCEL_RATE, WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN,
-        WRAITH_ATTACK_COOLDOWN, WRAITH_MAX_HEALTH, 0.02, 0.05, 0.1, 0.4);
+        WRAITH_ATTACK_COOLDOWN, WRAITH_MAX_HEALTH, WRAITH_IDLE_ANIM_FREQ,
+        WRAITH_ATTACK1_ANIM_FREQ, WRAITH_HURT_ANIM_FREQ, WRAITH_DIE_ANIM_FREQ);
 
     GameObject box(Renderer(boxSurfaceList),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT),
@@ -165,21 +170,23 @@ int main(int argc, char* args[]) {
     int skyblue = SDL_MapRGB(screen->format, 153, 240, 255);
     int brown = SDL_MapRGB(screen->format, 102, 51, 0);
 
-    int lastTime = 0, frames = 0;
-    int currentTime, delta;
+    int frames = 0;
     double fpsTimer = 0, fps = 0, realTime = 0, gameTime = 0, timeFactor = 0.01;
+    int currentTime, delta;
+    int lastTime = SDL_GetTicks();
     double runTime = 0;
     double gameDelta;
+
     bool inRun = true;
     bool quit = false;
-    lastTime = SDL_GetTicks();
+    bool wantQuit = false;
+
     Vector camera;
     Vector gravity(0, 10);
     Timer spawnMob;
     spawnMob.setCooldown(5);
-    Timer onDeath;
-    onDeath.setCooldown(5);
-    bool wantQuit = false;
+    Timer postDeath;
+    postDeath.setCooldown(5);
 
     // GAMELOOP
     while (!quit) {
@@ -239,18 +246,6 @@ int main(int argc, char* args[]) {
 
             if (player.getPosition().y > 0 || player.getPosition().x < 0 ||
                 player.getPosition().x > WORLD_WIDTH * BLOCK_WIDTH) {
-                // std::vector<GameObject> blockStrip =
-                //     world.terrain->queryRange(Rectangle(
-                //         100, worldHeight * BLOCK_HEIGHT,
-                //         player.getPosition().addY(worldHeight * BLOCK_HEIGHT
-                //         / 2)));
-                // double highestY = 0;
-                // for (int i = 0; i < blockStrip.size(); i++) {
-                //     if (blockStrip[i].getPosition().y < highestY) {
-                //         highestY = blockStrip[i].getPosition().y;
-                //     }
-                // }
-                // player.rb.hitbox.position.y = highestY - 3 * BLOCK_HEIGHT;
                 player.rb.hitbox.position = playerSpawnPoint;
             }
 
@@ -292,7 +287,7 @@ int main(int argc, char* args[]) {
                 break;
         }
         sprintf(text,
-                "Tryb: %s    Czas trwania: %.1lf s    %.0lf klatek / s    "
+                "Mode: %s    Run duration: %.1lf s    %.0lf fps    "
                 "Killcount: %d",
                 modeName.c_str(), realTime / 1000, fps, player.killCount);
         DrawString(screen,
@@ -309,8 +304,8 @@ int main(int argc, char* args[]) {
         if (!player.isAlive()) {
             DrawSurface(screen, youdied, screenMiddle.x, screenMiddle.y / 4);
 
-            onDeath.start(realTime / 1000);
-            if (onDeath.isUp(realTime / 1000)) {
+            postDeath.start(realTime / 1000);
+            if (postDeath.isUp(realTime / 1000)) {
                 inRun = false;
             }
         }
@@ -351,7 +346,7 @@ int main(int argc, char* args[]) {
                         wantQuit = true;
                     }
                     if (Keysym == SDLK_r) {
-                        restartRun(&realTime, &gameTime, &spawnMob, &onDeath,
+                        restartRun(&realTime, &gameTime, &spawnMob, &postDeath,
                                    &inRun, &player, &wraith);
                         delete world;
                         const int worldWidth = 600, worldHeight = 100,

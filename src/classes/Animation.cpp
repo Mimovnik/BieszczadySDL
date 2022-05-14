@@ -2,11 +2,11 @@
 
 Animation::Animation(std::vector<SDL_Surface*> leftSurfaceList,
                      std::vector<SDL_Surface*> rightSurfaceList, char* name,
-                     double animationSpeed) {
+                     double animationFrequency) {
     this->name = name;
     this->leftSurfaceList = leftSurfaceList;
     this->rightSurfaceList = rightSurfaceList;
-    this->nextSprite.setCooldown(animationSpeed);
+    this->nextSprite.setCooldown(animationFrequency);
     this->currentSurfaceIndex = 0;
     this->currentSurface = rightSurfaceList[currentSurfaceIndex];
     changeSide('R');

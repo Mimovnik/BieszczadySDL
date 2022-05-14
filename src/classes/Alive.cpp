@@ -9,9 +9,9 @@
 Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
              std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
              double jumpHeight, double jumpCooldown, double attackFrequency,
-             int maxHealth, double idleAnimSpeed, double attack1AnimSpeed,
-             double hurtingAnimSpeed, double dyingAnimSpeed,
-             double walkAnimSpeed, double jumpAnimSpeed, double fallAnimSpeed){
+             int maxHealth, double idleAnimFreq, double attack1AnimFreq,
+             double hurtingAnimFreq, double dyingAnimFreq,
+             double walkAnimFreq, double jumpAnimFreq, double fallAnimFreq){
     this->maxHealth = maxHealth;
     this->weapon = new Weapon(weapon);
     this->tool = new Tool(tool);
@@ -24,27 +24,27 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
     this->actionCursor = Vector::ZERO;
 
     if (!surfaces[0].empty() && !surfaces[1].empty())
-        idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimSpeed);
+        idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimFreq);
 
     if (!surfaces[2].empty() && !surfaces[3].empty())
-        walking = Animation(surfaces[2], surfaces[3], "walking", walkAnimSpeed);
+        walking = Animation(surfaces[2], surfaces[3], "walking", walkAnimFreq);
 
     if (!surfaces[4].empty() && !surfaces[5].empty())
-        jumping = Animation(surfaces[4], surfaces[5], "jumping", jumpAnimSpeed);
+        jumping = Animation(surfaces[4], surfaces[5], "jumping", jumpAnimFreq);
 
     if (!surfaces[6].empty() && !surfaces[7].empty())
-        falling = Animation(surfaces[6], surfaces[7], "falling", fallAnimSpeed);
+        falling = Animation(surfaces[6], surfaces[7], "falling", fallAnimFreq);
 
     if (!surfaces[8].empty() && !surfaces[9].empty())
         attacking1 =
-            Animation(surfaces[8], surfaces[9], "attack1", attack1AnimSpeed);
+            Animation(surfaces[8], surfaces[9], "attack1", attack1AnimFreq);
 
     if (!surfaces[10].empty() && !surfaces[11].empty())
         hurting =
-            Animation(surfaces[10], surfaces[11], "hurting", hurtingAnimSpeed);
+            Animation(surfaces[10], surfaces[11], "hurting", hurtingAnimFreq);
 
     if (!surfaces[12].empty() && !surfaces[13].empty())
-        dying = Animation(surfaces[12], surfaces[13], "dying", dyingAnimSpeed);
+        dying = Animation(surfaces[12], surfaces[13], "dying", dyingAnimFreq);
 
     if (!surfaces[14].empty())
         died = Animation(surfaces[14], surfaces[15], "died", 100);
