@@ -24,7 +24,7 @@ Animation* whichAnimation(Alive* entity) {
 
 void animationControl(Alive* entity, double realTime) {
     if (entity->isAlive()) {
-        if (!entity->attacking1.isRunning() && !entity->hurting.isRunning()) {
+        if (!entity->attacking1.isRunning() && !entity->attackingUp.isRunning() && !entity->hurting.isRunning()) {
             entity->startAnimation(whichAnimation(entity));
 
             if (entity->rb.velocity.x > 0) {
@@ -72,13 +72,21 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
         return true;
     }
 
-    if (KeyState[SDL_SCANCODE_W] || KeyState[SDL_SCANCODE_SPACE]) {
+    if(KeyState[SDL_SCANCODE_SPACE]) {
         player->jump(realTime);
     }
+    if (KeyState[SDL_SCANCODE_W]){
+        player->faceDirection = 'U';
+    } 
+    if (KeyState[SDL_SCANCODE_S]){
+        player->faceDirection = 'D';
+    } 
     if (KeyState[SDL_SCANCODE_D]) {
+        player->faceDirection = 'R';
         player->walk('R');
     }
     if (KeyState[SDL_SCANCODE_A]) {
+        player->faceDirection = 'L';
         player->walk('L');
     }
 
@@ -124,7 +132,7 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
     // if (directionKeysPressed) {
     //     switch (player->mode) {
     //         case player->fightMode:
-    //             player->attack(creature, direction, realTime);
+    //             player->attack1(creature, direction, realTime);
     //             break;
     //         case player->digMode:
     //             player->dig(blockPos, terrain, realTime);
@@ -152,7 +160,7 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
     if ((buttons & SDL_BUTTON_RMASK) != 0) {
         switch (player->mode) {
             case player->fightMode:
-                player->attack(creature, 'R', realTime);
+                player->attack1(creature, realTime);
                 break;
             case player->buildMode:
             case player->digMode:
@@ -165,7 +173,7 @@ bool playerControl(Alive* player, double realTime, Alive* creature,
     if ((buttons & SDL_BUTTON_LMASK) != 0) {
         switch (player->mode) {
             case player->fightMode:
-                player->attack(creature, 'L', realTime);
+                player->attack1(creature, realTime);
                 break;
             case player->buildMode:
             case player->digMode:

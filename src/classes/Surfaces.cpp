@@ -31,13 +31,13 @@ void Surfaces::load() {
     playerAnimations =
         loadSurfaces("bmp/player", PLAYER_IDLE_ANIM_FRAMES,
                      PLAYER_WALK_ANIM_FRAMES, PLAYER_JUMP_ANIM_FRAMES,
-                     PLAYER_FALL_ANIM_FRAMES, PLAYER_ATTACK1_ANIM_FRAMES,
+                     PLAYER_FALL_ANIM_FRAMES, PLAYER_ATTACK1_ANIM_FRAMES, PLAYER_ATTACKUP_ANIM_FRAMES,
                      PLAYER_HURT_ANIM_FRAMES, PLAYER_DIE_ANIM_FRAMES, false);
 
     mobAnimations =
         loadSurfaces("bmp/flyingEye", WRAITH_IDLE_ANIM_FRAMES,
                      WRAITH_WALK_ANIM_FRAMES, WRAITH_JUMP_ANIM_FRAMES,
-                     WRAITH_FALL_ANIM_FRAMES, WRAITH_ATTACK1_ANIM_FRAMES,
+                     WRAITH_FALL_ANIM_FRAMES, WRAITH_ATTACK1_ANIM_FRAMES, WRAITH_ATTACKUP_ANIM_FRAMES,
                      WRAITH_HURT_ANIM_FRAMES, WRAITH_DIE_ANIM_FRAMES, true);
 
     SDL_Surface* tempRedSquare = loadBMP("bmp/red.bmp");

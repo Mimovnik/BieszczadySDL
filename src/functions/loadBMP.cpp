@@ -55,7 +55,7 @@ SDL_Surface* createFlipH(SDL_Surface* surface) {
 
 std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     std::string folder, const int idleCount, const int walkCount,
-    const int jumpCount, const int fallCount, const int attack1Count,
+    const int jumpCount, const int fallCount, const int attack1Count, const int attackUpCount,
     const int hurtCount, const int dieCount, bool idleIsFly) {
     std::vector<std::vector<SDL_Surface*>> surfaces;
 
@@ -130,6 +130,17 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
         attack1Left.push_back(createFlipH(attack1Right[i]));
     }
 
+    std::vector<SDL_Surface*> attackUpRight;
+    for (int i = 0; i < attackUpCount; i++) {
+        attackUpRight.push_back(
+            loadBMP(folder + "/attackUp/attackUpp-" + std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> attackUpLeft;
+    for (int i = 0; i < attackUpRight.size(); i++) {
+        attackUpLeft.push_back(createFlipH(attackUpRight[i]));
+    }
+
     // HURT
 
     std::vector<SDL_Surface*> hurtRight;
@@ -177,12 +188,14 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     surfaces.push_back(fallRight);     // 7
     surfaces.push_back(attack1Left);   // 8
     surfaces.push_back(attack1Right);  // 9
-    surfaces.push_back(hurtLeft);      // 10
-    surfaces.push_back(hurtRight);     // 11
-    surfaces.push_back(dieLeft);       // 12
-    surfaces.push_back(dieRight);      // 13
-    surfaces.push_back(diedLeft);      // 14
-    surfaces.push_back(diedRight);    // 15
+    surfaces.push_back(attackUpLeft);  // 10
+    surfaces.push_back(attackUpRight); // 11
+    surfaces.push_back(hurtLeft);      // 12
+    surfaces.push_back(hurtRight);     // 13
+    surfaces.push_back(dieLeft);       // 14
+    surfaces.push_back(dieRight);      // 15
+    surfaces.push_back(diedLeft);      // 16
+    surfaces.push_back(diedRight);     // 17
 
     return surfaces;
 }

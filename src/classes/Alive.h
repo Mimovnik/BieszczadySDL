@@ -21,6 +21,7 @@ class Alive : public GameObject {
     double moveAccel;
     double jumpHeight;
     int killCount = 0;
+    char faceDirection;
 
     Vector actionCursor;
 
@@ -36,6 +37,7 @@ class Alive : public GameObject {
     Animation jumping;
     Animation falling;
     Animation attacking1;
+    Animation attackingUp;
     Animation hurting;
     Animation dying;
     Animation died;
@@ -43,7 +45,7 @@ class Alive : public GameObject {
     Alive(RigidBody rb, Weapon weapon, Tool tool,
           std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
           double jumpHeight, double jumpCooldown, double attackFrequency,
-          int maxHealth, double idleAnimFreq, double attack1AnimFreq,
+          int maxHealth, double idleAnimFreq, double attack1AnimFreq, double attackUpAnimFreq,
           double hurtingAnimFreq, double dyingAnimFreq,
           double walkAnimFreq = 0.2, double jumpAnimFreq = 0.2,
           double fallAnimFreq = 0.2);
@@ -59,8 +61,8 @@ class Alive : public GameObject {
 
     void flyTo(Vector position, double realTime);
 
-    void attack(Alive* creature, char direction, double realTime);
-
+    void attack1(Alive* creature, double realTime);
+    
     void startAnimation(Animation* animation);
 
     void die();

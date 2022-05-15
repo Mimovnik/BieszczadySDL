@@ -129,7 +129,8 @@ int main(int argc, char* args[]) {
         Weapon(9, Rectangle(60, 60), 20), Tool(), surfaces.getMobAnimations(),
         WRAITH_WALK_ACCEL_RATE, WRAITH_JUMP_HEIGHT, WRAITH_JUMP_COOLDOWN,
         WRAITH_ATTACK_COOLDOWN, WRAITH_MAX_HEALTH, WRAITH_IDLE_ANIM_FREQ,
-        WRAITH_ATTACK1_ANIM_FREQ, WRAITH_HURT_ANIM_FREQ, WRAITH_DIE_ANIM_FREQ);
+        WRAITH_ATTACK1_ANIM_FREQ, WRAITH_ATTACKUP_ANIM_FREQ,
+        WRAITH_HURT_ANIM_FREQ, WRAITH_DIE_ANIM_FREQ);
 
     GameObject box(Renderer(surfaces.getBoxSurfaces()),
                    RigidBody(Vector::ZERO, BLOCK_WIDTH, BLOCK_HEIGHT),
@@ -190,10 +191,11 @@ int main(int argc, char* args[]) {
                         .contains(player.getPosition())) {
                     // ATTACK
                     if (wraith.rb.velocity.x >= 0) {
-                        wraith.attack(&player, 'R', realTime / 1000);
+                        wraith.faceDirection = 'R';
                     } else {
-                        wraith.attack(&player, 'L', realTime / 1000);
+                        wraith.faceDirection = 'L';
                     }
+                    wraith.attack1(&player, realTime / 1000);
                 }
             } else {
                 spawnMob.start(realTime / 1000);

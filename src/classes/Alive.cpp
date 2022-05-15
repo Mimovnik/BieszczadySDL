@@ -10,8 +10,9 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
              std::vector<std::vector<SDL_Surface*>> surfaces, double moveAccel,
              double jumpHeight, double jumpCooldown, double attackFrequency,
              int maxHealth, double idleAnimFreq, double attack1AnimFreq,
-             double hurtingAnimFreq, double dyingAnimFreq,
-             double walkAnimFreq, double jumpAnimFreq, double fallAnimFreq){
+             double attackUpAnimFreq, double hurtingAnimFreq,
+             double dyingAnimFreq, double walkAnimFreq, double jumpAnimFreq,
+             double fallAnimFreq) {
     this->maxHealth = maxHealth;
     this->weapon = new Weapon(weapon);
     this->tool = new Tool(tool);
@@ -22,6 +23,7 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
     this->jumpTimer.setCooldown(jumpCooldown);
     this->alive = true;
     this->actionCursor = Vector::ZERO;
+    this->faceDirection = 'R';
 
     if (!surfaces[0].empty() && !surfaces[1].empty())
         idle = Animation(surfaces[0], surfaces[1], "idle", idleAnimFreq);
@@ -39,15 +41,20 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
         attacking1 =
             Animation(surfaces[8], surfaces[9], "attack1", attack1AnimFreq);
 
-    if (!surfaces[10].empty() && !surfaces[11].empty())
-        hurting =
-            Animation(surfaces[10], surfaces[11], "hurting", hurtingAnimFreq);
+    if (!surfaces[10].empty() && !surfaces[11].empty()) {
+        attackingUp =
+            Animation(surfaces[10], surfaces[11], "attackUp", attackUpAnimFreq);
+    }
 
     if (!surfaces[12].empty() && !surfaces[13].empty())
-        dying = Animation(surfaces[12], surfaces[13], "dying", dyingAnimFreq);
+        hurting =
+            Animation(surfaces[12], surfaces[13], "hurting", hurtingAnimFreq);
 
-    if (!surfaces[14].empty())
-        died = Animation(surfaces[14], surfaces[15], "died", 100);
+    if (!surfaces[14].empty() && !surfaces[15].empty())
+        dying = Animation(surfaces[14], surfaces[15], "dying", dyingAnimFreq);
+
+    if (!surfaces[16].empty())
+        died = Animation(surfaces[16], surfaces[17], "died", 100);
 
     rndr.active = &idle;
 
@@ -130,48 +137,52 @@ void Alive::walk(char direction) {
     delete[] othersHitboxes;
 }
 
-void Alive::attack(Alive* creature, char direction, double realTime) {
+void Alive::attack1(Alive* creature, double realTime) {
     if (attackFreq.isUp(realTime) && !hurting.isRunning()) {
         attackFreq.start(realTime);
 
         Vector weaponDir = rb.hitbox.position;
 
         if (!attacking1.rightSurfaceList.empty()) {
-            startAnimation(&attacking1);
+            if (faceDirection == 'U') {
+                startAnimation(&attackingUp);
+            } else {
+                startAnimation(&attacking1);
+            }
         }
 
-        if (direction == 'L') {
+        if (faceDirection == 'L') {
             weaponDir.x += -weapon->hitArea.width / 4;
             attacking1.changeSide('L');
-        }
-        if (direction == 'R') {
+        } else if (faceDirection == 'R') {
             weaponDir.x += weapon->hitArea.width / 4;
             attacking1.changeSide('R');
-        }
-        if (direction == 'D') {
+        } else if (faceDirection == 'D') {
             weaponDir.y += weapon->hitArea.height / 4;
-        }
-        if (direction == 'U') {
+        } else if (faceDirection == 'U') {
             weaponDir.y += -weapon->hitArea.height / 4;
+        } else {
+            throw "There is no such direction of attack";
         }
         weapon->hitArea.position = weaponDir;
+        Vector knockback;
+        if (faceDirection == 'L') {
+            knockback = Vector(-weapon->knockback, 0);
+            creature->hurting.changeSide('R');
+        } else if (faceDirection == 'R') {
+            knockback = Vector(weapon->knockback, 0);
+            creature->hurting.changeSide('L');
+        } else if (faceDirection == 'D') {
+            knockback = Vector(0, weapon->knockback);
+        } else if (faceDirection == 'U') {
+            knockback = Vector(0, -weapon->knockback);
+        }
+        rb.velocity -= knockback.rescale(0.03);
         if (weapon->hitArea.overlaps(creature->rb.hitbox)) {
             if (creature->isAlive())
                 creature->startAnimation(&creature->hurting);
             creature->health -= weapon->damage;
 
-            Vector knockback;
-            if (direction == 'L') {
-                knockback = Vector(-weapon->knockback, 0);
-                creature->hurting.changeSide('R');
-            } else if (direction == 'R') {
-                knockback = Vector(weapon->knockback, 0);
-                creature->hurting.changeSide('L');
-            } else if (direction == 'D') {
-                knockback = Vector(0, weapon->knockback);
-            } else if (direction == 'U') {
-                knockback = Vector(0, -weapon->knockback);
-            }
             creature->rb.velocity += knockback;
         }
         if (creature->health <= 0 && creature->isAlive()) {
