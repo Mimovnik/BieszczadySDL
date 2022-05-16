@@ -24,7 +24,7 @@ Animation* whichAnimation(Alive* entity) {
 
 void animationControl(Alive* entity, double realTime) {
     if (entity->isAlive()) {
-        if (!entity->attacking1.isRunning() && !entity->attackingUp.isRunning() && !entity->hurting.isRunning()) {
+        if (!entity->attacking1.isRunning() && !entity->attackingUp.isRunning() && !entity->attackingDown.isRunning() && !entity->hurting.isRunning()) {
             entity->startAnimation(whichAnimation(entity));
 
             if (entity->rb.velocity.x > 0) {

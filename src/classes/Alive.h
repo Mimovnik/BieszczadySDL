@@ -38,6 +38,7 @@ class Alive : public GameObject {
     Animation falling;
     Animation attacking1;
     Animation attackingUp;
+    Animation attackingDown;
     Animation hurting;
     Animation dying;
     Animation died;

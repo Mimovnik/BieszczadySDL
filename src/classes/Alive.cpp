@@ -47,14 +47,18 @@ Alive::Alive(RigidBody rb, Weapon weapon, Tool tool,
     }
 
     if (!surfaces[12].empty() && !surfaces[13].empty())
-        hurting =
-            Animation(surfaces[12], surfaces[13], "hurting", hurtingAnimFreq);
+        attackingDown = Animation(surfaces[12], surfaces[13], "attackDown",
+                                  attack1AnimFreq);
 
     if (!surfaces[14].empty() && !surfaces[15].empty())
-        dying = Animation(surfaces[14], surfaces[15], "dying", dyingAnimFreq);
+        hurting =
+            Animation(surfaces[14], surfaces[15], "hurting", hurtingAnimFreq);
 
-    if (!surfaces[16].empty())
-        died = Animation(surfaces[16], surfaces[17], "died", 100);
+    if (!surfaces[16].empty() && !surfaces[17].empty())
+        dying = Animation(surfaces[16], surfaces[17], "dying", dyingAnimFreq);
+
+    if (!surfaces[18].empty())
+        died = Animation(surfaces[18], surfaces[19], "died", 100);
 
     rndr.active = &idle;
 
@@ -146,6 +150,8 @@ void Alive::attack1(Alive* creature, double realTime) {
         if (!attacking1.rightSurfaceList.empty()) {
             if (faceDirection == 'U') {
                 startAnimation(&attackingUp);
+            } else if (faceDirection == 'D') {
+                startAnimation(&attackingDown);
             } else {
                 startAnimation(&attacking1);
             }

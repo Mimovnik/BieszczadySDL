@@ -55,8 +55,9 @@ SDL_Surface* createFlipH(SDL_Surface* surface) {
 
 std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     std::string folder, const int idleCount, const int walkCount,
-    const int jumpCount, const int fallCount, const int attack1Count, const int attackUpCount,
-    const int hurtCount, const int dieCount, bool idleIsFly) {
+    const int jumpCount, const int fallCount, const int attack1Count,
+    const int attackUpCount, const int attackDownCount, const int hurtCount,
+    const int dieCount, bool idleIsFly) {
     std::vector<std::vector<SDL_Surface*>> surfaces;
 
     // IDLE OR FLY
@@ -132,8 +133,8 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
 
     std::vector<SDL_Surface*> attackUpRight;
     for (int i = 0; i < attackUpCount; i++) {
-        attackUpRight.push_back(
-            loadBMP(folder + "/attackUp/attackUpp-" + std::to_string(i) + ".bmp"));
+        attackUpRight.push_back(loadBMP(folder + "/attackUp/attackUp-" +
+                                        std::to_string(i) + ".bmp"));
     }
 
     std::vector<SDL_Surface*> attackUpLeft;
@@ -141,6 +142,16 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
         attackUpLeft.push_back(createFlipH(attackUpRight[i]));
     }
 
+    std::vector<SDL_Surface*> attackDownRight;
+    for (int i = 0; i < attackDownCount; i++) {
+        attackDownRight.push_back(loadBMP(folder + "/attackDown/attackDown-" +
+                                          std::to_string(i) + ".bmp"));
+    }
+
+    std::vector<SDL_Surface*> attackDownLeft;
+    for (int i = 0; i < attackDownRight.size(); i++) {
+        attackDownLeft.push_back(createFlipH(attackDownRight[i]));
+    }
     // HURT
 
     std::vector<SDL_Surface*> hurtRight;
@@ -176,26 +187,28 @@ std::vector<std::vector<SDL_Surface*>> loadSurfaces(
     for (int i = 0; i < diedRight.size(); i++) {
         diedLeft.push_back(createFlipH(diedRight[i]));
     }
-        
+
     // ADD TO GENERAL LIST
-    surfaces.push_back(idleLeft);      // 0
-    surfaces.push_back(idleRight);     // 1
-    surfaces.push_back(walkLeft);      // 2
-    surfaces.push_back(walkRight);     // 3
-    surfaces.push_back(jumpLeft);      // 4
-    surfaces.push_back(jumpRight);     // 5
-    surfaces.push_back(fallLeft);      // 6
-    surfaces.push_back(fallRight);     // 7
-    surfaces.push_back(attack1Left);   // 8
-    surfaces.push_back(attack1Right);  // 9
-    surfaces.push_back(attackUpLeft);  // 10
-    surfaces.push_back(attackUpRight); // 11
-    surfaces.push_back(hurtLeft);      // 12
-    surfaces.push_back(hurtRight);     // 13
-    surfaces.push_back(dieLeft);       // 14
-    surfaces.push_back(dieRight);      // 15
-    surfaces.push_back(diedLeft);      // 16
-    surfaces.push_back(diedRight);     // 17
+    surfaces.push_back(idleLeft);       // 0
+    surfaces.push_back(idleRight);      // 1
+    surfaces.push_back(walkLeft);       // 2
+    surfaces.push_back(walkRight);      // 3
+    surfaces.push_back(jumpLeft);       // 4
+    surfaces.push_back(jumpRight);      // 5
+    surfaces.push_back(fallLeft);       // 6
+    surfaces.push_back(fallRight);      // 7
+    surfaces.push_back(attack1Left);    // 8
+    surfaces.push_back(attack1Right);   // 9
+    surfaces.push_back(attackUpLeft);   // 10
+    surfaces.push_back(attackUpRight);  // 11
+    surfaces.push_back(attackDownLeft); // 12
+    surfaces.push_back(attackDownRight);// 13
+    surfaces.push_back(hurtLeft);       // 14
+    surfaces.push_back(hurtRight);      // 15
+    surfaces.push_back(dieLeft);        // 16
+    surfaces.push_back(dieRight);       // 17
+    surfaces.push_back(diedLeft);       // 18
+    surfaces.push_back(diedRight);      // 19
 
     return surfaces;
 }
